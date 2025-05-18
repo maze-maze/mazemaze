@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 export default function MainLayout({
   children,
 }: Readonly<{
@@ -5,7 +7,9 @@ export default function MainLayout({
 }>) {
   return (
     <div className="p-10">
-      {children}
+      <Suspense fallback={<div>Loading...</div>}>
+        {children}
+      </Suspense>
     </div>
   )
 }
