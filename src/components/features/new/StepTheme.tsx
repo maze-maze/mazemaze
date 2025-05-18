@@ -1,4 +1,6 @@
 'use client'
+import { Button } from '🎙️/components/ui/button'
+import { Input } from '🎙️/components/ui/input'
 import {
   CheckCircle2,
   ChevronRight,
@@ -7,9 +9,7 @@ import {
   RefreshCw,
   Search,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
+import { useEffect, useState } from 'react'
 
 export default function ThemeSelector({
   onSelect,

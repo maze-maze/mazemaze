@@ -1,17 +1,16 @@
 'use client'
+import { Button } from '🎙️/components/ui/button'
+import { Input } from '🎙️/components/ui/input'
 import { useChat } from 'ai/react'
 import {
   ArrowLeft,
   ArrowLeftCircle,
-  CheckCircle2,
   ChevronRight,
   Loader2,
   UserCircle2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
 
 export default function CharacterSelector({
   theme,
@@ -92,7 +91,7 @@ export default function CharacterSelector({
           tone: string
         }> = []
 
-        let content = message.content
+        const content = message.content
         while ((match = personalityRegex.exec(content)) !== null) {
           if (match.length >= 4) {
             extractedSuggestions.push({

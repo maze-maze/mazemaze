@@ -97,19 +97,19 @@ function extractPersonalitiesFromText(
   const tonePattern = /トーン[:：]?\s*([^\n]+(?:\n(?!\S+[:：])[^\n]+)*)/g
 
   let nameMatch
-  let names = []
+  const names = []
   while ((nameMatch = namePattern.exec(text)) !== null) {
     names.push(nameMatch[1].trim())
   }
 
   let descMatch
-  let descriptions = []
+  const descriptions = []
   while ((descMatch = descPattern.exec(text)) !== null) {
     descriptions.push(descMatch[1].trim())
   }
 
   let toneMatch
-  let tones = []
+  const tones = []
   while ((toneMatch = tonePattern.exec(text)) !== null) {
     tones.push(toneMatch[1].trim())
   }
