@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '🎙️/components/ui/button'
 import {
   ArrowRight,
   FileText,
@@ -15,7 +16,6 @@ import CharacterSelector from './StepCharacter'
 import ScriptGenerator from './StepScript'
 import StructureSelector from './StepStructure'
 import ThemeSelector from './StepTheme'
-import { Button } from '🎙️/components/ui/button'
 
 export default function NewTmp() {
   const [name, setName] = useQueryState('s')

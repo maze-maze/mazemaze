@@ -1,4 +1,6 @@
 'use client'
+import { Button } from '🎙️/components/ui/button'
+import { Input } from '🎙️/components/ui/input'
 import { useChat } from 'ai/react'
 import {
   ArrowLeft,
@@ -12,8 +14,6 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
 
 export default function ScriptGenerator({
   theme,
