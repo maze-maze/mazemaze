@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
+import { Providers } from '🎙️/components/providers'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { NuqsAdapter } from 'nuqs/adapters/next'
 import './globals.css'
 
 const geistSans = Geist({
@@ -28,9 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>
+        <Providers>
           {children}
-        </NuqsAdapter>
+        </Providers>
       </body>
     </html>
   )
