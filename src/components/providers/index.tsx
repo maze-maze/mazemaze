@@ -1,4 +1,3 @@
-// src/app/Providers.tsx
 'use client'
 
 import { LocationStateProvider } from '@location-state/core'
