@@ -1,14 +1,20 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
+import Link from 'next/link'
 import { useQueryState } from 'nuqs'
-import { Button } from '~/components/ui/button';
+import { Button } from '~/components/ui/button'
 
 export default function NewTmp() {
   const [name, setName] = useQueryState('s')
 
   return (
     <div>
+      {name && (
+        <div className="mt-4">
+          Step
+          {name}
+        </div>
+      )}
       <Button
         onClick={() => {
           setName('1')
@@ -38,7 +44,7 @@ export default function NewTmp() {
         Step 4
       </Button>
       <br />
-      <Link href='/new/recording'>
+      <Link href="/new/recording">
         録音
       </Link>
     </div>
