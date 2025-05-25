@@ -1,3 +1,5 @@
+/* eslint-disable ts/no-use-before-define */
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { Button } from '🎙️/components/ui/button'

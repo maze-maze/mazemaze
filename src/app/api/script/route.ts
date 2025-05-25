@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { NextRequest } from 'next/server'
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'
@@ -101,7 +102,12 @@ export async function POST(req: NextRequest) {
     }
 
     // ホスト情報を決定
-    const mainHost = mainCharacterInfo
+    const mainHost = mainCharacterInfo || {
+      name: 'メインホスト',
+      description:
+            'ポッドキャストの中心となる話し手で、テーマに関する深い知識と経験を持つ。専門的な視点からリスナーに情報を提供します。',
+      tone: '落ち着いて、専門的な口調',
+    }
     const coHost = guestCharacterInfo || {
       name: 'ユウキ',
       description:

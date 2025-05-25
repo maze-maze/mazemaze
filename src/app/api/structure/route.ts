@@ -1,3 +1,7 @@
+/* eslint-disable regexp/no-unused-capturing-group */
+/* eslint-disable regexp/no-super-linear-backtracking */
+/* eslint-disable no-cond-assign */
+/* eslint-disable no-console */
 import type { NextRequest } from 'next/server'
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'

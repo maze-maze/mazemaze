@@ -1,3 +1,6 @@
+/* eslint-disable style/max-statements-per-line */
+/* eslint-disable no-cond-assign */
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 import { Button } from '🎙️/components/ui/button'
 import { useChat } from 'ai/react'

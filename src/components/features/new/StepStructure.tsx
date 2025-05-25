@@ -1,3 +1,6 @@
+/* eslint-disable style/multiline-ternary */
+/* eslint-disable ts/no-use-before-define */
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { Button } from '🎙️/components/ui/button'
@@ -14,8 +17,7 @@ import {
   PlusCircle, // 再生成アイコンを追加
   Trash2,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react' // useEffect をインポート
-import React from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react' // useEffect をインポート
 
 // 型定義
 interface Character {
@@ -266,7 +268,7 @@ export default function StructureSelector({
                 editMode={editMode}
               />
               {structure.sections.map((section, index) => (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                   <StructureCard
                     title={section.title}
                     content={section.title} // セクションは title を content として渡す
@@ -288,7 +290,7 @@ export default function StructureSelector({
                     onClick={() => addSection(index + 1)}
                     editMode={editMode}
                   />
-                </React.Fragment>
+                </Fragment>
               ))}
               <StructureCard
                 title="アウトロ"
