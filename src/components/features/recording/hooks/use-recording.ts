@@ -27,6 +27,7 @@ interface UseWebRTCAudioSessionReturn {
 
 export default function useWebRTCAudioSession(
   voice: string,
+  prompt: string,
 ): UseWebRTCAudioSessionReturn {
   const [status, setStatus] = useState<Status>('idle')
   const [isSessionActive, setIsSessionActive] = useState(false)
@@ -185,7 +186,6 @@ export default function useWebRTCAudioSession(
          */
         case 'input_audio_buffer.speech_stopped': {
           // オプション: "stopped"に設定するか、単に"speaking"のままにしておくこともできます
-          setStatus('recording')
           updateEphemeralUserMessage({ status: 'speaking' })
           break
         }
@@ -609,7 +609,7 @@ export default function useWebRTCAudioSession(
         setConversation([{
           id: generateUniqueId(),
           role: 'system',
-          text: 'セッションが開始されました。カウントダウン後に録音を開始します。',
+          text: 'カウントダウン後に録音を開始します。',
           timestamp: new Date().toISOString(),
           isFinal: true,
         }])
@@ -626,7 +626,7 @@ export default function useWebRTCAudioSession(
       // SDPオファーをOpenAI Realtimeに送信
       const baseUrl = 'https://api.openai.com/v1/realtime'
       const model = 'gpt-4o-realtime-preview-2024-12-17'
-      const response = await fetch(`${baseUrl}?model=${model}&voice=${voice}`, {
+      const response = await fetch(`${baseUrl}?model=${model}&voice=${voice}&instructions=${prompt}`, {
         method: 'POST',
         body: offer.sdp,
         headers: {

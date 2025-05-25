@@ -6,14 +6,24 @@ import Background from './background'
 import Character from './character'
 import Controller from './controller'
 import Countdown from './countdown'
-import { useRecordingScripts } from './hooks/use-recoding-scripts'
 import useWebRTCAudioSession from './hooks/use-recording'
+import { useRecordingScripts } from './hooks/use-recording-scripts'
 import Scripts from './scripts'
 import Title from './title'
 
 export default function RecordingPage() {
-  const { title, character, script } = useRecordingScripts()
+  const { title, character, script, userName, guest } = useRecordingScripts()
   const [voice] = useState('ash')
+  const [prompt] = useState(`これからポッドキャストを収録します。
+
+    あなたはポッドキャストのゲストでメインパーソナリティの${userName}と共にポッドキャストを収録します。
+    あなたの人格は以下の通りです。
+    ゲスト：${guest}
+
+    そして、以下の台本に沿って収録を行うので、あなたのセリフを話してください。
+    タイトル: ${title}
+    台本: ${script}
+    `)
 
   const {
     status,
@@ -23,7 +33,7 @@ export default function RecordingPage() {
     playRecording,
     recordingDuration,
     countdown,
-  } = useWebRTCAudioSession(voice)
+  } = useWebRTCAudioSession(voice, prompt)
   const isRecording = status !== 'idle' && status !== 'connecting' && !countdown
   const isFinished = status === 'finish' || status === 'disconnected'
 
