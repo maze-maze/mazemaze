@@ -84,6 +84,7 @@ export default function useWebRTCAudioSession(
       type: 'session.update',
       session: {
         modalities: ['audio', 'text'],
+        instructions: prompt, // プロンプトをシステム指示として設定
         input_audio_transcription: {
           model: 'whisper-1',
         },
@@ -626,7 +627,7 @@ export default function useWebRTCAudioSession(
       // SDPオファーをOpenAI Realtimeに送信
       const baseUrl = 'https://api.openai.com/v1/realtime'
       const model = 'gpt-4o-realtime-preview-2024-12-17'
-      const response = await fetch(`${baseUrl}?model=${model}&voice=${voice}&instructions=${prompt}`, {
+      const response = await fetch(`${baseUrl}?model=${model}&voice=${voice}`, {
         method: 'POST',
         body: offer.sdp,
         headers: {

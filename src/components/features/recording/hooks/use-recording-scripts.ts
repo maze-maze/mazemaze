@@ -7,13 +7,19 @@ export function useRecordingScripts() {
     character: string
     script: string
     userName?: string
-    guest: string
+    guest: {
+      name: string
+      description: string
+    }
   }>({
     title: '',
     character: '',
     script: '',
     userName: '',
-    guest: '',
+    guest: {
+      name: '',
+      description: '',
+    },
   })
 
   useEffect(() => {
@@ -27,7 +33,10 @@ export function useRecordingScripts() {
       character: 'character',
       script,
       userName: JSON.parse(mainCharacter).name,
-      guest: JSON.parse(guestCharacter),
+      guest: {
+        name: JSON.parse(guestCharacter).name,
+        description: JSON.parse(guestCharacter).description,
+      },
     })
   }, [])
 

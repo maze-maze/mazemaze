@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '🎙️/components/ui/button'
+import { StorageKeys } from '🎙️/lib/storage-keys'
 import { useState } from 'react'
 import Background from './background'
 import Character from './character'
@@ -12,17 +13,27 @@ import Scripts from './scripts'
 import Title from './title'
 
 export default function RecordingPage() {
-  const { title, character, script, userName, guest } = useRecordingScripts()
+  const { title, character, script } = useRecordingScripts()
   const [voice] = useState('ash')
-  const [prompt] = useState(`これからポッドキャストを収録します。
+  const [prompt] = useState(`
+    ## 概要
+    これから${JSON.parse(window.sessionStorage.getItem(StorageKeys.THEME)!).theme}というタイトルのポッドキャストを収録します。
 
-    あなたはポッドキャストのゲストでメインパーソナリティの${userName}と共にポッドキャストを収録します。
-    あなたの人格は以下の通りです。
-    ゲスト：${guest}
+    ## ルール
+    これから説明する、「役割」と「収録内容」に沿うことが重要です。絶対にこのルールに従ってください。
 
-    そして、以下の台本に沿って収録を行うので、あなたのセリフを話してください。
-    タイトル: ${title}
-    台本: ${script}
+    ## 役割
+    あなたはポッドキャストのゲスト（${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).name}）です。
+    メインパーソナリティの${JSON.parse(window.sessionStorage.getItem(StorageKeys.MAIN)!).name}と共にポッドキャストを収録します。
+
+    あなたの名前と詳細は以下の通りです。この人物像になりきって話を進めてください。
+    名前：${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).name}
+    詳細：${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).description}
+
+    ## 収録内容
+    そして、以下の台本に沿って収録を行います。絶対にこの台本に沿って話を進めてください。
+    タイトル: ${JSON.parse(window.sessionStorage.getItem(StorageKeys.THEME)!).theme}
+    台本: ${JSON.parse(window.sessionStorage.getItem(StorageKeys.SCRIPT)!)}
     `)
 
   const {
