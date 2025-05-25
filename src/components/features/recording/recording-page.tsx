@@ -13,6 +13,9 @@ import Scripts from './scripts'
 import Title from './title'
 
 export default function RecordingPage() {
+  if (typeof window === 'undefined')
+    return null
+
   const { title, character, script } = useRecordingScripts()
   const [voice] = useState('ash')
   const [prompt] = useState(`
