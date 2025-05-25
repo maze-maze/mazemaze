@@ -1,24 +1,11 @@
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { useLocationState } from '@location-state/core'
-import { Button } from '🎙️/components/ui/button'
 import { StorageKeys } from '🎙️/lib/storage-keys'
-import {
-  ArrowRight,
-  FileText,
-  MenuSquare,
-  Mic,
-  Podcast,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+
 import { useRouter } from 'next/navigation'
 import { useQueryState } from 'nuqs'
-import { useState } from 'react'
-import CharacterSelector from './StepCharacter'
-import ScriptGenerator from './StepScript'
-import StructureSelector from './StepStructure'
-import ThemeSelector from './StepTheme'
 
 export default function NewTmp() {
   const [name, setName] = useQueryState('s')

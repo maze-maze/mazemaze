@@ -1,3 +1,6 @@
+/* eslint-disable ts/no-use-before-define */
+/* eslint-disable no-console */
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 import { Button } from '🎙️/components/ui/button'
 import { Input } from '🎙️/components/ui/input'

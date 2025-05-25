@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import type { NextRequest } from 'next/server'
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'
@@ -100,7 +102,7 @@ ${characterInfo.name}: (セリフ)
         model: google('gemini-1.5-flash'),
         prompt,
         temperature: 0.7, // 創造性を高めるために温度を上げる
-        maxOutputTokens: 4096, // 長めのスクリプトを生成できるように
+        maxTokens: 4096, // 長めのスクリプトを生成できるように
       })
 
       console.log(

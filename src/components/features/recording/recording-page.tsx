@@ -1,6 +1,5 @@
 'use client'
 
-import type { Status } from '🎙️/lib/types/recording'
 import { Button } from '🎙️/components/ui/button'
 import { useState } from 'react'
 import Background from './background'

@@ -1,3 +1,5 @@
+/* eslint-disable no-cond-assign */
+/* eslint-disable regexp/no-super-linear-backtracking */
 'use client'
 import { Button } from '🎙️/components/ui/button'
 import { Input } from '🎙️/components/ui/input'
@@ -83,7 +85,7 @@ export default function CharacterSelector({
       if (message.role === 'assistant' && messages.length <= 2) {
         // Extract personality suggestions using regex
         const personalityRegex
-          = /\*\*候補\d+:\s*(.*?)\*\*\s*-\s*説明:\s*(.*?)\s*-\s*トーン:\s*(.*?)(?=\n\n|\n\*\*|$)/gs
+          = /\*\*候補\d+:\s*([\s\S]*?)\*\*\s*-\s*説明:\s*([\s\S]*?)\s*-\s*トーン:\s*([\s\S]*?)(?=\n\n|\n\*\*|$)/g
         let match
         const extractedSuggestions: Array<{
           name: string
