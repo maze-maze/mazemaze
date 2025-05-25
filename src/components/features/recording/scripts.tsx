@@ -7,8 +7,8 @@ export default function Scripts({ script, conversation }: { script: string, conv
     <Accordion type="multiple" defaultValue={['item-1', 'item-2']} className="bg-background/20 backdrop-blur-lg border-t absolute bottom-30 left-2 right-2">
       <AccordionItem value="item-1">
         <AccordionTrigger>台本</AccordionTrigger>
-        <AccordionContent className="overflow-y-auto max-h-96">
-          {script}
+        <AccordionContent className="overflow-y-auto max-h-96 whitespace-pre-wrap">
+          {JSON.parse(script)}
         </AccordionContent>
       </AccordionItem>
       {/* <AccordionItem value="item-2">

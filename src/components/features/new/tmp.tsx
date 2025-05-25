@@ -1,8 +1,10 @@
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable unused-imports/no-unused-imports */
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 'use client'
 
-import { Button } from '🎙️/components/ui/button'
+import { Button, buttonVariants } from '🎙️/components/ui/button'
 // import { useLocationState, jsonSerializer } from "@location-state/core"; // 不要になるので削除
 import { StorageKeys } from '🎙️/lib/storage-keys'
 import {
@@ -15,6 +17,7 @@ import {
   User,
   Users,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import React, { useEffect, useState } from 'react' // useState, useEffect をインポート
 import GuestCharacterSelector from './StepGuestCharacter'
@@ -212,19 +215,16 @@ function CompletePage({
           </div>
         </InfoCard>
         <div className="mt-12 flex justify-center gap-4">
-          <Button onClick={onRestart} size="lg" variant="default">
-            <Podcast className="mr-2" />
+          <Button onClick={onRestart} size="lg" variant="secondary">
             もう一度生成する
           </Button>
-          <Button
-            onClick={handleCheckSessionStorage}
-            size="lg"
-            variant="outline"
-            className="text-black"
+          <a
+            href="/new/recording"
+            className={buttonVariants({ size: 'lg', variant: 'default' })}
           >
-            <Save className="mr-2" />
-            セッション保存確認
-          </Button>
+            <Podcast className="mr-2" />
+            録音する
+          </a>
         </div>
       </div>
     </div>
