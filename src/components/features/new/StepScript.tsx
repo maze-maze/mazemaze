@@ -1,459 +1,316 @@
 'use client'
+
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input'
-import { useChat } from 'ai/react'
+import { Input } from '🎙️/components/ui/input' // Inputは現在使われていませんが、将来のために残すことも可能です
 import {
   ArrowLeft,
+  CheckIcon,
   ChevronRight,
-  Copy,
-  FileText,
   Loader2,
+  MenuSquare,
+  PenIcon,
   RefreshCw,
-  User,
-  Users,
+  FileText, // イントロ/アウトロ用アイコン
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+
+// 型定義
+interface Character {
+  name: string
+  description: string
+  tone: string
+}
+
+interface Structure {
+  intro: string
+  sections: { title: string; description: string }[]
+  outro: string
+}
+
+interface ScriptSections {
+  intro: string
+  sections: { title: string; content: string }[]
+  outro: string
+}
 
 export default function ScriptGenerator({
   theme,
-  character,
+  mainCharacter,
+  guestCharacter,
   structure,
   onGenerate,
   onNext,
   onBack,
 }: {
   theme: string
-  character: {
-    name: string
-    description: string
-    tone: string
-  } | null
-  structure: {
-    intro: string
-    sections: string[]
-    outro: string
-  } | null
+  mainCharacter: Character | null
+  guestCharacter: Character | null
+  structure: Structure | null
   onGenerate: (script: string) => void
   onNext: () => void
   onBack: () => void
 }) {
-  const [script, setScript] = useState<string>('')
+  const [scriptSections, setScriptSections] = useState<ScriptSections>({
+    intro: '',
+    sections: [],
+    outro: '',
+  })
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
-  const [copied, setCopied] = useState(false)
-  const [autoGenerate, setAutoGenerate] = useState(true)
-  const [dialogueMode, setDialogueMode] = useState(true) // デフォルトで対話形式
-  const [coHostName, setCoHostName] = useState('ユウキ') // デフォルトの第二ホスト名
+  const [editMode, setEditMode] = useState(false)
 
-  const chatEndRef = useRef<HTMLDivElement>(null)
-  const scriptRef = useRef<HTMLDivElement>(null)
+  // スクリプトセクションから完全なスクリプトを生成
+  const generateFullScript = (sections: ScriptSections) => {
+    let fullScript = `## イントロ\n${sections.intro}\n\n`
+    sections.sections.forEach((section, index) => {
+      fullScript += `## セクション${index + 1}: ${section.title}\n${section.content}\n\n`
+    })
+    fullScript += `## アウトロ\n${sections.outro}`
+    return fullScript.trim()
+  }
 
-  // useChat hook from AI SDK
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    setMessages,
-  } = useChat({
-    api: '/api/script-chat',
-    body: {
-      theme,
-      character: character ? JSON.stringify(character) : null,
-      structure: structure ? JSON.stringify(structure) : null,
-      dialogueMode,
-      coHostName,
-    },
-    onFinish: (message) => {
-      // Scroll to bottom when message is complete
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  // スクリプトをセクションに分割する関数 (ベストエフォート)
+  const parseScriptIntoSections = (
+    scriptContent: string,
+    currentStructure: Structure,
+  ): ScriptSections => {
+    const sections = currentStructure.sections.map(s => ({
+      title: s.title,
+      content: '',
+    }))
+    let intro = ''
+    let outro = ''
 
-      // Check if this is an AI response providing a script
-      if (message.role === 'assistant' && messages.length <= 2) {
-        // AI response contains the script
-        // only update if we don't already have a script
-        if (!script) {
-          const scriptContent = message.content
-          setScript(scriptContent)
-          onGenerate(scriptContent)
-        }
-        setLoading(false)
-        setGenerating(false)
-      }
-    },
-  })
+    // 正規表現でタイトルをエスケープするヘルパー
+    const escapeRegex = (str: string) =>
+      str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-  // 初回ロード時に自動的にスクリプト生成
-  useEffect(() => {
-    // APIからスクリプトを取得
-    const fetchScript = async () => {
-      if (!theme || !character || !structure) {
-        setError('必要な情報が不足しています')
-        setLoading(false)
-        return
-      }
+    // 1. アウトロを探す
+    const outroKeywords = ['アウトロ', 'おわりに', 'まとめ']
+    const outroPattern
+      = new RegExp(`(##\\s*)?(${outroKeywords.join('|')})[:：]?([\\s\\S]*)`, 'i')
+    const outroMatch = scriptContent.match(outroPattern)
+    let scriptWithoutOutro = scriptContent
+    if (outroMatch && typeof outroMatch.index !== 'undefined') {
+      outro = outroMatch[3].trim()
+      scriptWithoutOutro = scriptContent.substring(0, outroMatch.index).trim()
+    }
 
-      // 渡すデータをログに出力
-      console.log('Fetching script with data:', {
-        theme,
-        character:
-          typeof character === 'string' ? character : JSON.stringify(character),
-        structure:
-          typeof structure === 'string' ? structure : JSON.stringify(structure),
-        dialogueMode,
-        coHostName,
-      })
-
-      setLoading(true)
-      setError('')
-      try {
-        const res = await fetch('/api/script', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            theme,
-            character,
-            structure,
-            dialogueMode,
-            coHostName,
-          }),
-        })
-
-        if (!res.ok) {
-          console.error(`API error: ${res.status} ${res.statusText}`)
-          throw new Error(
-            `Failed to fetch script: ${res.status} ${res.statusText}`,
-          )
-        }
-
-        const data = await res.json()
-        console.log('API response:', data)
-
-        if (data && data.script) {
-          console.log('Script received, length:', data.script.length)
-          setScript(data.script)
-          onGenerate(data.script)
-          setLoading(false)
-        }
-        else if (data && data.error) {
-          console.error('API returned error:', data.error)
-          // APIからエラーが返された場合は、AIに生成を依頼
-          if (autoGenerate) {
-            generateScript()
-          }
-          else {
-            setError(`エラー: ${data.error}`)
-            setLoading(false)
-          }
-        }
-        else {
-          // APIから適切なスクリプトが取得できなかった場合は、AIに生成を依頼
-          console.warn('API returned no script or error')
-          if (autoGenerate) {
-            generateScript()
-          }
-          else {
-            setError('スクリプトの取得に失敗しました')
-            setLoading(false)
-          }
-        }
-      }
-      catch (err) {
-        console.error('Error fetching script:', err)
-        // エラー時もAIに生成を依頼
-        if (autoGenerate) {
-          generateScript()
-        }
-        else {
-          setError(
-            `エラー: ${err instanceof Error ? err.message : String(err)}`,
-          )
-          setLoading(false)
-        }
+    // 2. セクションを探す (後ろから検索して、セクション間の内容を抽出)
+    let remainingScript = scriptWithoutOutro
+    for (let i = currentStructure.sections.length - 1; i >= 0; i--) {
+      const sec = currentStructure.sections[i]
+      const titlePattern = escapeRegex(sec.title)
+      const pattern = new RegExp(
+        `(##\\s*)?セクション${
+          i + 1
+        }[:：]?.*?${titlePattern}([\\s\\S]*)`,
+        'i',
+      )
+      const match = remainingScript.match(pattern)
+      if (match && typeof match.index !== 'undefined') {
+        sections[i].content = match[2].trim()
+        remainingScript = remainingScript.substring(0, match.index).trim()
       }
     }
 
-    fetchScript()
-  }, [theme, character, structure, dialogueMode, coHostName])
+    // 3. 残りをイントロとする
+    const introKeywords = ['イントロ', 'はじめに', '導入']
+    const introPattern
+      = new RegExp(`(##\\s*)?(${introKeywords.join('|')})[:：]?([\\s\\S]*)`, 'i')
+    const introMatch = remainingScript.match(introPattern)
+    intro = introMatch ? introMatch[3].trim() : remainingScript
 
-  // スクリプトを生成する関数
-  const generateScript = () => {
-    if (!theme || !character || !structure) {
-      setError('必要な情報が不足しています')
+    // 4. パースが不完全な場合のフォールバック
+    if (
+      !intro.trim()
+      && !outro.trim()
+      && !sections.some(s => s.content.trim())
+    ) {
+      console.warn('Script parsing likely failed. Displaying full script.')
+      intro = scriptContent // 全体をイントロに
+      outro = '（アウトロの内容をここに記述）'
+      sections.forEach(
+        s => (s.content = `（${s.title}のスクリプトをここに記述）`),
+      )
+    }
+
+    return {
+      intro: intro.trim() || '（イントロの内容をここに記述）',
+      sections: sections.map((s, i) => ({
+        ...s,
+        content: s.content.trim() || `（${currentStructure.sections[i].title}の内容）`,
+      })),
+      outro: outro.trim() || '（アウトロの内容をここに記述）',
+    }
+  }
+
+  // スクリプトをフェッチする関数
+  const fetchScript = async () => {
+    if (!theme || !mainCharacter || !structure) {
+      setError('テーマ、キャラクター、構成の情報が不足しています。')
+      setLoading(false)
       return
     }
 
+    setLoading(true)
     setGenerating(true)
     setError('')
+    try {
+      const res = await fetch('/api/script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme,
+          mainCharacter,
+          guestCharacter, // guestCharacter を渡す
+          structure,
+        }),
+      })
 
-    // 構造情報をフォーマットする
-    const sectionsList = structure.sections
-      .map((section, index) => `${index + 1}. ${section}`)
-      .join('\n')
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(
+          `API error: ${res.status} - ${errorData.error || res.statusText}`,
+        )
+      }
 
-    let promptTemplate
+      const data = await res.json()
 
-    if (dialogueMode) {
-      // 対話形式のプロンプト
-      promptTemplate = `
-テーマ: ${theme}
-メインホスト: ${character.name}
-メインホストの説明: ${character.description}
-メインホストのトーン: ${character.tone}
-サブホスト: ${coHostName}
-サブホストの特徴: メインホストと異なる視点や意見を持ち、質問や補足をしながら会話を進める役割
-
-構成:
-イントロ: ${structure.intro}
-セクション:
-${sectionsList}
-アウトロ: ${structure.outro}
-
-この情報をもとに、メインホストとサブホストの対話形式で進行する、実際のポッドキャストスクリプトを作成してください。
-二人の会話が自然で、リスナーにとって分かりやすく魅力的な内容になるようにしてください。
-`
+      if (data && data.script) {
+        const parsed = parseScriptIntoSections(data.script, structure)
+        setScriptSections(parsed)
+        onGenerate(generateFullScript(parsed)) // 完全なスクリプトを親に渡す
+      }
+      else {
+        throw new Error('APIからスクリプトが返されませんでした。')
+      }
     }
-    else {
-      // 単独ホスト形式のプロンプト
-      promptTemplate = `
-テーマ: ${theme}
-パーソナリティ: ${character.name}
-説明: ${character.description}
-トーン: ${character.tone}
-
-構成:
-イントロ: ${structure.intro}
-セクション:
-${sectionsList}
-アウトロ: ${structure.outro}
-
-この情報をもとに、パーソナリティの特徴を反映した実際のポッドキャストスクリプトを作成してください。
-スクリプトは読み上げることを前提とした台本形式で、実際に話すトーンを反映させてください。
-`
+    catch (err) {
+      console.error('Error fetching/generating script:', err)
+      setError(
+        `スクリプトの生成または取得中にエラーが発生しました: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      )
+      // エラー時もデフォルト構造を表示する
+      setScriptSections({
+          intro: '（エラーが発生しました。イントロを記述してください）',
+          sections: structure.sections.map(s => ({ title: s.title, content: `（${s.title}の内容を記述してください）`})),
+          outro: '（エラーが発生しました。アウトロを記述してください）'
+      })
     }
+    finally {
+      setLoading(false)
+      setGenerating(false)
+    }
+  }
 
-    // AIにスクリプト生成を依頼
-    handleSubmit(new Event('submit') as any, {
-      data: {
-        prompt: promptTemplate,
-      },
+  // 初回ロード時にスクリプトをフェッチ
+  useEffect(() => {
+    fetchScript()
+  }, [theme, mainCharacter, guestCharacter, structure])
+
+  // スクリプトセクションを更新
+  const updateScriptSection = (field: 'intro' | 'outro', value: string) => {
+    setScriptSections((prev) => {
+      const newSections = { ...prev, [field]: value }
+      onGenerate(generateFullScript(newSections))
+      return newSections
     })
   }
 
-  // スクリプトをクリップボードにコピーする関数
-  const copyToClipboard = () => {
-    if (!script)
-      return
-
-    navigator.clipboard.writeText(script).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+  // セクションを更新
+  const updateSection = (index: number, content: string) => {
+    setScriptSections((prev) => {
+      const newSectionsList = [...prev.sections]
+      if (newSectionsList[index]) {
+        newSectionsList[index] = { ...newSectionsList[index], content }
+      }
+      const newScriptSections = { ...prev, sections: newSectionsList }
+      onGenerate(generateFullScript(newScriptSections))
+      return newScriptSections
     })
   }
 
-  // チャットで質問を送信
-  const submitChatMessage = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!input.trim())
-      return
-    handleSubmit(e)
+  // 再生成ボタンのハンドラー
+  const handleRegenerateScript = () => {
+    fetchScript()
   }
 
-  // チャットが表示されているかどうか
-  const showChat = messages.length > 1
-
-  // エラーがあるかどうか
-  const hasError = error !== ''
-
-  // 対話形式を切り替える
-  const toggleDialogueMode = () => {
-    setDialogueMode(!dialogueMode)
-    // 切り替え後に再生成
-    if (script) {
-      setTimeout(() => {
-        generateScript()
-      }, 100)
-    }
-  }
-
-  // サブホスト名を変更する
-  const handleCoHostNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCoHostName(e.target.value)
-  }
-
-  // サブホスト名変更を適用する
-  const applyCoHostNameChange = () => {
-    if (script) {
-      generateScript()
-    }
-  }
+  // サブホスト名を取得
+  const coHostName = guestCharacter ? guestCharacter.name : 'ユウキ'
 
   return (
-    <div className="flex flex-col items-center w-full h-full">
-      <div className="w-full flex justify-between items-center px-4 md:px-8 py-4">
+    <div className={`flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]`}>
+    {/* テーマ名表示（上部） */}
+    <div className="w-full py-5 flex items-center justify-center">
+      {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
+      <div className="mb-2 flex items-center justify-center">
+        <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
+        <span className="text-gray-100 text-base font-bold">{theme}</span>
+      </div>
+    </div>
+
+    <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
+      
         <button
           onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-primary transition-colors"
+          className="flex items-center text-white hover:text-primary transition-colors"
         >
-          <ArrowLeft className="mr-1" size={16} />
-          構成選択に戻る
+          <ArrowLeft size={26} />
         </button>
-
-        {script && (
-          <Button onClick={onNext} className="flex items-center" size="sm">
-            次へ進む
-            <ChevronRight className="ml-1" size={16} />
-          </Button>
-        )}
+        <p className="text-white font-black text-xl text-center">
+          原稿を考える
+        </p>
+     
+      <div className="flex items-center">
+        <Button
+          variant="outline"
+          className='rounded-full w-8 h-8'
+          size="sm"
+          onClick={() => setEditMode(!editMode)}
+        >
+          {editMode ? <CheckIcon/> : <PenIcon/>}
+        </Button>
       </div>
-
-      <h1 className="text-3xl font-serif text-center mt-6 mb-2">
-        ポッドキャストスクリプト
-      </h1>
-      <p className="mb-6 text-gray-500 text-center max-w-md px-4">
-        テーマ「
-        {theme}
-        」のポッドキャスト用スクリプトを生成しました。
-        {character && `「${character.name}」の個性を反映しています。`}
-      </p>
-
-      {/* スクリプト形式選択 */}
-      <div className="w-full max-w-md mb-4 flex flex-col md:flex-row justify-center items-center gap-4">
-        <div className="flex items-center space-x-2">
-          <Button
-            variant={dialogueMode ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              if (!dialogueMode)
-                toggleDialogueMode()
-            }}
-            className="flex items-center"
-          >
-            <Users size={16} className="mr-2" />
-            対話形式
-          </Button>
-          <Button
-            variant={!dialogueMode ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              if (dialogueMode)
-                toggleDialogueMode()
-            }}
-            className="flex items-center"
-          >
-            <User size={16} className="mr-2" />
-            単独ホスト
-          </Button>
-        </div>
-
-        {dialogueMode && (
-          <div className="flex items-center space-x-2">
-            <Input
-              value={coHostName}
-              onChange={handleCoHostNameChange}
-              placeholder="サブホスト名"
-              className="w-32"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={applyCoHostNameChange}
-              disabled={generating || !coHostName.trim()}
-            >
-              適用
-            </Button>
-          </div>
-        )}
-      </div>
+    </div>
 
       {/* エラー表示 */}
-      {hasError && (
-        <div className="w-full max-w-3xl mb-4 bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
-          <p className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {error}
-          </p>
-          <div className="mt-2 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateScript}
-              disabled={generating}
-              className="text-red-600 hover:text-red-800 border-red-300"
-            >
-              AI生成を試す
-            </Button>
-          </div>
+      {error && (
+        <div className="text-red-500 bg-red-900/30 border border-red-500/50 p-3 rounded-md mb-4 w-full max-w-2xl">
+          {error}
         </div>
       )}
 
-      {/* スクリプト表示 */}
-      {script && !loading && !generating && (
-        <div className="w-full max-w-3xl mb-8 bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <FileText className="text-primary h-6 w-6 mr-3" />
-                <div>
-                  <h3 className="text-xl font-bold">スクリプト</h3>
-                  <p className="text-sm text-gray-500">
-                    {dialogueMode
-                      ? `${character?.name}と${coHostName}の対話形式台本`
-                      : '単独ホスト形式台本'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copyToClipboard}
-                  className="flex items-center"
-                >
-                  <Copy size={16} className="mr-1" />
-                  {copied ? 'コピーしました' : 'コピー'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={generateScript}
-                  className="flex items-center"
-                  disabled={generating}
-                >
-                  <RefreshCw
-                    size={16}
-                    className={`mr-1 ${generating ? 'animate-spin' : ''}`}
-                  />
-                  再生成
-                </Button>
-              </div>
-            </div>
-
-            {/* スクリプト内容 */}
-            <div
-              ref={scriptRef}
-              className="border border-gray-200 rounded-lg p-4 max-h-[60vh] overflow-y-auto whitespace-pre-line prose prose-sm max-w-none"
-            >
-              <ReactMarkdown>{script}</ReactMarkdown>
-            </div>
-
-            {/* アクションボタン */}
-            <div className="flex justify-end mt-6">
-              <Button onClick={onNext}>このスクリプトで次へ進む</Button>
+      {/* スクリプト表示・編集 */}
+      {!(loading || generating) && scriptSections.intro && (
+        <div className="w-full max-w-2xl overflow-y-auto flex-1 px-4">
+          <div className="p-6 pb-32">
+            <div className="space-y-4">
+              <ScriptCard
+                title="イントロ"
+                content={scriptSections.intro}
+                editMode={editMode}
+                onContentChange={value => updateScriptSection('intro', value)}
+              />
+              {scriptSections.sections.map((section, index) => (
+                <ScriptCard
+                  key={index}
+                  title={`セクション ${index + 1}: ${section.title}`}
+                  content={section.content}
+                  editMode={editMode}
+                  onContentChange={value => updateSection(index, value)}
+                  isSection={true}
+                />
+              ))}
+              <ScriptCard
+                title="アウトロ"
+                content={scriptSections.outro}
+                editMode={editMode}
+                onContentChange={value => updateScriptSection('outro', value)}
+              />
             </div>
           </div>
         </div>
@@ -461,120 +318,124 @@ ${sectionsList}
 
       {/* ローディング表示 */}
       {(loading || generating) && (
-        <div className="flex flex-col justify-center items-center h-64 w-full max-w-2xl">
-          <Loader2 className="animate-spin mb-4" size={32} />
-          <p className="text-gray-500 mb-2">
-            {generating ? 'スクリプトを生成中...' : 'データを読み込み中...'}
-          </p>
-          <p className="text-xs text-gray-400 max-w-sm text-center">
-            良質なスクリプトを生成するには少し時間がかかります。
-            {dialogueMode
-              ? '二人の自然な対話形式で作成しています...'
-              : 'パーソナリティのトーンと構成を考慮しながら作成しています...'}
-          </p>
+        <div className="flex-1 flex justify-center items-center h-64">
+          <Loader2 size={32} className="animate-spin mr-3 text-white" />
+          <span className="text-gray-400 text-lg">
+            {generating ? '台本を生成中...' : 'データを読み込み中...'}
+          </span>
         </div>
       )}
 
-      {/* チャットUI */}
-      {showChat && !generating && (
-        <div className="w-full max-w-md flex flex-col gap-2 mb-8 rounded-xl p-4">
-          {messages.slice(1).map(message => (
-            <div
-              key={message.id}
-              className={`whitespace-pre-wrap ${
-                message.role === 'user' ? 'text-right' : 'text-left'
-              }`}
-            >
-              <div
-                className={`inline-block px-3 py-2 rounded-2xl ${
-                  message.role === 'user'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-primary/10 text-primary'
-                } max-w-[85%]`}
-              >
-                {message.role === 'assistant'
-                  ? (
-                      <div className="markdown prose prose-sm max-w-none">
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
-                      </div>
-                    )
-                  : (
-                      message.content
-                    )}
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="text-left text-primary">
-              <span className="inline-block px-3 py-2 rounded-2xl bg-primary/10 text-primary">
-                <div className="flex items-center space-x-2">
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '0ms' }}
-                  />
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '150ms' }}
-                  />
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '300ms' }}
-                  />
-                </div>
-              </span>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-      )}
-
-      {/* 入力欄 - チャット時のみ表示 */}
-      {showChat && !generating && (
-        <div className="w-full max-w-md fixed bottom-8 left-1/2 -translate-x-1/2">
-          <form
-            onSubmit={submitChatMessage}
-            className="flex items-center bg-gray-100 rounded-full px-4 py-2 shadow"
-          >
-            <Input
-              className="flex-1 border-none bg-transparent shadow-none focus-visible:ring-0"
-              placeholder="スクリプトについて質問・相談できます"
-              value={input}
-              onChange={handleInputChange}
-              style={{
-                boxShadow: 'none',
-                border: 'none',
-              }}
-            />
-            <button
-              type="submit"
-              className="ml-2 text-gray-400 hover:text-primary transition-colors"
-              aria-label="send chat"
-              disabled={isLoading || !input.trim()}
-            >
-              💬
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* チャット切り替えボタン */}
-      {!generating && script && (
-        <Button
-          variant={showChat ? 'outline' : 'default'}
-          className="mt-4"
-          onClick={() => {
-            if (!showChat) {
-              // AIにスクリプトについて相談
-              handleSubmit(new Event('submit') as any, {
-                data: {
-                  prompt: `生成されたスクリプトについて質問や改善の相談をしたいです。現在のスクリプトの特徴を教えてください。`,
-                },
-              })
-            }
+      {/* 決定ボタン */}
+      {!loading && !generating && (
+        <div
+          className="fixed bottom-8 left-1/2 border-white border-1 border-double -translate-x-1/2 w-[280px] h-[60px] flex items-center justify-center px-8 rounded-full z-20"
+          style={{
+            background: 'rgba(255,255,255,0.65)',
+            boxShadow:
+              '0 4px 32px 0 rgba(0,0,0,0.18), 0 1.5px 8px 0 rgba(255,255,255,0.25) inset',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1.5px solid rgba(255,255,255,0.45)',
           }}
         >
-          {showChat ? 'スクリプトを表示' : 'AIとスクリプトについて相談する'}
-        </Button>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '9999px',
+              border: '2px solid #fff',
+              pointerEvents: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <button
+            className="font-bold text-lg px-8 py-2 rounded-full transition text-gray-900 hover:text-black"
+            onClick={onNext}
+            disabled={
+              !scriptSections.intro
+              || scriptSections.sections.length === 0
+              || !scriptSections.outro
+            }
+          >
+            決定
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 各スクリプト要素を表示するカードコンポーネント
+interface ScriptCardProps {
+  title: string
+  content: string
+  editMode: boolean
+  onContentChange: (value: string) => void
+  isSection?: boolean
+}
+
+const ScriptCard: React.FC<ScriptCardProps> = ({
+  title,
+  content,
+  editMode,
+  onContentChange,
+  isSection = false,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(!isSection) // セクション以外はデフォルトで展開
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+
+  // テキストエリアの高さを自動調整
+  useEffect(() => {
+    if (editMode && textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto'
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
+    }
+  }, [content, editMode, isExpanded]) // isExpanded も依存関係に追加
+
+  return (
+    <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/20 text-white">
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center">
+          <div className="w-6 h-6 mr-3 flex items-center justify-center text-gray-300">
+            {isSection ? <MenuSquare size={20} /> : <FileText size={20} />}
+          </div>
+          <h4 className="font-semibold text-gray-100 text-lg">{title}</h4>
+        </div>
+        <button
+          className="text-gray-300 hover:text-white ml-2 p-1 rounded-full"
+          aria-label={isExpanded ? '折りたたむ' : '展開する'}
+        >
+          <ChevronRight
+            size={22}
+            className={`${
+              isExpanded ? 'transform rotate-90' : ''
+            } transition-transform duration-200`}
+          />
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div className="mt-4 pl-9">
+          {editMode ? (
+            <textarea
+              ref={textAreaRef}
+              value={content}
+              onChange={e => onContentChange(e.target.value)}
+              className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
+              placeholder={`${title}の台本内容...`}
+            />
+          ) : (
+            <div className="text-gray-200 text-base leading-relaxed whitespace-pre-wrap bg-gray-800/30 p-4 rounded-md">
+              {content || (
+                <span className="text-gray-500">内容がありません...</span>
+              )}
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
