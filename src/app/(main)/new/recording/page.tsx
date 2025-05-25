@@ -1,7 +1,5 @@
-import React from 'react'
+import RecordingPage from '🎙️/components/features/recording/recording-page'
 
-export default function Recoding() {
-  return (
-    <div>録音</div>
-  )
+export default function Recording() {
+  return <RecordingPage />
 }
