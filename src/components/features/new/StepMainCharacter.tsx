@@ -331,7 +331,7 @@ export default function MainCharacterSelector({
   }, [emblaApi, personalities.length]) // personalities.length は必要
 
   // personalities配列の前に「自分」カードを追加
-  const selfCard = { name: '自分', description: 'あなた自身がパーソナリティとして参加します', tone: '自由', self: true } as Personality
+  const selfCard = { name: 'SomaTakata', description: 'とある大学生', tone: '自由', self: true } as Personality
 
   return (
     <div className={`flex flex-col overflow-hidden  items-center w-full min-h-screen h-full ${gradient || ''}`}>
@@ -575,7 +575,7 @@ export default function MainCharacterSelector({
                 }}
               />
               <button
-                className="font-bold text-lg px-8 py-2 rounded-full  transition"
+                className="font-bold text-lg px-8 py-2 rounded-full text-black transition"
                 disabled={selectedIndex === 0 ? false : !personalities[selectedIndex - 1]}
                 onClick={() => {
                   // personalitiesのindexは1つずれる（0:自分, 1:AI提案1件目...）

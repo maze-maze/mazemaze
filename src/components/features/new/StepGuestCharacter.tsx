@@ -581,7 +581,7 @@ export default function GuestCharacterSelector({
                 }}
               />
               <button
-                className="font-bold text-lg px-8 py-2 rounded-full  transition"
+                className="font-bold text-lg px-8 py-2 rounded-full  text-black transition"
                 disabled={mainSelfSelected ? !personalities[selectedIndex] : selectedIndex === 0}
                 onClick={() => {
                   if (!mainSelfSelected && selectedIndex === 0) {
