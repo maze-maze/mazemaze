@@ -1,3 +1,4 @@
+import { StorageKeys } from '🎙️/lib/storage-keys'
 import { useEffect, useState } from 'react'
 
 export function useRecordingScripts() {
@@ -16,28 +17,18 @@ export function useRecordingScripts() {
   })
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // セッションストレージから__location_state_*キーを検索
-      const locationStateKey = Object.keys(sessionStorage).find(key =>
-        key.startsWith('__location_state_'),
-      )
+    const theme = window.sessionStorage.getItem(StorageKeys.THEME)!
+    const script = window.sessionStorage.getItem(StorageKeys.SCRIPT)!
+    const mainCharacter = window.sessionStorage.getItem(StorageKeys.MAIN)!
+    const guestCharacter = window.sessionStorage.getItem(StorageKeys.GUEST)!
 
-      if (locationStateKey) {
-        try {
-          const sessionData = JSON.parse(sessionStorage.getItem(locationStateKey) || '{}')
-          setData({
-            title: sessionData.title || '',
-            character: sessionData.character || '',
-            script: sessionData.script || '',
-            userName: sessionData.userName || '',
-            guest: sessionData.guest || '',
-          })
-        }
-        catch (error) {
-          console.error('Failed to parse session data:', error)
-        }
-      }
-    }
+    setData({
+      title: JSON.parse(theme).theme,
+      character: 'character',
+      script,
+      userName: JSON.parse(mainCharacter).name,
+      guest: JSON.parse(guestCharacter),
+    })
   }, [])
 
   return {
