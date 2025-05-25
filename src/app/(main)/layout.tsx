@@ -6,7 +6,7 @@ export default function MainLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="max-w-md mx-auto">
+    <div className="max-w-md mx-auto relative">
       <Suspense fallback={<div>Loading...</div>}>
         {children}
       </Suspense>

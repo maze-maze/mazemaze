@@ -1,11 +1,12 @@
 'use client'
 
-import { LocationStateProvider } from '@location-state/core'
+import { LocationStateProvider, NavigationSyncer } from '@location-state/core'
+import { unsafeNavigation } from '@location-state/core/unsafe-navigation'
 import { NuqsAdapter } from 'nuqs/adapters/next'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <LocationStateProvider>
+    <LocationStateProvider syncer={new NavigationSyncer(unsafeNavigation)}>
       <NuqsAdapter>
         {children}
       </NuqsAdapter>
