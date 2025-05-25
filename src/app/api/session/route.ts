@@ -17,7 +17,6 @@ export async function POST() {
         model: 'gpt-4o-realtime-preview-2024-12-17',
         voice: 'alloy',
         modalities: ['audio', 'text'],
-        instructions: '「こんにちは、今日はどのようなご用件でしょうか」と言ってユーザーと会話を始めてください。',
       }),
     })
 
