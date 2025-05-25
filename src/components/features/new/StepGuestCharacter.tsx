@@ -1,23 +1,16 @@
 'use client'
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input'
 import { useChat } from 'ai/react'
 import useEmblaCarousel from 'embla-carousel-react'
 import {
   ArrowLeft,
   ArrowLeftCircle,
-  ChevronRight,
-  Home,
   Info,
-  Loader2,
   PlayIcon,
-  Plus,
   User,
   UserCircle2,
 } from 'lucide-react'
-import { Play } from 'next/font/google'
 import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 
 // personalities型を拡張
 interface Personality {
@@ -309,13 +302,16 @@ export default function GuestCharacterSelector({
 
   // オートプレイ用タイマー
   useEffect(() => {
-    if (!emblaApi || personalities.length === 0) return // personalitiesがないとAI提案がないためオートプレイしない
+    if (!emblaApi || personalities.length === 0)
+      return // personalitiesがないとAI提案がないためオートプレイしない
     let stopped = false
     let timer: NodeJS.Timeout | null = null
     const autoplay = () => {
-      if (stopped) return
+      if (stopped)
+        return
       timer = setTimeout(() => {
-        if (!emblaApi) return
+        if (!emblaApi)
+          return
         const slideCount = personalities.length + (!mainSelfSelected ? 1 : 0)
         const nextIndex = (emblaApi.selectedScrollSnap() + 1) % slideCount
         emblaApi.scrollTo(nextIndex)
@@ -324,11 +320,13 @@ export default function GuestCharacterSelector({
     autoplay()
     emblaApi.on('select', () => {
       stopped = true
-      if (timer) clearTimeout(timer)
+      if (timer)
+        clearTimeout(timer)
     })
     return () => {
       stopped = true
-      if (timer) clearTimeout(timer)
+      if (timer)
+        clearTimeout(timer)
     }
   }, [emblaApi, personalities.length, mainSelfSelected])
 
@@ -469,16 +467,14 @@ export default function GuestCharacterSelector({
         </div>
       )}
 
-     
-
       {/* パーソナリティカード一覧（スワイプ） */}
       {(!selected || showList) && !editMode && !showChat && (
         <div className="w-full max-w-xl rounded-xl mt-8 overflow-visible">
           <div className="p-4">
             <div className="embla" ref={emblaRef}>
               <div className="embla__container flex gap-4">
-                {[ ...(!mainSelfSelected ? [selfCard] : []), ...personalities
-].map((personality, idx) => (
+                {[...(!mainSelfSelected ? [selfCard] : []), ...personalities,
+                ].map((personality, idx) => (
                   <div
                     key={idx}
                     className={`embla__slide flex-shrink-0 p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/5.5 w-60 relative mx-2 
@@ -497,14 +493,15 @@ export default function GuestCharacterSelector({
                       }
                     }}
                   >
-                    {personality.self ? (
+                    {personality.self
+                      ? (
                           <>
                             <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center mb-2 bg-primary/10">
                               <User className=" text-white" size={28} />
                             </div>
                             <span className=" font-bold mb-1 text-white">{personality.name}</span>
                             <p className="text-xs  line-clamp-2 mb-1 text-gray-200">{personality.description}</p>
-                           
+
                           </>
                         )
                       : (
@@ -547,8 +544,8 @@ export default function GuestCharacterSelector({
             {/* ページネーション */}
             <div className="w-full mt-8 flex justify-center">
               <div className="flex justify-center gap-2 w-fit px-3 py-2 rounded-full opacity-40 bg-[#BFBFBF]">
-                {[ ...(!mainSelfSelected ? [selfCard] : []), ...personalities
-].map((_, idx) => (
+                {[...(!mainSelfSelected ? [selfCard] : []), ...personalities,
+                ].map((_, idx) => (
                   <button
                     key={idx}
                     className={`w-2 h-2 rounded-full transition-colors ${selectedIndex === idx ? 'bg-primary' : 'bg-gray-500'}`}
@@ -584,18 +581,19 @@ export default function GuestCharacterSelector({
                 disabled={mainSelfSelected ? !personalities[selectedIndex] : selectedIndex === 0}
                 onClick={() => {
                   if (!mainSelfSelected && selectedIndex === 0) {
-                      // 自分カードを選択
-                      handleSelect(selfCard)
+                    // 自分カードを選択
+                    handleSelect(selfCard)
+                    onNext()
+                  }
+                  else {
+                    // AI提案カードを選択
+                    // personalitiesのindexは mainSelfSelectedならselectedIndex、そうでなければ selectedIndex - 1
+                    const selectedPersonality = mainSelfSelected ? personalities[selectedIndex] : personalities[selectedIndex - 1]
+                    if (selectedPersonality) {
+                      handleSelect(selectedPersonality)
                       onNext()
-                   } else {
-                      // AI提案カードを選択
-                      // personalitiesのindexは mainSelfSelectedならselectedIndex、そうでなければ selectedIndex - 1
-                      const selectedPersonality = mainSelfSelected ? personalities[selectedIndex] : personalities[selectedIndex - 1];
-                      if (selectedPersonality) {
-                        handleSelect(selectedPersonality)
-                        onNext()
-                      }
-                   }
+                    }
+                  }
                 }}
               >
                 決定

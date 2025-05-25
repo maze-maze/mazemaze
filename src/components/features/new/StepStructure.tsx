@@ -1,23 +1,21 @@
 'use client'
 
+import { Button } from '🎙️/components/ui/button'
+import { Input } from '🎙️/components/ui/input' // 編集モードで使用
+import { Textarea } from '🎙️/components/ui/textarea' // Textarea をインポート
 import {
   ArrowLeft,
   CheckIcon,
   ChevronRight,
-  Loader2,
-  MenuSquare, // セクションアイコンとして使用
-  PenIcon,
-  PlusCircle,
-  Trash2,
-  MoveUp,
+  Loader2, // セクションアイコンとして使用
   MoveDown,
-  RefreshCw, // 再生成アイコンを追加
+  MoveUp,
+  PenIcon,
+  PlusCircle, // 再生成アイコンを追加
+  Trash2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react' // useEffect をインポート
 import React from 'react'
-import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input' // 編集モードで使用
-import { Textarea } from '🎙️/components/ui/textarea' // Textarea をインポート
 
 // 型定義
 interface Character {
@@ -29,7 +27,7 @@ interface Character {
 
 interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 
@@ -125,20 +123,20 @@ export default function StructureSelector({
   useEffect(() => {
     // ローディング中や初期状態（空）では呼び出さない
     if (!loading && (structure.intro || structure.sections.length > 0 || structure.outro)) {
-        onSelect(structure);
+      onSelect(structure)
     }
-  }, [structure, onSelect, loading]); // structure, onSelect, loading を依存配列に追加
+  }, [structure, onSelect, loading]) // structure, onSelect, loading を依存配列に追加
 
   // 構成を更新する関数
   const updateStructure = (field: 'intro' | 'outro', value: string) => {
-    setStructure(prev => ({ ...prev, [field]: value }));
+    setStructure(prev => ({ ...prev, [field]: value }))
     // onSelect(newStructure) // <- 削除
   }
 
   // セクションを更新する関数
   const updateSection = (
     index: number,
-    updatedFields: { title?: string; description?: string },
+    updatedFields: { title?: string, description?: string },
   ) => {
     setStructure((prevStructure) => {
       const newSections = [...prevStructure.sections]
@@ -166,7 +164,8 @@ export default function StructureSelector({
   // セクションを削除する関数
   const removeSection = (index: number) => {
     setStructure((prevStructure) => {
-      if (prevStructure.sections.length <= 1) return prevStructure
+      if (prevStructure.sections.length <= 1)
+        return prevStructure
       const newSections = prevStructure.sections.filter((_, i) => i !== index)
       // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
       return { ...prevStructure, sections: newSections }
@@ -175,7 +174,8 @@ export default function StructureSelector({
 
   // セクションを上に移動
   const moveSectionUp = (index: number) => {
-    if (index === 0) return
+    if (index === 0)
+      return
     setStructure((prevStructure) => {
       const newSections = [...prevStructure.sections]
       ;[newSections[index - 1], newSections[index]] = [
@@ -189,7 +189,8 @@ export default function StructureSelector({
 
   // セクションを下に移動
   const moveSectionDown = (index: number) => {
-    if (index === structure.sections.length - 1) return
+    if (index === structure.sections.length - 1)
+      return
     setStructure((prevStructure) => {
       const newSections = [...prevStructure.sections]
       ;[newSections[index], newSections[index + 1]] = [
@@ -207,18 +208,18 @@ export default function StructureSelector({
   }
 
   return (
-    <div className={`flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]`}>
-    {/* テーマ名表示（上部） */}
-    <div className="w-full py-5 flex items-center justify-center">
-      {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
-      <div className="mb-2 flex items-center justify-center">
-        <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
-        <span className="text-gray-100 text-base font-bold">{theme}</span>
+    <div className="flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]">
+      {/* テーマ名表示（上部） */}
+      <div className="w-full py-5 flex items-center justify-center">
+        {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
+        <div className="mb-2 flex items-center justify-center">
+          <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
+          <span className="text-gray-100 text-base font-bold">{theme}</span>
+        </div>
       </div>
-    </div>
 
-    <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
-      
+      <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
+
         <button
           onClick={onBack}
           className="flex items-center text-white hover:text-primary transition-colors"
@@ -228,19 +229,18 @@ export default function StructureSelector({
         <p className="text-white font-black text-xl text-center">
           構成を考える
         </p>
-     
-      <div className="flex items-center">
-        <Button
-          variant="outline"
-          className='rounded-full w-8 h-8'
-          size="sm"
-          onClick={() => setEditMode(!editMode)}
-        >
-          {editMode ? <CheckIcon/> : <PenIcon/>}
-        </Button>
-      </div>
-    </div>
 
+        <div className="flex items-center">
+          <Button
+            variant="outline"
+            className="rounded-full w-8 h-8"
+            size="sm"
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? <CheckIcon /> : <PenIcon />}
+          </Button>
+        </div>
+      </div>
 
       {/* エラー表示 */}
       {error && (
@@ -273,11 +273,9 @@ export default function StructureSelector({
                     description={section.description}
                     editMode={editMode}
                     onContentChange={value =>
-                      updateSection(index, { title: value })
-                    }
+                      updateSection(index, { title: value })}
                     onDescriptionChange={value =>
-                      updateSection(index, { description: value })
-                    }
+                      updateSection(index, { description: value })}
                     isSection={true}
                     onRemove={() => removeSection(index)}
                     canRemove={structure.sections.length > 1}
@@ -385,20 +383,22 @@ const StructureCard: React.FC<StructureCardProps> = ({
   canMoveDown,
 }) => {
   const [isExpanded, setIsExpanded] = useState(isSection)
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-    // テキストエリアの高さを自動調整
+  // テキストエリアの高さを自動調整
   useEffect(() => {
-      if (editMode && textAreaRef.current) {
-          textAreaRef.current.style.height = 'auto';
-          textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-      }
-  }, [description, content, editMode, isExpanded]);
+    if (editMode && textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto'
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
+    }
+  }, [description, content, editMode, isExpanded])
 
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/20 text-white mb-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center flex-1 min-w-0"> {/* flex-1 と min-w-0 で幅を確保 */}
+        <div className="flex items-center flex-1 min-w-0">
+          {' '}
+          {/* flex-1 と min-w-0 で幅を確保 */}
           {isSection && (
             <div className="flex flex-col mr-3">
               <button
@@ -427,20 +427,24 @@ const StructureCard: React.FC<StructureCardProps> = ({
             <div className="w-6 h-6 mr-3" />
           )}
 
-          {editMode ? (
-            <Input
-              type="text"
-              value={content}
-              onChange={e => onContentChange(e.target.value)}
-              className="font-semibold text-gray-100 text-lg w-full bg-transparent border-b border-gray-600 focus:outline-none focus:ring-0 focus:border-white p-1 truncate"
-              placeholder={isSection ? 'セクションタイトル' : title}
-            />
-          ) : (
-            <h4 className="font-semibold text-gray-100 text-lg truncate">{title}</h4>
-          )}
+          {editMode
+            ? (
+                <Input
+                  type="text"
+                  value={content}
+                  onChange={e => onContentChange(e.target.value)}
+                  className="font-semibold text-gray-100 text-lg w-full bg-transparent border-b border-gray-600 focus:outline-none focus:ring-0 focus:border-white p-1 truncate"
+                  placeholder={isSection ? 'セクションタイトル' : title}
+                />
+              )
+            : (
+                <h4 className="font-semibold text-gray-100 text-lg truncate">{title}</h4>
+              )}
         </div>
 
-        <div className="flex items-center gap-2 ml-2 flex-shrink-0"> {/* flex-shrink-0 を追加 */}
+        <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+          {' '}
+          {/* flex-shrink-0 を追加 */}
           {editMode && isSection && onRemove && (
             <button
               onClick={onRemove}
@@ -479,8 +483,7 @@ const StructureCard: React.FC<StructureCardProps> = ({
               onChange={e =>
                 isSection && onDescriptionChange
                   ? onDescriptionChange(e.target.value)
-                  : onContentChange(e.target.value)
-              }
+                  : onContentChange(e.target.value)}
               className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
               placeholder={
                 isSection
@@ -501,7 +504,7 @@ const StructureCard: React.FC<StructureCardProps> = ({
 }
 
 // セクション追加ボタンコンポーネント
-const AddSectionButton: React.FC<{ onClick: () => void; editMode: boolean }> = ({
+const AddSectionButton: React.FC<{ onClick: () => void, editMode: boolean }> = ({
   onClick,
   editMode,
 }) => {
@@ -509,7 +512,7 @@ const AddSectionButton: React.FC<{ onClick: () => void; editMode: boolean }> = (
     <>
       {editMode && (
         <div className="flex justify-center my-2 h-6 items-center">
-            <div className="h-px bg-white/20 w-1/3"></div>
+          <div className="h-px bg-white/20 w-1/3"></div>
           <button
             onClick={onClick}
             className="text-gray-400 hover:text-white transition-colors flex items-center mx-4"
@@ -517,7 +520,7 @@ const AddSectionButton: React.FC<{ onClick: () => void; editMode: boolean }> = (
           >
             <PlusCircle size={20} />
           </button>
-           <div className="h-px bg-white/20 w-1/3"></div>
+          <div className="h-px bg-white/20 w-1/3"></div>
         </div>
       )}
     </>

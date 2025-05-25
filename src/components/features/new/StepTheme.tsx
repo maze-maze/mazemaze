@@ -1,17 +1,10 @@
 'use client'
-import { Button } from '🎙️/components/ui/button'
 import { Input } from '🎙️/components/ui/input'
 import useEmblaCarousel from 'embla-carousel-react'
 import {
-  CheckCircle2,
-  ChevronRight,
   Home,
-  ListTodo,
-  Loader2,
   Plus,
-  RefreshCw,
   Search,
-  SearchIcon,
   User,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'

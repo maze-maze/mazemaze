@@ -1,18 +1,17 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input' // Inputは現在使われていませんが、将来のために残すことも可能です
+// Inputは現在使われていませんが、将来のために残すことも可能です
 import {
   ArrowLeft,
   CheckIcon,
   ChevronRight,
+  FileText, // イントロ/アウトロ用アイコン
   Loader2,
   MenuSquare,
   PenIcon,
-  RefreshCw,
-  FileText, // イントロ/アウトロ用アイコン
 } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // 型定義
 interface Character {
@@ -23,13 +22,13 @@ interface Character {
 
 interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 
 interface ScriptSections {
   intro: string
-  sections: { title: string; content: string }[]
+  sections: { title: string, content: string }[]
   outro: string
 }
 
@@ -196,9 +195,9 @@ export default function ScriptGenerator({
       )
       // エラー時もデフォルト構造を表示する
       setScriptSections({
-          intro: '（エラーが発生しました。イントロを記述してください）',
-          sections: structure.sections.map(s => ({ title: s.title, content: `（${s.title}の内容を記述してください）`})),
-          outro: '（エラーが発生しました。アウトロを記述してください）'
+        intro: '（エラーが発生しました。イントロを記述してください）',
+        sections: structure.sections.map(s => ({ title: s.title, content: `（${s.title}の内容を記述してください）` })),
+        outro: '（エラーが発生しました。アウトロを記述してください）',
       })
     }
     finally {
@@ -243,18 +242,18 @@ export default function ScriptGenerator({
   const coHostName = guestCharacter ? guestCharacter.name : 'ユウキ'
 
   return (
-    <div className={`flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]`}>
-    {/* テーマ名表示（上部） */}
-    <div className="w-full py-5 flex items-center justify-center">
-      {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
-      <div className="mb-2 flex items-center justify-center">
-        <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
-        <span className="text-gray-100 text-base font-bold">{theme}</span>
+    <div className="flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]">
+      {/* テーマ名表示（上部） */}
+      <div className="w-full py-5 flex items-center justify-center">
+        {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
+        <div className="mb-2 flex items-center justify-center">
+          <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
+          <span className="text-gray-100 text-base font-bold">{theme}</span>
+        </div>
       </div>
-    </div>
 
-    <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
-      
+      <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
+
         <button
           onClick={onBack}
           className="flex items-center text-white hover:text-primary transition-colors"
@@ -264,18 +263,18 @@ export default function ScriptGenerator({
         <p className="text-white font-black text-xl text-center">
           原稿を考える
         </p>
-     
-      <div className="flex items-center">
-        <Button
-          variant="outline"
-          className='rounded-full w-8 h-8'
-          size="sm"
-          onClick={() => setEditMode(!editMode)}
-        >
-          {editMode ? <CheckIcon/> : <PenIcon/>}
-        </Button>
+
+        <div className="flex items-center">
+          <Button
+            variant="outline"
+            className="rounded-full w-8 h-8"
+            size="sm"
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? <CheckIcon /> : <PenIcon />}
+          </Button>
+        </div>
       </div>
-    </div>
 
       {/* エラー表示 */}
       {error && (
@@ -420,21 +419,23 @@ const ScriptCard: React.FC<ScriptCardProps> = ({
 
       {isExpanded && (
         <div className="mt-4 pl-9">
-          {editMode ? (
-            <textarea
-              ref={textAreaRef}
-              value={content}
-              onChange={e => onContentChange(e.target.value)}
-              className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
-              placeholder={`${title}の台本内容...`}
-            />
-          ) : (
-            <div className="text-gray-200 text-base leading-relaxed whitespace-pre-wrap bg-gray-800/30 p-4 rounded-md">
-              {content || (
-                <span className="text-gray-500">内容がありません...</span>
+          {editMode
+            ? (
+                <textarea
+                  ref={textAreaRef}
+                  value={content}
+                  onChange={e => onContentChange(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
+                  placeholder={`${title}の台本内容...`}
+                />
+              )
+            : (
+                <div className="text-gray-200 text-base leading-relaxed whitespace-pre-wrap bg-gray-800/30 p-4 rounded-md">
+                  {content || (
+                    <span className="text-gray-500">内容がありません...</span>
+                  )}
+                </div>
               )}
-            </div>
-          )}
         </div>
       )}
     </div>

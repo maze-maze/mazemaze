@@ -24,8 +24,8 @@ interface Structure {
 
 export async function POST(req: NextRequest) {
   try {
-    const { theme, mainCharacter, guestCharacter, structure } =
-      await req.json()
+    const { theme, mainCharacter, guestCharacter, structure }
+      = await req.json()
 
     // 必須パラメータのバリデーション
     if (!theme || !structure) {
@@ -102,14 +102,12 @@ export async function POST(req: NextRequest) {
 
     // ホスト情報を決定
     const mainHost = mainCharacterInfo
-    const coHost = guestCharacterInfo
-      ? guestCharacterInfo
-      : {
-          name: 'ユウキ',
-          description:
+    const coHost = guestCharacterInfo || {
+      name: 'ユウキ',
+      description:
             'メインホストと異なる視点や意見を持ち、時に質問を投げかけ、時に補足説明をする役割。親しみやすく、聴取者の疑問を代弁するような話し方をします。',
-          tone: '親しみやすく、好奇心旺盛な口調',
-        }
+      tone: '親しみやすく、好奇心旺盛な口調',
+    }
 
     // セクションのリストを作成（タイトルと説明を含む）
     const sectionsList = structureInfo.sections

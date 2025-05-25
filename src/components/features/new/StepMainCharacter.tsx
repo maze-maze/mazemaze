@@ -1,23 +1,16 @@
 'use client'
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input'
 import { useChat } from 'ai/react'
 import useEmblaCarousel from 'embla-carousel-react'
 import {
   ArrowLeft,
   ArrowLeftCircle,
-  ChevronRight,
-  Home,
   Info,
-  Loader2,
   PlayIcon,
-  Plus,
   User,
   UserCircle2,
 } from 'lucide-react'
-import { Play } from 'next/font/google'
 import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 
 // personalities型を拡張
 interface Personality {
@@ -305,13 +298,16 @@ export default function MainCharacterSelector({
 
   // オートプレイ用タイマー
   useEffect(() => {
-    if (!emblaApi) return // personalities.length === 0 でも自分カードでオートプレイ
+    if (!emblaApi)
+      return // personalities.length === 0 でも自分カードでオートプレイ
     let stopped = false
     let timer: NodeJS.Timeout | null = null
     const autoplay = () => {
-      if (stopped) return
+      if (stopped)
+        return
       timer = setTimeout(() => {
-        if (!emblaApi) return
+        if (!emblaApi)
+          return
         const slideCount = personalities.length + 1 // 自分+AI提案
         const nextIndex = (emblaApi.selectedScrollSnap() + 1) % slideCount
         emblaApi.scrollTo(nextIndex)
@@ -320,11 +316,13 @@ export default function MainCharacterSelector({
     autoplay()
     emblaApi.on('select', () => {
       stopped = true
-      if (timer) clearTimeout(timer)
+      if (timer)
+        clearTimeout(timer)
     })
     return () => {
       stopped = true
-      if (timer) clearTimeout(timer)
+      if (timer)
+        clearTimeout(timer)
     }
   }, [emblaApi, personalities.length]) // personalities.length は必要
 
@@ -465,8 +463,6 @@ export default function MainCharacterSelector({
         </div>
       )}
 
-  
-
       {/* パーソナリティカード一覧（スワイプ） */}
       {(!selected || showList) && !editMode && !showChat && (
         <div className="w-full max-w-xl rounded-xl mt-8 overflow-visible">
@@ -492,14 +488,15 @@ export default function MainCharacterSelector({
                       }
                     }}
                   >
-                    {personality.self ? (
+                    {personality.self
+                      ? (
                           <>
                             <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center mb-2 bg-primary/10">
                               <User className=" text-white" size={28} />
                             </div>
                             <span className=" font-bold mb-1 text-white">{personality.name}</span>
                             <p className="text-xs  line-clamp-2 mb-1 text-gray-200">{personality.description}</p>
-                          
+
                           </>
                         )
                       : (
@@ -581,7 +578,8 @@ export default function MainCharacterSelector({
                   if (selectedIndex === 0) {
                     handleSelect(selfCard) // 自分カードを選択
                     onNext()
-                  } else {
+                  }
+                  else {
                     const selectedPersonality = personalities[selectedIndex - 1]
                     if (selectedPersonality) {
                       handleSelect(selectedPersonality)

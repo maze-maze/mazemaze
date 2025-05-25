@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     if (mainCharacter) {
       try {
         mainCharacterInfo = typeof mainCharacter === 'string' ? JSON.parse(mainCharacter) : mainCharacter
-      } catch (e) {
+      }
+      catch (e) {
         console.error('Error parsing main character info:', e)
       }
     }
@@ -25,21 +26,22 @@ export async function POST(req: NextRequest) {
     if (guestCharacter) {
       try {
         guestCharacterInfo = typeof guestCharacter === 'string' ? JSON.parse(guestCharacter) : guestCharacter
-      } catch (e) {
+      }
+      catch (e) {
         console.error('Error parsing guest character info:', e)
       }
     }
 
     // キャラクター情報を考慮した追加プロンプト
-    let charactersPrompt = '';
+    let charactersPrompt = ''
     if (mainCharacterInfo || guestCharacterInfo) {
-        charactersPrompt = `以下のパーソナリティを考慮して構成を考えてください：\n`;
-        if (mainCharacterInfo) {
-            charactersPrompt += `- メインパーソナリティ: ${mainCharacterInfo.name} (${mainCharacterInfo.description}) トーン: ${mainCharacterInfo.tone}\n`;
-        }
-        if (guestCharacterInfo) {
-            charactersPrompt += `- ゲストパーソナリティ: ${guestCharacterInfo.name} (${guestCharacterInfo.description}) トーン: ${guestCharacterInfo.tone}\n`;
-        }
+      charactersPrompt = `以下のパーソナリティを考慮して構成を考えてください：\n`
+      if (mainCharacterInfo) {
+        charactersPrompt += `- メインパーソナリティ: ${mainCharacterInfo.name} (${mainCharacterInfo.description}) トーン: ${mainCharacterInfo.tone}\n`
+      }
+      if (guestCharacterInfo) {
+        charactersPrompt += `- ゲストパーソナリティ: ${guestCharacterInfo.name} (${guestCharacterInfo.description}) トーン: ${guestCharacterInfo.tone}\n`
+      }
     }
 
     const prompt = `
@@ -126,7 +128,7 @@ export async function POST(req: NextRequest) {
 function extractStructureFromText(
   text: string,
   theme: string,
-): { intro: string, sections: { title: string; description: string }[], outro: string } {
+): { intro: string, sections: { title: string, description: string }[], outro: string } {
   // イントロを抽出
   const introPattern = /イントロ[:：]?\s*([^\n]+(?:\n(?!\S+[:：])[^\n]+)*)/
   const introMatch = text.match(introPattern)
@@ -135,27 +137,27 @@ function extractStructureFromText(
     : `テーマ「${theme}」についての紹介`
 
   // セクションを抽出（様々なパターンを試す）
-  let sections: { title: string; description: string }[] = [];
+  let sections: { title: string, description: string }[] = []
 
   // 抽出ロジックを改善してタイトルと説明をペアで取得
   // 簡単な正規表現で「N. タイトル\n説明...」のような形式を想定
-  const complexSectionPattern = /(\d+)\.\s*([^\n]+)\n([\s\S]*?)(?=\n\d+\. |\n\n|アウトロ[:：]|$)/g;
-  let complexMatch;
+  const complexSectionPattern = /(\d+)\.\s*([^\n]+)\n([\s\S]*?)(?=\n\d+\. |\n\n|アウトロ[:：]|$)/g
+  let complexMatch
   while ((complexMatch = complexSectionPattern.exec(text)) !== null) {
-      if (complexMatch[2] && complexMatch[3]) {
-          sections.push({ title: complexMatch[2].trim(), description: complexMatch[3].trim() });
-      }
+    if (complexMatch[2] && complexMatch[3]) {
+      sections.push({ title: complexMatch[2].trim(), description: complexMatch[3].trim() })
+    }
   }
 
   // JSONパースに失敗した場合のフォールバックとして、タイトルのみを抽出する旧ロジックも残す（ただしsectionsの型は合わせる）
   if (sections.length === 0) {
-      const simpleSectionPattern = /セクション\d+[:：]?\s*([^\n]+)/g;
-      let simpleMatch;
-      while ((simpleMatch = simpleSectionPattern.exec(text)) !== null) {
-          if (simpleMatch[1]) {
-              sections.push({ title: simpleMatch[1].trim(), description: '' }); // 説明は空文字
-          }
+    const simpleSectionPattern = /セクション\d+[:：]?\s*([^\n]+)/g
+    let simpleMatch
+    while ((simpleMatch = simpleSectionPattern.exec(text)) !== null) {
+      if (simpleMatch[1]) {
+        sections.push({ title: simpleMatch[1].trim(), description: '' }) // 説明は空文字
       }
+    }
   }
 
   // アウトロを抽出
@@ -184,14 +186,16 @@ function getDefaultStructure(
   theme: string,
   mainCharacter: { name: string, description: string, tone: string } | null,
   guestCharacter: { name: string, description: string, tone: string } | null,
-): { intro: string, sections: { title: string; description: string }[], outro: string } {
-  let hostNames = 'ホスト';
+): { intro: string, sections: { title: string, description: string }[], outro: string } {
+  let hostNames = 'ホスト'
   if (mainCharacter && guestCharacter) {
-    hostNames = `${mainCharacter.name}と${guestCharacter.name}`;
-  } else if (mainCharacter) {
-    hostNames = mainCharacter.name;
-  } else if (guestCharacter) {
-    hostNames = guestCharacter.name;
+    hostNames = `${mainCharacter.name}と${guestCharacter.name}`
+  }
+  else if (mainCharacter) {
+    hostNames = mainCharacter.name
+  }
+  else if (guestCharacter) {
+    hostNames = guestCharacter.name
   }
 
   return {
