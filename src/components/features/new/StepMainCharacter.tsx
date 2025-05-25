@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   ArrowLeftCircle,
   Info,
+  Loader2,
   PlayIcon,
   User,
   UserCircle2,
@@ -276,7 +277,7 @@ export default function MainCharacterSelector({
   }
 
   // Embla Carousel用
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true })
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center' })
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [infoModal, setInfoModal] = useState<{ open: boolean, personality: Personality | null }>({ open: false, personality: null })
 
@@ -354,7 +355,7 @@ export default function MainCharacterSelector({
 
         </button>
         <p className="text-white font-black text-xl text-center">
-          メインパーソナリティを選ぶ
+        {loading ? "メインパーソナリティーを生成中...":"メインパーソナリティを選ぶ"} 
         </p>
       </div>
 
@@ -419,7 +420,7 @@ export default function MainCharacterSelector({
       {/* テーマ選択用のスワイプUI部分は削除 */}
 
       {/* 選択済みパーソナリティ表示 */}
-      {selected && !editMode && !showList && !showChat && (
+      {selected && !editMode && !showList && !showChat && !loading && (
         <div className="w-full max-w-md mb-8 bg-white rounded-xl  overflow-hidden">
           <div className="p-6">
             <div className="flex items-center mb-4">
@@ -467,7 +468,7 @@ export default function MainCharacterSelector({
       )}
 
       {/* パーソナリティカード一覧（スワイプ） */}
-      {(!selected || showList) && !editMode && !showChat && (
+      {(!selected || showList) && !editMode && !showChat && !loading && (
         <div className="w-full max-w-xl rounded-xl mt-8 overflow-visible">
           <div className="p-4">
             <div className="embla" ref={emblaRef}>
@@ -598,6 +599,12 @@ export default function MainCharacterSelector({
 
         </div>
       )}
+        {/* ローディング表示 */}
+        {loading && (
+        <div className="flex-1 flex justify-center items-center h-64">
+          <Loader2 size={40} className="animate-spin mr-3 text-white" />
+        </div>
+      )}
       {/* 詳細情報モーダル */}
       {infoModal.open && infoModal.personality && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -616,6 +623,7 @@ export default function MainCharacterSelector({
               <p className="text-sm text-gray-200 mt-1">{infoModal.personality.tone}</p>
             </div>
           </div>
+          
 
         </div>
       )}
