@@ -18,7 +18,7 @@ export default function ThemeSelector({
   onNext: () => void
 }) {
   // Embla Carousel用
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true })
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center' })
   const [selectedIndex, setSelectedIndex] = useState(1)
 
   // モックデータ
