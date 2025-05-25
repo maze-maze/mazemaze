@@ -1,4 +1,3 @@
-/* eslint-disable ts/no-use-before-define */
 'use client'
 import { Input } from '🎙️/components/ui/input'
 import useEmblaCarousel from 'embla-carousel-react'

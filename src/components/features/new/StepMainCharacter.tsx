@@ -355,7 +355,7 @@ export default function MainCharacterSelector({
 
         </button>
         <p className="text-white font-black text-xl text-center">
-        {loading ? "メインパーソナリティーを生成中...":"メインパーソナリティを選ぶ"} 
+          {loading ? 'メインパーソナリティーを生成中...' : 'メインパーソナリティを選ぶ'}
         </p>
       </div>
 
@@ -599,8 +599,8 @@ export default function MainCharacterSelector({
 
         </div>
       )}
-        {/* ローディング表示 */}
-        {loading && (
+      {/* ローディング表示 */}
+      {loading && (
         <div className="flex-1 flex justify-center items-center h-64">
           <Loader2 size={40} className="animate-spin mr-3 text-white" />
         </div>
@@ -623,7 +623,6 @@ export default function MainCharacterSelector({
               <p className="text-sm text-gray-200 mt-1">{infoModal.personality.tone}</p>
             </div>
           </div>
-          
 
         </div>
       )}
