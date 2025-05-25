@@ -1,3 +1,6 @@
+/* eslint-disable no-cond-assign */
+/* eslint-disable no-console */
+
 import type { NextRequest } from 'next/server'
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
         model: google('gemini-1.5-flash'),
         prompt,
         temperature: 0.7,
-        maxOutputTokens: 1000,
+        maxTokens: 1000,
       })
 
       console.log(

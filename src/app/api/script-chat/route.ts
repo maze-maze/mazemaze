@@ -52,7 +52,7 @@ export async function POST(req: Request) {
   if (structureInfo) {
     const sectionsList = Array.isArray(structureInfo.sections)
       ? structureInfo.sections
-          .map((section, index) => `セクション${index + 1}: ${section}`)
+          .map((section: any, index: number) => `セクション${index + 1}: ${section}`)
           .join('\n')
       : ''
 
@@ -93,7 +93,7 @@ ${structurePrompt}
       model: google('gemini-1.5-flash'),
       messages: fullMessages,
       temperature: 0.7,
-      maxOutputTokens: 4096, // 長めのスクリプトを生成できるように
+      maxTokens: 4096, // 長めのスクリプトを生成できるように
     })
 
     // 公式ドキュメント通りにストリーミングレスポンスを返す

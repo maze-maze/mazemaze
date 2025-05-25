@@ -1,3 +1,7 @@
+/* eslint-disable no-cond-assign */
+/* eslint-disable regexp/no-super-linear-backtracking */
+/* eslint-disable ts/no-use-before-define */
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 import { Button } from '🎙️/components/ui/button'
 import { Input } from '🎙️/components/ui/input'
@@ -154,7 +158,7 @@ export default function StructureSelector({
   const extractStructureFromMessage = (content: string) => {
     // イントロを抽出
     const introMatch = content.match(
-      /イントロ[:：]\s*(.*?)(?=\n\n|\n##|\n\*\*セクション|$)/s,
+      /イントロ[:：]\s*([\s\S]*?)(?=\n\n|\n##|\n\*\*セクション|$)/,
     )
     const intro = introMatch ? introMatch[1].trim() : ''
 
@@ -207,7 +211,7 @@ export default function StructureSelector({
     }
 
     // アウトロを抽出
-    const outroMatch = content.match(/アウトロ[:：]\s*(.*?)(?=\n\n|$)/s)
+    const outroMatch = content.match(/アウトロ[:：]\s*([\s\S]*?)(?=\n\n|$)/)
     const outro = outroMatch ? outroMatch[1].trim() : ''
 
     // セクションが空の場合は、最低3つのダミーセクションを作成

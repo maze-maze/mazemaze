@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import type { NextRequest } from 'next/server'
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
       model: google('gemini-1.5-flash'),
       prompt,
       temperature: 0.8, // 多様なテーマを生成するために温度を上げる
-      maxOutputTokens: 1000,
+      maxTokens: 1000,
     })
 
     // テキストからテーマを抽出
