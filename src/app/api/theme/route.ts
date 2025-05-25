@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       model: google('gemini-1.5-flash'),
       prompt,
       temperature: 0.8, // 多様なテーマを生成するために温度を上げる
-      maxTokens: 1000,
+      maxTokens: 9000,
     })
 
     // テキストからテーマを抽出

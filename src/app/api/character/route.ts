@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         model: google('gemini-1.5-flash'),
         prompt,
         temperature: 0.7,
-        maxTokens: 1000,
+        maxTokens: 9000,
       })
 
       console.log(

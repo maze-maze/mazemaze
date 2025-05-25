@@ -1,4 +1,3 @@
-/* eslint-disable ts/no-use-before-define */
 'use client'
 import { Input } from '🎙️/components/ui/input'
 import useEmblaCarousel from 'embla-carousel-react'
@@ -18,7 +17,7 @@ export default function ThemeSelector({
   onNext: () => void
 }) {
   // Embla Carousel用
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true })
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center' })
   const [selectedIndex, setSelectedIndex] = useState(1)
 
   // モックデータ
