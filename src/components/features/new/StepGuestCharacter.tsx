@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   ArrowLeftCircle,
   Info,
+  Loader2,
   PlayIcon,
   User,
   UserCircle2,
@@ -278,7 +279,7 @@ export default function GuestCharacterSelector({
   }
 
   // Embla Carousel用
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true })
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center'})
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [infoModal, setInfoModal] = useState<{ open: boolean, personality: Personality | null }>({ open: false, personality: null })
 
@@ -358,7 +359,7 @@ export default function GuestCharacterSelector({
 
         </button>
         <p className="text-white font-black text-xl text-center">
-          ゲストパーソナリティを選ぶ
+        {loading ? "ゲストパーソナリティーを生成中...":"ゲストパーソナリティーを選ぶ"} 
         </p>
       </div>
 
@@ -423,7 +424,7 @@ export default function GuestCharacterSelector({
       {/* テーマ選択用のスワイプUI部分は削除 */}
 
       {/* 選択済みパーソナリティ表示 */}
-      {selected && !editMode && !showList && !showChat && (
+      {selected && !editMode && !showList && !showChat && !loading &&  (
         <div className="w-full max-w-md mb-8 bg-white rounded-xl  overflow-hidden">
           <div className="p-6">
             <div className="flex items-center mb-4">
@@ -471,7 +472,7 @@ export default function GuestCharacterSelector({
       )}
 
       {/* パーソナリティカード一覧（スワイプ） */}
-      {(!selected || showList) && !editMode && !showChat && (
+      {(!selected || showList) && !editMode && !showChat && !loading && (
         <div className="w-full max-w-xl rounded-xl mt-8 overflow-visible">
           <div className="p-4">
             <div className="embla" ref={emblaRef}>
@@ -604,6 +605,12 @@ export default function GuestCharacterSelector({
             </div>
           </div>
 
+        </div>
+      )}
+        {/* ローディング表示 */}
+        {loading && (
+        <div className="flex-1 flex justify-center items-center h-64">
+          <Loader2 size={40} className="animate-spin mr-3 text-white" />
         </div>
       )}
       {/* 詳細情報モーダル */}
