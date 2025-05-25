@@ -1,48 +1,56 @@
-/* eslint-disable no-cond-assign */
-/* eslint-disable regexp/no-super-linear-backtracking */
+/* eslint-disable style/multiline-ternary */
 /* eslint-disable ts/no-use-before-define */
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
+
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input'
-import { useChat } from 'ai/react'
+import { Input } from '🎙️/components/ui/input' // 編集モードで使用
+import { Textarea } from '🎙️/components/ui/textarea' // Textarea をインポート
 import {
   ArrowLeft,
+  CheckIcon,
   ChevronRight,
-  Loader2,
-  MenuSquare,
-  PlusCircle,
+  Loader2, // セクションアイコンとして使用
+  MoveDown,
+  MoveUp,
+  PenIcon,
+  PlusCircle, // 再生成アイコンを追加
   Trash2,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { Fragment, useEffect, useRef, useState } from 'react' // useEffect をインポート
+
+// 型定義
+interface Character {
+  name: string
+  description: string
+  tone: string
+  self?: boolean
+}
+
+interface Structure {
+  intro: string
+  sections: { title: string, description: string }[]
+  outro: string
+}
 
 export default function StructureSelector({
   theme,
-  character,
+  mainCharacter,
+  guestCharacter,
+  gradient,
   onSelect,
   onNext,
   onBack,
 }: {
   theme: string
-  character: {
-    name: string
-    description: string
-    tone: string
-  } | null
-  onSelect: (structure: {
-    intro: string
-    sections: string[]
-    outro: string
-  }) => void
+  mainCharacter: Character | null
+  guestCharacter: Character | null
+  gradient: string
+  onSelect: (structure: Structure) => void
   onNext: () => void
   onBack: () => void
 }) {
-  const [structure, setStructure] = useState<{
-    intro: string
-    sections: string[]
-    outro: string
-  }>({
+  const [structure, setStructure] = useState<Structure>({
     intro: '',
     sections: [],
     outro: '',
@@ -50,560 +58,473 @@ export default function StructureSelector({
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [error, setError] = useState('')
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
-  const [autoGenerate, setAutoGenerate] = useState(true)
 
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  // 構成をフェッチする関数
+  const fetchStructure = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme,
+          mainCharacter,
+          guestCharacter,
+        }),
+      })
 
-  // useChat hook from AI SDK
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    setMessages,
-  } = useChat({
-    api: '/api/structure-chat',
-    body: {
-      theme,
-      character: character ? JSON.stringify(character) : null,
-    },
-    onFinish: (message) => {
-      // Scroll to bottom when message is complete
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-
-      // Check if this is an AI response providing structure suggestions
-      if (message.role === 'assistant' && messages.length <= 2) {
-        // Try to extract structure suggestions
-        try {
-          extractStructureFromMessage(message.content)
-        }
-        catch (err) {
-          console.error('Failed to extract structure', err)
-        }
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(
+          `API error: ${res.status} - ${errorData.error || res.statusText}`,
+        )
       }
-    },
-  })
 
-  // 初回ロード時に自動的にAIに構成の提案を依頼
-  useEffect(() => {
-    // APIから構成の候補を取得
-    const fetchStructure = async () => {
-      setLoading(true)
-      setError('')
-      try {
-        const res = await fetch('/api/structure', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            theme,
-            character,
-          }),
-        })
+      const data = await res.json()
 
-        // Check if the API request was successful
-        if (!res.ok) {
-          console.error(`API error: ${res.status} ${res.statusText}`)
-          // Instead of throwing an error, we'll fall back to AI generation
-          // Trigger AI to generate structure suggestions
-          if (autoGenerate) {
-            handleSubmit(new Event('submit') as any, {
-              data: {
-                prompt: `テーマ「${theme}」のポッドキャストの構成を提案してください。イントロ、${3}～${5}個のセクション、アウトロを含めてください。`,
-              },
-            })
-          }
-          setLoading(false)
-          return // Exit early instead of throwing
-        }
-
-        const data = await res.json()
-
-        if (data && data.intro && Array.isArray(data.sections) && data.outro) {
-          setStructure(data)
-          onSelect(data)
-          setLoading(false)
-        }
-        else {
-          // APIから適切な構造が取得できなかった場合は、AIに提案を依頼
-          if (autoGenerate) {
-            handleSubmit(new Event('submit') as any, {
-              data: {
-                prompt: `テーマ「${theme}」のポッドキャストの構成を提案してください。イントロ、${3}～${5}個のセクション、アウトロを含めてください。`,
-              },
-            })
-          }
-          setLoading(false)
-        }
+      if (data && data.intro && Array.isArray(data.sections) && data.outro) {
+        setStructure(data)
+        // onSelect(data) // <- 削除
       }
-      catch (err) {
-        console.error('Error fetching structure:', err)
-        // エラー時もAIに提案を依頼
-        if (autoGenerate) {
-          handleSubmit(new Event('submit') as any, {
-            data: {
-              prompt: `テーマ「${theme}」のポッドキャストの構成を提案してください。イントロ、${3}～${5}個のセクション、アウトロを含めてください。`,
-            },
-          })
-        }
-        setLoading(false)
+      else {
+        throw new Error('APIから有効な構成が返されませんでした。')
       }
     }
-
-    fetchStructure()
-  }, [theme, character, autoGenerate])
-
-  // メッセージの内容から構成を抽出する関数
-  const extractStructureFromMessage = (content: string) => {
-    // イントロを抽出
-    const introMatch = content.match(
-      /イントロ[:：]\s*([\s\S]*?)(?=\n\n|\n##|\n\*\*セクション|$)/,
-    )
-    const intro = introMatch ? introMatch[1].trim() : ''
-
-    // セクションを抽出 (複数の抽出パターンを試す)
-    let sections: string[] = []
-
-    // パターン1: **セクション1: タイトル** 形式
-    const sectionPattern1 = /\*\*セクション\d+[:：]?\s*(.*?)\*\*/g
-    let sectionMatch1
-    const sectionsFromPattern1: string[] = []
-    while ((sectionMatch1 = sectionPattern1.exec(content)) !== null) {
-      if (sectionMatch1[1]) {
-        sectionsFromPattern1.push(sectionMatch1[1].trim())
+    catch (err) {
+      console.error('Error fetching/generating structure:', err)
+      setError(
+        `構成の取得または生成中にエラーが発生しました: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      )
+      // エラー時もデフォルト構造を表示
+      const defaultStructure = {
+        intro: `テーマ「${theme}」についての紹介`,
+        sections: [
+          { title: 'テーマの背景と重要性', description: 'このセクションでは、テーマの背景にある歴史や、なぜ今このテーマが重要なのかについて話します。' },
+          { title: '主要な論点とディスカッション', description: 'テーマに関するいくつかの主要なポイントを取り上げ、それぞれの視点から深く掘り下げて議論します。' },
+          { title: 'まとめと今後の展望', description: 'これまでの議論をまとめ、このテーマが今後どのように展開していく可能性があるかについて考察します。' },
+        ],
+        outro: '今回のポッドキャストのまとめと、リスナーへのメッセージ、次回の予告など。',
       }
+      setStructure(defaultStructure)
+      // onSelect(defaultStructure) // <- 削除
     }
-
-    // パターン2: ## セクション1: タイトル 形式
-    const sectionPattern2 = /##\s*セクション\d+[:：]?\s*(.*)(?=\n|$)/g
-    let sectionMatch2
-    const sectionsFromPattern2: string[] = []
-    while ((sectionMatch2 = sectionPattern2.exec(content)) !== null) {
-      if (sectionMatch2[1]) {
-        sectionsFromPattern2.push(sectionMatch2[1].trim())
-      }
+    finally {
+      setLoading(false)
     }
-
-    // パターン3: 1. タイトル 形式
-    const sectionPattern3
-      = /\d+\.\s*(.*)(?=\n\d+\.|\n\n|\n##|\n\*\*アウトロ|$)/g
-    let sectionMatch3
-    const sectionsFromPattern3: string[] = []
-    while ((sectionMatch3 = sectionPattern3.exec(content)) !== null) {
-      if (sectionMatch3[1]) {
-        sectionsFromPattern3.push(sectionMatch3[1].trim())
-      }
-    }
-
-    // 最も多くのセクションを抽出できたパターンを採用
-    if (
-      sectionsFromPattern1.length >= sectionsFromPattern2.length
-      && sectionsFromPattern1.length >= sectionsFromPattern3.length
-    ) {
-      sections = sectionsFromPattern1
-    }
-    else if (sectionsFromPattern2.length >= sectionsFromPattern3.length) {
-      sections = sectionsFromPattern2
-    }
-    else {
-      sections = sectionsFromPattern3
-    }
-
-    // アウトロを抽出
-    const outroMatch = content.match(/アウトロ[:：]\s*([\s\S]*?)(?=\n\n|$)/)
-    const outro = outroMatch ? outroMatch[1].trim() : ''
-
-    // セクションが空の場合は、最低3つのダミーセクションを作成
-    if (sections.length === 0) {
-      sections = [
-        'テーマの背景と重要性',
-        '主要な論点とディスカッション',
-        'まとめと今後の展望',
-      ]
-    }
-
-    // 構造を設定
-    const newStructure = {
-      intro: intro || `テーマ「${theme}」についての紹介`,
-      sections,
-      outro: outro || 'まとめと次回の予告',
-    }
-
-    setStructure(newStructure)
-    onSelect(newStructure)
-    setLoading(false)
   }
 
-  // 構造を更新する関数
+  // 初回ロード時に構成をフェッチ
+  useEffect(() => {
+    fetchStructure()
+  }, [theme, mainCharacter, guestCharacter]) // 依存関係を明記
+
+  // *** 追加: structure が変更されたときに onSelect を呼び出す副作用フック ***
+  useEffect(() => {
+    // ローディング中や初期状態（空）では呼び出さない
+    if (!loading && (structure.intro || structure.sections.length > 0 || structure.outro)) {
+      onSelect(structure)
+    }
+  }, [structure, onSelect, loading]) // structure, onSelect, loading を依存配列に追加
+
+  // 構成を更新する関数
   const updateStructure = (field: 'intro' | 'outro', value: string) => {
-    const newStructure = { ...structure, [field]: value }
-    setStructure(newStructure)
-    onSelect(newStructure)
+    setStructure(prev => ({ ...prev, [field]: value }))
+    // onSelect(newStructure) // <- 削除
   }
 
   // セクションを更新する関数
-  const updateSection = (index: number, value: string) => {
-    const newSections = [...structure.sections]
-    newSections[index] = value
-    const newStructure = { ...structure, sections: newSections }
-    setStructure(newStructure)
-    onSelect(newStructure)
+  const updateSection = (
+    index: number,
+    updatedFields: { title?: string, description?: string },
+  ) => {
+    setStructure((prevStructure) => {
+      const newSections = [...prevStructure.sections]
+      if (newSections[index]) {
+        newSections[index] = { ...newSections[index], ...updatedFields }
+      }
+      // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
+      return { ...prevStructure, sections: newSections }
+    })
   }
 
   // セクションを追加する関数
-  const addSection = () => {
-    const newSections = [...structure.sections, '新しいセクション']
-    const newStructure = { ...structure, sections: newSections }
-    setStructure(newStructure)
-    onSelect(newStructure)
+  const addSection = (index: number) => {
+    setStructure((prevStructure) => {
+      const newSections = [...prevStructure.sections]
+      newSections.splice(index, 0, {
+        title: '新しいセクション',
+        description: 'このセクションで話す内容...',
+      })
+      // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
+      return { ...prevStructure, sections: newSections }
+    })
   }
 
   // セクションを削除する関数
   const removeSection = (index: number) => {
-    const newSections = structure.sections.filter((_, i) => i !== index)
-    const newStructure = { ...structure, sections: newSections }
-    setStructure(newStructure)
-    onSelect(newStructure)
-  }
-
-  // チャットで質問を送信
-  const submitChatMessage = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!input.trim())
-      return
-    handleSubmit(e)
-  }
-
-  // チャットが表示されているかどうか
-  const showChat = messages.length > 1
-
-  // 再生成ボタンのクリックハンドラー
-  const handleRegenerateStructure = () => {
-    setLoading(true)
-    handleSubmit(new Event('submit') as any, {
-      data: {
-        prompt: `テーマ「${theme}」のポッドキャストの構成を提案してください。イントロ、${3}～${5}個のセクション、アウトロを含めてください。${
-          character
-            ? `キャラクター「${character.name}」の個性に合わせた内容にしてください。`
-            : ''
-        }`,
-      },
+    setStructure((prevStructure) => {
+      if (prevStructure.sections.length <= 1)
+        return prevStructure
+      const newSections = prevStructure.sections.filter((_, i) => i !== index)
+      // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
+      return { ...prevStructure, sections: newSections }
     })
   }
 
-  return (
-    <div className="flex flex-col items-center w-full h-full">
-      <div className="w-full flex justify-between items-center px-4 md:px-8 py-4">
-        <button
-          onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-primary transition-colors"
-        >
-          <ArrowLeft className="mr-1" size={16} />
-          パーソナリティ選択に戻る
-        </button>
+  // セクションを上に移動
+  const moveSectionUp = (index: number) => {
+    if (index === 0)
+      return
+    setStructure((prevStructure) => {
+      const newSections = [...prevStructure.sections]
+      ;[newSections[index - 1], newSections[index]] = [
+        newSections[index],
+        newSections[index - 1],
+      ] // Swap
+      // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
+      return { ...prevStructure, sections: newSections }
+    })
+  }
 
-        {structure
-          && structure.intro
-          && structure.sections.length > 0
-          && structure.outro && (
-          <Button onClick={onNext} className="flex items-center" size="sm">
-            次へ進む
-            <ChevronRight className="ml-1" size={16} />
-          </Button>
-        )}
+  // セクションを下に移動
+  const moveSectionDown = (index: number) => {
+    if (index === structure.sections.length - 1)
+      return
+    setStructure((prevStructure) => {
+      const newSections = [...prevStructure.sections]
+      ;[newSections[index], newSections[index + 1]] = [
+        newSections[index + 1],
+        newSections[index],
+      ] // Swap
+      // onSelect({ ...prevStructure, sections: newSections }) // <- 削除
+      return { ...prevStructure, sections: newSections }
+    })
+  }
+
+  // 再生成ボタンのハンドラー
+  const handleRegenerateStructure = () => {
+    fetchStructure()
+  }
+
+  return (
+    <div className="flex flex-col overflow-hidden items-center w-full h-screen bg-[#0E0B16]">
+      {/* テーマ名表示（上部） */}
+      <div className="w-full py-5 flex items-center justify-center">
+        {/* アイコン例: テーマ名に応じて画像を出し分けたい場合はここで */}
+        <div className="mb-2 flex items-center justify-center">
+          <img src="/lama.png" alt="テーマアイコン" className="w-8 h-8 inline-block align-middle mr-2" />
+          <span className="text-gray-100 text-base font-bold">{theme}</span>
+        </div>
       </div>
 
-      <h1 className="text-3xl font-serif text-center mt-6 mb-2">
-        ポッドキャストの構成
-      </h1>
-      <p className="mb-6 text-gray-500 text-center max-w-md px-4">
-        テーマ「
-        {theme}
-        」のポッドキャストの構成を決めましょう。
-        {character && `「${character.name}」の個性を活かした構成にします。`}
-      </p>
+      <div className="flex items-center mb-2 px-8 justify-between w-full gap-3">
+
+        <button
+          onClick={onBack}
+          className="flex items-center text-white hover:text-primary transition-colors"
+        >
+          <ArrowLeft size={26} />
+        </button>
+        <p className="text-white font-black text-xl text-center">
+          構成を考える
+        </p>
+
+        <div className="flex items-center">
+          <Button
+            variant="outline"
+            className="rounded-full w-8 h-8"
+            size="sm"
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? <CheckIcon /> : <PenIcon />}
+          </Button>
+        </div>
+      </div>
+
+      {/* エラー表示 */}
+      {error && (
+        <div className="text-red-500 bg-red-900/30 border border-red-500/50 p-3 rounded-md mb-4 w-full max-w-2xl">
+          {error}
+        </div>
+      )}
 
       {/* 構成表示・編集 */}
       {!loading && structure && (
-        <div className="w-full max-w-2xl mb-8 bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center mb-4">
-              <MenuSquare className="text-primary h-6 w-6 mr-3" />
-              <div>
-                <h3 className="text-xl font-bold">ポッドキャスト構成</h3>
-                <p className="text-sm text-gray-500">
-                  セクションの順序はドラッグで変更できます
-                </p>
-              </div>
-              <div className="ml-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditMode(!editMode)}
-                >
-                  {editMode ? '表示モード' : '編集モード'}
-                </Button>
-              </div>
-            </div>
-
-            {/* 構成内容 */}
-            <div className="space-y-4">
-              {/* イントロ */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-primary mb-2">イントロ</h4>
-                {editMode
-                  ? (
-                      <textarea
-                        value={structure.intro}
-                        onChange={e => updateStructure('intro', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        rows={2}
-                      />
-                    )
-                  : (
-                      <p className="text-gray-700">{structure.intro}</p>
-                    )}
-              </div>
-
-              {/* セクション */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium text-primary">セクション</h4>
-                  {editMode && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={addSection}
-                      className="flex items-center text-gray-600 hover:text-primary"
-                    >
-                      <PlusCircle size={16} className="mr-1" />
-                      セクション追加
-                    </Button>
-                  )}
-                </div>
-
-                {structure.sections.map((section, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center border border-gray-200 rounded-lg p-3"
-                  >
-                    <div className="w-8 h-8 flex-shrink-0 bg-gray-100 rounded-full flex items-center justify-center mr-3">
-                      {index + 1}
-                    </div>
-                    <div className="flex-grow">
-                      {editMode
-                        ? (
-                            <Input
-                              value={section}
-                              onChange={e => updateSection(index, e.target.value)}
-                              className="w-full"
-                            />
-                          )
-                        : (
-                            <p className="text-gray-700">{section}</p>
-                          )}
-                    </div>
-                    {editMode && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeSection(index)}
-                        className="ml-2 text-gray-400 hover:text-red-500"
-                        disabled={structure.sections.length <= 1}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* アウトロ */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-primary mb-2">アウトロ</h4>
-                {editMode
-                  ? (
-                      <textarea
-                        value={structure.outro}
-                        onChange={e => updateStructure('outro', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        rows={2}
-                      />
-                    )
-                  : (
-                      <p className="text-gray-700">{structure.outro}</p>
-                    )}
-              </div>
-            </div>
-
-            {/* アクションボタン */}
-            <div className="flex justify-between mt-6">
-              <Button
-                variant="outline"
-                onClick={handleRegenerateStructure}
-                disabled={isLoading}
-                className="flex items-center gap-2"
-              >
-                {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
-                構成を再生成
-              </Button>
-
-              <Button
-                onClick={onNext}
-                disabled={
-                  !structure.intro
-                  || structure.sections.length === 0
-                  || !structure.outro
-                }
-              >
-                この構成で次へ進む
-              </Button>
+        <div className="w-full max-w-2xl overflow-y-auto flex-1 px-4">
+          <div className="p-6 pb-32">
+            <div className="space-y-1">
+              <StructureCard
+                title="イントロ"
+                content={structure.intro} // イントロは content を使う
+                editMode={editMode}
+                onContentChange={value => updateStructure('intro', value)}
+                isSection={false}
+              />
+              <AddSectionButton
+                onClick={() => addSection(0)}
+                editMode={editMode}
+              />
+              {structure.sections.map((section, index) => (
+                <Fragment key={index}>
+                  <StructureCard
+                    title={section.title}
+                    content={section.title} // セクションは title を content として渡す
+                    description={section.description}
+                    editMode={editMode}
+                    onContentChange={value =>
+                      updateSection(index, { title: value })}
+                    onDescriptionChange={value =>
+                      updateSection(index, { description: value })}
+                    isSection={true}
+                    onRemove={() => removeSection(index)}
+                    canRemove={structure.sections.length > 1}
+                    onMoveUp={() => moveSectionUp(index)}
+                    onMoveDown={() => moveSectionDown(index)}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < structure.sections.length - 1}
+                  />
+                  <AddSectionButton
+                    onClick={() => addSection(index + 1)}
+                    editMode={editMode}
+                  />
+                </Fragment>
+              ))}
+              <StructureCard
+                title="アウトロ"
+                content={structure.outro} // アウトロは content を使う
+                editMode={editMode}
+                onContentChange={value => updateStructure('outro', value)}
+                isSection={false}
+              />
             </div>
           </div>
         </div>
       )}
 
+      {/* 決定ボタン */}
+      {!loading && (
+        <div
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[60px] flex items-center justify-center px-8 rounded-full z-20"
+          style={{
+            background: 'rgba(255,255,255,0.65)',
+            boxShadow:
+              '0 4px 32px 0 rgba(0,0,0,0.18), 0 1.5px 8px 0 rgba(255,255,255,0.25) inset',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1.5px solid rgba(255,255,255,0.45)',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '9999px',
+              border: '2px solid #fff',
+              pointerEvents: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <button
+            className="font-bold text-lg px-8 py-2 rounded-full transition text-gray-900 hover:text-black"
+            onClick={onNext}
+            disabled={
+              !structure.intro
+              || structure.sections.length === 0
+              || !structure.outro
+            }
+          >
+            決定
+          </button>
+        </div>
+      )}
+
       {/* ローディング表示 */}
       {loading && (
-        <div className="flex justify-center items-center h-32">
-          <Loader2 className="animate-spin mr-2" />
-          <span className="text-gray-500">構成を生成中...</span>
+        <div className="flex-1 flex justify-center items-center h-64">
+          <Loader2 size={32} className="animate-spin mr-3 text-white" />
+          <span className="text-gray-400 text-lg">構成を生成中...</span>
         </div>
       )}
+    </div>
+  )
+}
 
-      {/* チャットUI */}
-      {showChat && !editMode && (
-        <div className="w-full max-w-md flex flex-col gap-2 mb-8 rounded-xl p-4">
-          {messages.slice(1).map(message => (
-            <div
-              key={message.id}
-              className={`whitespace-pre-wrap ${
-                message.role === 'user' ? 'text-right' : 'text-left'
-              }`}
-            >
-              <div
-                className={`inline-block px-3 py-2 rounded-2xl ${
-                  message.role === 'user'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-primary/10 text-primary'
-                } max-w-[85%]`}
-              >
-                {message.role === 'assistant'
-                  ? (
-                      <div className="markdown prose prose-sm max-w-none">
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
-                      </div>
-                    )
-                  : (
-                      message.content
-                    )}
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="text-left text-primary">
-              <span className="inline-block px-3 py-2 rounded-2xl bg-primary/10 text-primary">
-                <div className="flex items-center space-x-2">
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '0ms' }}
-                  />
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '150ms' }}
-                  />
-                  <div
-                    className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
-                    style={{ animationDelay: '300ms' }}
-                  />
-                </div>
-              </span>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-      )}
+// 各構成要素を表示するカードコンポーネント
+interface StructureCardProps {
+  title: string
+  content: string
+  description?: string
+  editMode: boolean
+  onContentChange: (value: string) => void
+  onDescriptionChange?: (value: string) => void
+  isSection?: boolean
+  onRemove?: () => void
+  canRemove?: boolean
+  onMoveUp?: () => void
+  onMoveDown?: () => void
+  canMoveUp?: boolean
+  canMoveDown?: boolean
+}
 
-      {/* 入力欄 - チャット時のみ表示 */}
-      {showChat && !editMode && (
-        <div className="w-full max-w-md fixed bottom-8 left-1/2 -translate-x-1/2">
-          <form
-            onSubmit={submitChatMessage}
-            className="flex items-center bg-gray-100 rounded-full px-4 py-2 shadow"
-          >
-            <Input
-              className="flex-1 border-none bg-transparent shadow-none focus-visible:ring-0"
-              placeholder="構成について質問・相談できます"
-              value={input}
-              onChange={handleInputChange}
-              style={{
-                boxShadow: 'none',
-                border: 'none',
-              }}
-            />
-            <button
-              type="submit"
-              className="ml-2 text-gray-400 hover:text-primary transition-colors"
-              aria-label="send chat"
-              disabled={isLoading || !input.trim()}
-            >
-              💬
-            </button>
-          </form>
+const StructureCard: React.FC<StructureCardProps> = ({
+  title,
+  content,
+  description,
+  editMode,
+  onContentChange,
+  onDescriptionChange,
+  isSection = false,
+  onRemove,
+  canRemove,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(isSection)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-          {messages.length > 2 && !structure.intro && (
-            <div className="mt-2 flex justify-center">
+  // テキストエリアの高さを自動調整
+  useEffect(() => {
+    if (editMode && textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto'
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
+    }
+  }, [description, content, editMode, isExpanded])
+
+  return (
+    <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg p-5 border border-white/20 text-white mb-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center flex-1 min-w-0">
+          {' '}
+          {/* flex-1 と min-w-0 で幅を確保 */}
+          {isSection && (
+            <div className="flex flex-col mr-3">
               <button
-                onClick={() => {
-                  // Try to extract structure from the conversation
-                  const lastAiMessage = [...messages]
-                    .reverse()
-                    .find(m => m.role === 'assistant')
-                  if (lastAiMessage) {
-                    extractStructureFromMessage(lastAiMessage.content)
-                  }
-                }}
-                className="text-sm text-primary hover:underline flex items-center"
+                onClick={onMoveUp}
+                disabled={!canMoveUp || !editMode}
+                className={`text-gray-400 hover:text-white ${
+                  !canMoveUp || !editMode ? 'cursor-not-allowed opacity-30' : ''
+                }`}
+                aria-label="Move section up"
               >
-                AIの提案から構成を作成
-                <svg
-                  className="ml-1 w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
+                <MoveUp size={16} />
+              </button>
+              <button
+                onClick={onMoveDown}
+                disabled={!canMoveDown || !editMode}
+                className={`text-gray-400 hover:text-white ${
+                  !canMoveDown || !editMode ? 'cursor-not-allowed opacity-30' : ''
+                }`}
+                aria-label="Move section down"
+              >
+                <MoveDown size={16} />
               </button>
             </div>
           )}
+          {!isSection && (
+            <div className="w-6 h-6 mr-3" />
+          )}
+
+          {editMode
+            ? (
+                <Input
+                  type="text"
+                  value={content}
+                  onChange={e => onContentChange(e.target.value)}
+                  className="font-semibold text-gray-100 text-lg w-full bg-transparent border-b border-gray-600 focus:outline-none focus:ring-0 focus:border-white p-1 truncate"
+                  placeholder={isSection ? 'セクションタイトル' : title}
+                />
+              )
+            : (
+                <h4 className="font-semibold text-gray-100 text-lg truncate">{title}</h4>
+              )}
+        </div>
+
+        <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+          {' '}
+          {/* flex-shrink-0 を追加 */}
+          {editMode && isSection && onRemove && (
+            <button
+              onClick={onRemove}
+              disabled={!canRemove}
+              className={`text-gray-400 hover:text-red-400 ${
+                !canRemove ? 'cursor-not-allowed opacity-30' : ''
+              }`}
+              aria-label="Remove section"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+          {isSection && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-gray-300 hover:text-white p-1 rounded-full"
+              aria-label={isExpanded ? '折りたたむ' : '展開する'}
+            >
+              <ChevronRight
+                size={22}
+                className={`${
+                  isExpanded ? 'transform rotate-90' : ''
+                } transition-transform duration-200`}
+              />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {(isExpanded || !isSection) && (
+        <div className="mt-3 pl-9">
+          {editMode ? (
+            <Textarea
+              ref={textAreaRef}
+              value={isSection ? description : content}
+              onChange={e =>
+                isSection && onDescriptionChange
+                  ? onDescriptionChange(e.target.value)
+                  : onContentChange(e.target.value)}
+              className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
+              placeholder={
+                isSection
+                  ? 'セクションの具体的な内容や説明'
+                  : `${title}の内容説明`
+              }
+              rows={isSection ? 3 : 2} // 行数を調整
+            />
+          ) : (
+            <p className="text-gray-300 text-sm whitespace-pre-wrap bg-gray-800/20 p-3 rounded-md">
+              {isSection ? description : content}
+            </p>
+          )}
         </div>
       )}
-
-      {/* チャット切り替えボタン */}
-      <Button
-        variant={showChat ? 'outline' : 'default'}
-        className="mt-4"
-        onClick={() => {
-          if (!showChat) {
-            // AIに構成について相談
-            handleSubmit(new Event('submit') as any, {
-              data: {
-                prompt: `テーマ「${theme}」のポッドキャストの構成について相談したいです。どのような構成がおすすめですか？`,
-              },
-            })
-          }
-        }}
-      >
-        {showChat ? '構成エディタを表示' : 'AIと構成について相談する'}
-      </Button>
     </div>
+  )
+}
+
+// セクション追加ボタンコンポーネント
+const AddSectionButton: React.FC<{ onClick: () => void, editMode: boolean }> = ({
+  onClick,
+  editMode,
+}) => {
+  return (
+    <>
+      {editMode && (
+        <div className="flex justify-center my-2 h-6 items-center">
+          <div className="h-px bg-white/20 w-1/3"></div>
+          <button
+            onClick={onClick}
+            className="text-gray-400 hover:text-white transition-colors flex items-center mx-4"
+            aria-label="Add section"
+          >
+            <PlusCircle size={20} />
+          </button>
+          <div className="h-px bg-white/20 w-1/3"></div>
+        </div>
+      )}
+    </>
   )
 }

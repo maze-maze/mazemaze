@@ -1,7 +1,7 @@
 export const StorageKeys = {
-  THEME: 'theme',
-  TITLE: 'title',
-  CHARACTER: 'character',
-  STRUCTURE: 'structure',
-  SCRIPT: 'script',
+  THEME: 'podcast-theme', // キー名にプレフィックスを付けると衝突しにくい
+  MAIN: 'podcast-main-character',
+  GUEST: 'podcast-guest-character',
+  STRUCTURE: 'podcast-structure',
+  SCRIPT: 'podcast-script',
 } as const
