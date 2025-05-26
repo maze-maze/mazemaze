@@ -7,6 +7,7 @@ import {
   Search,
   User,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export default function ThemeSelector({
@@ -175,13 +176,13 @@ export default function ThemeSelector({
               <Input
                 className="flex-1 py-4 px-2 pl-12 h-12 border-none text-[#9B9FAB] bg-white rounded-[40px]"
                 placeholder="AIとテーマを探そう"
-                // value={searchQuery}
-                // onChange={e => setSearchQuery(e.target.value)}
-                // onKeyDown={(e) => {
-                // if (e.key === 'Enter' && searchQuery.trim()) {
-                // searchRelatedThemes(searchQuery)
-                // }
-                // }}
+              // value={searchQuery}
+              // onChange={e => setSearchQuery(e.target.value)}
+              // onKeyDown={(e) => {
+              // if (e.key === 'Enter' && searchQuery.trim()) {
+              // searchRelatedThemes(searchQuery)
+              // }
+              // }}
               />
 
             </div>
@@ -200,8 +201,7 @@ export default function ThemeSelector({
                     <button
                       key={idx}
                       className={`embla__slide flex-shrink-0 p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/4 w-40 relative mx-2 shadow-md text-white
-                        ${
-                    idx === 0
+                        ${idx === 0
                       ? 'bg-gradient-to-b from-black to-gray-800'
                       : gradients[(idx - 1) % gradients.length]
                     }
@@ -244,12 +244,16 @@ export default function ThemeSelector({
 
               {/* ナビゲーションバー */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
-                <Home className="text-white opacity-80" size={28} />
-                <div className="flex-1 flex justify-center">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
-                    <Plus className="text-white" size={38} />
+                <Link href="/">
+                  <Home className="text-white opacity-80" size={28} />
+                </Link>
+                <Link href="/new">
+                  <div className="flex-1 flex justify-center">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
+                      <Plus className="text-white" size={38} />
+                    </div>
                   </div>
-                </div>
+                </Link>
                 <User className="text-white opacity-80" size={28} />
               </div>
             </div>
