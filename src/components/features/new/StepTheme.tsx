@@ -243,7 +243,7 @@ export default function ThemeSelector({
               </div>
 
               {/* ナビゲーションバー */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
+              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
                 <Link href="/">
                   <Home className="text-white opacity-80" size={28} />
                 </Link>

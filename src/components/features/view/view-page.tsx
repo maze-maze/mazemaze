@@ -59,7 +59,7 @@ export default function ViewPage() {
         }}
         setApi={setApi}
       >
-        <CarouselContent className="h-dvh">
+        <CarouselContent className="h-screen">
           {Array.from({ length: 4 }).map((_, index) => (
             <CarouselItem key={index} className="h-full w-full bg-[#0E0B16] flex flex-col items-center gap-8 pt-20 relative">
               <p className="text-2xl">{items[index].title}</p>
