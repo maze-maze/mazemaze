@@ -12,18 +12,22 @@ import { useEffect, useState } from 'react'
 
 const items = [
   {
+    id: 'uma',
     bg: 'bg-gradient-to-b from-purple-500 to-pink-300',
     title: '謎の未確認生物 UMA探訪記',
   },
   {
+    id: 'gourmet',
     bg: 'bg-gradient-to-b from-blue-600 to-blue-200',
     title: '異世界転生グルメ紀行',
   },
   {
+    id: 'cafe',
     bg: 'bg-gradient-to-b from-yellow-400 to-yellow-200',
     title: '昭和レトロ喫茶の魅力',
   },
   {
+    id: 'space',
     bg: 'bg-gradient-to-b from-green-400 to-green-200',
     title: '宇宙人と語る夜',
   },
@@ -31,6 +35,9 @@ const items = [
 
 export default function ViewPage() {
   const [api, setApi] = useState<CarouselApi>()
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
+  const [progress, setProgress] = useState(0)
+  const [duration, setDuration] = useState(0)
 
   useEffect(() => {
     if (!api) {
@@ -40,12 +47,83 @@ export default function ViewPage() {
     const onSelect = () => {
       const currentIndex = api.selectedScrollSnap()
       console.log('現在のアイテムインデックス:', currentIndex)
+
+      // 現在再生中の音声を停止
+      if (currentAudio) {
+        currentAudio.pause()
+        currentAudio.currentTime = 0
+      }
+
+      // 新しい音声を再生
+      const currentItem = items[currentIndex]
+      if (currentItem) {
+        const audio = new Audio(`/audio/${currentItem.id}.wav`)
+
+        // 音声の進行状況を監視
+        const updateProgress = () => {
+          setProgress((audio.currentTime / audio.duration) * 100 || 0)
+        }
+
+        const updateDuration = () => {
+          setDuration(audio.duration || 0)
+        }
+
+        const resetProgress = () => {
+          setProgress(0)
+        }
+
+        audio.addEventListener('timeupdate', updateProgress)
+        audio.addEventListener('loadedmetadata', updateDuration)
+        audio.addEventListener('ended', resetProgress)
+
+        audio.play().catch((error) => {
+          console.log('音声の再生に失敗しました:', error)
+        })
+        setCurrentAudio(audio)
+      }
     }
 
     api.on('select', onSelect)
 
     return () => {
       api.off('select', onSelect)
+      // クリーンアップ時に音声を停止
+      if (currentAudio) {
+        currentAudio.pause()
+        currentAudio.currentTime = 0
+      }
+    }
+  }, [api, currentAudio])
+
+  // 初期表示時に最初のアイテムの音声を再生
+  useEffect(() => {
+    if (api && items.length > 0) {
+      const initialAudio = new Audio(`/audio/${items[0].id}.wav`)
+
+      // 音声の進行状況を監視
+      const updateProgress = () => {
+        setProgress((initialAudio.currentTime / initialAudio.duration) * 100 || 0)
+      }
+
+      const updateDuration = () => {
+        setDuration(initialAudio.duration || 0)
+      }
+
+      const resetProgress = () => {
+        setProgress(0)
+      }
+
+      console.log('progress:', progress)
+      console.log('duration:', duration)
+
+      initialAudio.addEventListener('timeupdate', updateProgress)
+      initialAudio.addEventListener('loadedmetadata', updateDuration)
+      initialAudio.addEventListener('ended', resetProgress)
+
+      initialAudio.play().catch((error) => {
+        console.log('初期音声の再生に失敗しました:', error)
+      })
+      setCurrentAudio(initialAudio)
     }
   }, [api])
 
@@ -95,6 +173,17 @@ export default function ViewPage() {
           ))}
         </CarouselContent>
       </Carousel>
+
+      {/* 音声プログレスバー */}
+      <div className="fixed bottom-0 right-1/2 translate-x-1/2 z-30 w-md">
+        <div className="w-full h-1 bg-gray-800">
+          <div
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-100"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
         <Link href="/">
           <HomeIcon className="text-white opacity-80" size={28} />
