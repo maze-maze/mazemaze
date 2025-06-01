@@ -195,7 +195,9 @@ export default function ViewPage() {
             </div>
           </div>
         </Link>
-        <UserIcon className="text-white opacity-80" size={28} />
+        <Link href="/111">
+          <UserIcon className="text-white opacity-80" size={28} />
+        </Link>
       </div>
     </>
   )
