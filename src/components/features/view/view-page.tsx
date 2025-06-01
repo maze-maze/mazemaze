@@ -343,7 +343,7 @@ height={40}
       </div>
 
       {/* フッターナビゲーション */}
-      <div className="fixed bottom-0 left-0 right-0 z-20">
+      <div className="fixed bottom-8 left-0 right-0 z-20">
           <div className="w-[280px] mx-auto mb-5 h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B]/80 to-[#23232A]/80 backdrop-blur-lg rounded-full shadow-xl"> {/* backdrop-blur強度調整 */}
             <Link href="/">
               <HomeIcon className="text-white/90 hover:text-white transition-opacity" size={28} />
