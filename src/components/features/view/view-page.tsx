@@ -5,7 +5,7 @@ import type { CarouselApi } from '🎙️/components/ui/carousel'
 import { Button } from '🎙️/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem } from '🎙️/components/ui/carousel'
 import { cn } from '🎙️/lib/utils'
-import { HomeIcon, MessageSquareMoreIcon, PlusIcon, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, UserIcon, X } from 'lucide-react'
+import { Home, HomeIcon, MessageSquareMoreIcon, Plus, PlusIcon, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, User, UserIcon, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -342,23 +342,22 @@ height={40}
         </div>
       </div>
 
-      {/* フッターナビゲーション */}
-      <div className="fixed bottom-8 left-0 right-0 z-20">
-          <div className="w-[280px] mx-auto mb-5 h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B]/80 to-[#23232A]/80 backdrop-blur-lg rounded-full shadow-xl"> {/* backdrop-blur強度調整 */}
-            <Link href="/">
-              <HomeIcon className="text-white/90 hover:text-white transition-opacity" size={28} />
-            </Link>
-            <Link href="/new">
-              <div className="flex-1 flex justify-center">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#CFCFCF] to-[#9C9C9C] hover:from-[#D9D9D9] hover:to-[#A6A6A6] shadow-lg transition-all"> {/* サイズ、色、ホバー調整 */}
-                  <PlusIcon className="text-black/70" size={36} /> {/* 色、サイズ調整 */}
-                </div>
-              </div>
-            </Link>
-            <Link href="/111">
-              <UserIcon className="text-white/90 hover:text-white transition-opacity" size={28} />
-            </Link>
+      
+      {/* ナビゲーションバー */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
+        <Link href="/">
+          <Home className="text-white opacity-80" size={28} />
+        </Link>
+        <Link href="/new">
+          <div className="flex-1 flex justify-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
+              <Plus className="text-white" size={38} />
+            </div>
           </div>
+        </Link>
+        <Link href="/1111">
+          <User className="text-white opacity-80" size={28} />
+        </Link>
       </div>
 
       {/* --- モーダル群 --- */}
