@@ -1,5 +1,9 @@
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
+import type { EmblaOptionsType } from 'embla-carousel'
 import { Input } from '🎙️/components/ui/input'
+import { cn } from '🎙️/lib/utils'
+import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
 import {
   Home,
@@ -9,6 +13,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCarousel } from '../carousel/useCarousel'
 
 export default function ThemeSelector({
   onSelect,
@@ -19,7 +24,7 @@ export default function ThemeSelector({
 }) {
   // Embla Carousel用
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center' })
-  const [selectedIndex, setSelectedIndex] = useState(1)
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   // モックデータ
   const [themes] = useState<string[]>([
@@ -37,11 +42,29 @@ export default function ThemeSelector({
     'bg-gradient-to-b from-blue-600 to-blue-200',
     'bg-gradient-to-b from-yellow-400 to-yellow-200',
     'bg-gradient-to-b from-green-400 to-green-200',
+    'bg-gradient-to-b from-purple-400 to-purple-200',
   ]
 
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [transitionGradient, setTransitionGradient] = useState<string | null>(null)
   const transitionRef = useRef<HTMLDivElement>(null)
+
+  // 選択されているスライドのインデックス
+  const [activeIndex, setActiveIndex] = useState<number>(0)
+
+  // スライドのオプション
+  const sliderOption: EmblaOptionsType = {
+    loop: true,
+    align: 'center',
+  }
+
+  // カスタムフックからスライド操作用のオブジェクトを取得
+  const slider = useCarousel(setActiveIndex, sliderOption, [
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: true,
+    }),
+  ])
 
   // Emblaのスライド変更時にインデックスを更新
   const onSelectCallback = useCallback(() => {
@@ -194,69 +217,63 @@ export default function ThemeSelector({
 
           {/* AIテーマ表示エリア */}
           <div className="w-full max-w-xl rounded-xl shadow-md overflow-visible">
-            <div className="p-4">
-              <div className="embla" ref={emblaRef}>
-                <div className="embla__container flex gap-4">
-                  {themes.map((theme, idx) => (
+            <div className="p-4" ref={slider.sliderRef}>
+              <div className="flex">
+                {themes.map((theme, idx) => (
+                  <div
+                    key={idx}
+                    className="w-fit px-4"
+                  >
                     <button
                       key={idx}
-                      className={`embla__slide flex-shrink-0 p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/4 w-40 relative mx-2 shadow-md text-white
-                        ${idx === 0
-                      ? 'bg-gradient-to-b from-black to-gray-800'
-                      : gradients[(idx - 1) % gradients.length]
-                    }
-                        ${selected === theme ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/30'}
-                        ${selectedIndex === idx ? 'scale-120 z-10' : 'scale-85 opacity-80'}
-                      `}
-                      style={{ boxShadow: selectedIndex === idx ? '0 4px 24px rgba(0,0,0,0.10)' : undefined }}
+                      className={cn(
+                        'p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/4 w-40 h-full relative',
+                        activeIndex === idx ? 'scale-120 z-10 ' : 'scale-90 opacity-80 ',
+                        gradients[(idx) % gradients.length],
+                      )}
+
                       onClick={() => handleSelect(theme, idx)}
                     >
-                      {idx === 0
-                        ? (
-                            <span className="text-lg font-bold flex flex-col items-center justify-center h-full w-full">
-                              <span className="text-3xl mb-2">＋</span>
-                              新規作成
-                            </span>
-                          )
-                        : (
-                            <>
-                              <span className="text-base font-bold">{theme}</span>
-                              <img src="/lama.png" alt="" />
-                            </>
-                          )}
+                      <span className="text-base font-bold">{theme}</span>
+                      <img src="/lama.png" alt="" />
                     </button>
-                  ))}
-                </div>
-              </div>
-              {/* ページネーション */}
-              <div className="w-full mt-12 flex justify-center">
-                <div className="flex justify-center  gap-2 w-fit px-3 py-2 rounded-full opacity-40 bg-[#BFBFBF]">
-                  {themes.map((_, idx) => (
-                    <button
-                      key={idx}
-                      className={`w-2 h-2 rounded-full transition-colors ${selectedIndex === idx ? 'bg-primary' : 'bg-gray-500'}`}
-                      onClick={() => emblaApi && emblaApi.scrollTo(idx)}
-                      aria-label={`Go to slide ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* ナビゲーションバー */}
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
-                <Link href="/">
-                  <Home className="text-white opacity-80" size={28} />
-                </Link>
-                <Link href="/new">
-                  <div className="flex-1 flex justify-center">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
-                      <Plus className="text-white" size={38} />
-                    </div>
                   </div>
-                </Link>
-                <User className="text-white opacity-80" size={28} />
+                ))}
+
               </div>
             </div>
+            {/* ページネーション */}
+            <div className="w-full mt-8 flex justify-center">
+              <div className="flex justify-center gap-2 w-fit px-3 py-2 rounded-full opacity-40 bg-[#BFBFBF]">
+                {themes.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={cn(
+                      'w-2 h-2 rounded-full transition-colors',
+                      activeIndex === idx ? 'bg-primary' : 'bg-gray-500',
+                    )}
+                    onClick={() => slider.handleToRightScroll && slider.handleToRightScroll(idx)}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* ナビゲーションバー */}
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
+              <Link href="/">
+                <Home className="text-white opacity-80" size={28} />
+              </Link>
+              <Link href="/new">
+                <div className="flex-1 flex justify-center">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
+                    <Plus className="text-white" size={38} />
+                  </div>
+                </div>
+              </Link>
+              <User className="text-white opacity-80" size={28} />
+            </div>
+
           </div>
         </>
       )}
