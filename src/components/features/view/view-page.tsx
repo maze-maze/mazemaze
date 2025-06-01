@@ -250,7 +250,7 @@ export default function ViewPage() {
        <CarouselContent className="h-screen">
        {Array.from({ length: 4 }).map((_, index) => (
 
-            <CarouselItem key={index} className={cn( 'h-full w-full flex flex-col items-center gap-20 pt-30 relative')}>   
+            <CarouselItem key={index} className={cn( 'h-full w-full flex flex-col items-center gap-20 pt-36 relative')}>   
             <div className={cn(items[index].bg,'text-xl flex font-bold gap-2 p-4 rounded-2xl backdrop-blur-sm text-center')}>
             
             <Image
