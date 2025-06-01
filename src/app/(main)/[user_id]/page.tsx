@@ -1,4 +1,5 @@
-/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable no-console */
+
 'use client'
 
 import { cn } from '🎙️/lib/utils'
@@ -15,13 +16,7 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 
-export default function ThemeSelector({
-  onSelect,
-  onNext,
-}: {
-  onSelect: (theme: { theme: string, gradient: string }) => void
-  onNext: () => void
-}) {
+export default function ThemeSelector() {
   // モックデータ
   const [themes] = useState<string[]>([
     '謎の未確認生物 UMA探訪記',
