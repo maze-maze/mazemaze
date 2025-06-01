@@ -117,7 +117,6 @@ export default function NewTmp() {
           }}
           onNext={() => setName('structure')}
           onBack={() => setName('main-character')}
-          mainSelfSelected={!!character?.self}
         />
       )}
       {step === 'structure' && themeObj && character && (
