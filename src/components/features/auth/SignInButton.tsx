@@ -1,11 +1,11 @@
-"use client"
-import { Button } from "🎙️/components/ui/button"
-import { signIn } from "🎙️/lib/auth-client"
+'use client'
+import { Button } from '🎙️/components/ui/button'
+import { signIn } from '🎙️/lib/auth-client'
 
-export const SignInButton = () => {
+export function SignInButton() {
   return (
     <Button
-      onClick={()=>signIn("/1111")}
+      onClick={() => signIn('/enter/callback/welcome')}
       type="submit"
       size="lg"
       variant="outline"

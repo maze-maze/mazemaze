@@ -271,7 +271,7 @@ export default function ThemeSelector({
                   </div>
                 </div>
               </Link>
-              <Link href="/1111">
+              <Link href="/user">
                 <User className="text-white opacity-80" size={28} />
               </Link>
             </div>

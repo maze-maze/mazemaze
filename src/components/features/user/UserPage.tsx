@@ -2,6 +2,7 @@
 
 'use client'
 
+import { signOut } from '🎙️/lib/auth-client'
 import { cn } from '🎙️/lib/utils'
 import {
   AlignJustifyIcon,
@@ -16,10 +17,9 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SignInButton } from '../auth/SignInButton'
-import { signOut } from '🎙️/lib/auth-client'
+import { usePathname, useRouter } from 'next/navigation'
 
-export default function UserPage({name}: {name: string}) {
-  
+export default function UserPage({ name }: { name: string }) {
   // モックデータ
   const [themes] = useState<string[]>([
     '謎の未確認生物 UMA探訪記',
@@ -83,12 +83,15 @@ export default function UserPage({name}: {name: string}) {
     // 実際のBillingページへの遷移や処理をここに記述
   }
 
-  // ログアウトアクションのプレースホルダー
-  const handleLogout = () => {
-    console.log('Logout clicked')
-    handleCloseMenu()
-    // 実際のログアウト処理をここに記述
-  }
+
+// パスからusernameを取得してきて
+
+const pathname = usePathname()
+const pathSegments = pathname.split('/')
+const usernameFromPath = pathSegments[pathSegments.length - 1] // 最後のセグメントを取得
+
+
+
 
   // 表示するテーマリストをアクティブなタブに応じて決定
   return (
@@ -180,8 +183,6 @@ export default function UserPage({name}: {name: string}) {
         </svg>
       </div>
 
-
-  
       <div className="mt-10 flex flex-col items-center justify-center z-10">
 
         {/* グラデーションのかかった円 */}
@@ -194,7 +195,7 @@ export default function UserPage({name}: {name: string}) {
         <h1 className="text-white text-2xl font-bold mb-1">{name}</h1>
 
         {/* ユーザーID */}
-        <p className="text-gray-400 text-sm mb-8">@soma_takata</p>
+        <p className="text-gray-400 text-sm mb-8">@{usernameFromPath}</p>
       </div>
 
       {/* タブ部分 */}
@@ -262,7 +263,7 @@ export default function UserPage({name}: {name: string}) {
             </div>
           </div>
         </Link>
-        <Link href="/1111">
+        <Link href="/user">
           <User className="text-white opacity-80" size={28} />
         </Link>
       </div>
@@ -316,7 +317,7 @@ export default function UserPage({name}: {name: string}) {
                 </li>
                 <li>
                   <button
-                    onClick={signOut}
+                    onClick={signOut("/user")}
                     className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg transition-colors duration-150 ease-in-out text-red-400 hover:text-red-300"
                   >
                     <LogOut size={20} className="mr-4" />
