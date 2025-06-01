@@ -1,23 +1,19 @@
-/* eslint-disable style/max-statements-per-line */
 /* eslint-disable no-cond-assign */
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
-import { Button } from '🎙️/components/ui/button'
-import { useChat } from 'ai/react'
 import type { EmblaOptionsType } from 'embla-carousel'
+import { cn } from '🎙️/lib/utils'
+import { useChat } from 'ai/react'
 import AutoPlay from 'embla-carousel-autoplay'
 import {
   ArrowLeft,
-  ArrowLeftCircle,
   Info,
   Loader2,
   PlayIcon,
   User,
-  UserCircle2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCarousel } from '../carousel/useCarousel'
-import { cn } from '🎙️/lib/utils'
 
 // personalities型を拡張
 interface Personality {
@@ -68,13 +64,13 @@ export default function GuestCharacterSelector({
 
   // 選択されているスライドのインデックス
   const [activeIndex, setActiveIndex] = useState<number>(0)
-  
+
   // スライドのオプション
-  const sliderOption: EmblaOptionsType = { 
-    loop: true, 
-   align:"center"
+  const sliderOption: EmblaOptionsType = {
+    loop: true,
+    align: 'center',
   }
-  
+
   // カスタムフックからスライド操作用のオブジェクトを取得
   const slider = useCarousel(setActiveIndex, sliderOption, [
     AutoPlay({
@@ -238,82 +234,82 @@ export default function GuestCharacterSelector({
         <div className="w-full max-w-xl rounded-xl mt-8 overflow-visible">
           <div className="p-4" ref={slider.sliderRef}>
             {/* 新しいカルーセル実装 */}
-       
-              <div className="flex">
-                {allSlides.map((personality, idx) => (
-                  <div
-                    key={idx}
-                    className="w-fit px-2"
-                 
-                  >
-                    <div
-                      className={cn(
-                        "p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/5.5 w-60 h-full relative",
-                        activeIndex === idx ? 'scale-110 z-10 bg-[#0E0B16]' : 'scale-90 opacity-80 bg-[#0E0B16]',
-                        personality.custom ? 'border-2 border-dashed border-gray-400 text-gray-500 hover:text-primary' : '',
-                        personality.self ? 'border-2 border-primary text-primary' : ''
-                      )}
-                      style={{ boxShadow: activeIndex === idx ? '0 4px 24px rgba(0,0,0,0.10)' : undefined }}
-                      onClick={() => {
-                        if (personality.custom) {
-                          setEditMode(true)
-                          setCustomPersonality({ name: '', description: '', tone: '' })
-                        }
-                        else {
-                          setSelected(personality)
-                        }
-                      }}
-                    >
-                      {personality.self
-                        ? (
-                            <>
-                              <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center mb-2 bg-primary/10">
-                                <User className=" text-white" size={28} />
-                              </div>
-                              <span className=" font-bold mb-1 text-white">{personality.name}</span>
-                              <p className="text-xs  line-clamp-2 mb-1 text-gray-200">{personality.description}</p>
 
-                            </>
-                          )
-                        : (
-                            <>
-                              <div className="absolute top-4 right-3">
-                                <button
-                                  type="button"
-                                  className=""
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    setInfoModal({ open: true, personality })
-                                  }}
-                                >
-                                  <Info className="text-white" size={22} />
-                                </button>
-                              </div>
-                              <img src="/character.png" />
-                              <h3 className="font-bold text-white mb-1">{personality.name}</h3>
-                              <p className="text-xs text-gray-200 line-clamp-2 mb-1">{personality.description}</p>
-                              <p className="text-xs text-gray-200 line-clamp-2">
-                                トーン:
-                                {personality.tone}
-                              </p>
+            <div className="flex">
+              {allSlides.map((personality, idx) => (
+                <div
+                  key={idx}
+                  className="w-fit px-2"
+
+                >
+                  <div
+                    className={cn(
+                      'p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/5.5 w-60 h-full relative',
+                      activeIndex === idx ? 'scale-110 z-10 bg-[#0E0B16]' : 'scale-90 opacity-80 bg-[#0E0B16]',
+                      personality.custom ? 'border-2 border-dashed border-gray-400 text-gray-500 hover:text-primary' : '',
+                      personality.self ? 'border-2 border-primary text-primary' : '',
+                    )}
+                    style={{ boxShadow: activeIndex === idx ? '0 4px 24px rgba(0,0,0,0.10)' : undefined }}
+                    onClick={() => {
+                      if (personality.custom) {
+                        setEditMode(true)
+                        setCustomPersonality({ name: '', description: '', tone: '' })
+                      }
+                      else {
+                        setSelected(personality)
+                      }
+                    }}
+                  >
+                    {personality.self
+                      ? (
+                          <>
+                            <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center mb-2 bg-primary/10">
+                              <User className=" text-white" size={28} />
+                            </div>
+                            <span className=" font-bold mb-1 text-white">{personality.name}</span>
+                            <p className="text-xs  line-clamp-2 mb-1 text-gray-200">{personality.description}</p>
+
+                          </>
+                        )
+                      : (
+                          <>
+                            <div className="absolute top-4 right-3">
                               <button
                                 type="button"
-                              className="mt-3 mb-1"
+                                className=""
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   setInfoModal({ open: true, personality })
                                 }}
                               >
-                                <PlayIcon className="text-white" size={22} />
+                                <Info className="text-white" size={22} />
                               </button>
-                            </>
-                          )}
-                    </div>
+                            </div>
+                            <img src="/character.png" />
+                            <h3 className="font-bold text-white mb-1">{personality.name}</h3>
+                            <p className="text-xs text-gray-200 line-clamp-2 mb-1">{personality.description}</p>
+                            <p className="text-xs text-gray-200 line-clamp-2">
+                              トーン:
+                              {personality.tone}
+                            </p>
+                            <button
+                              type="button"
+                              className="mt-3 mb-1"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setInfoModal({ open: true, personality })
+                              }}
+                            >
+                              <PlayIcon className="text-white" size={22} />
+                            </button>
+                          </>
+                        )}
                   </div>
-                ))}
-             
+                </div>
+              ))}
+
             </div>
-            
+
             {/* ページネーション */}
             <div className="w-full mt-8 flex justify-center">
               <div className="flex justify-center gap-2 w-fit px-3 py-2 rounded-full opacity-40 bg-[#BFBFBF]">
@@ -322,7 +318,7 @@ export default function GuestCharacterSelector({
                     key={idx}
                     className={cn(
                       'w-2 h-2 rounded-full transition-colors',
-                      activeIndex === idx ? 'bg-primary' : 'bg-gray-500'
+                      activeIndex === idx ? 'bg-primary' : 'bg-gray-500',
                     )}
                     onClick={() => slider.handleToRightScroll && slider.handleToRightScroll(idx)}
                     aria-label={`Go to slide ${idx + 1}`}
@@ -330,7 +326,7 @@ export default function GuestCharacterSelector({
                 ))}
               </div>
             </div>
-            
+
             {/* 決定ボタン */}
             <div
               className="absolute bottom-8 left-1/2 border-white border-1 border-double -translate-x-1/2 w-[280px] h-[60px] flex items-center justify-center px-8 rounded-full z-20"
@@ -376,8 +372,8 @@ export default function GuestCharacterSelector({
           <Loader2 size={40} className="animate-spin mr-3 text-white" />
         </div>
       )}
-     {/* 詳細情報モーダル */}
-     {infoModal.open && infoModal.personality && (
+      {/* 詳細情報モーダル */}
+      {infoModal.open && infoModal.personality && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setInfoModal({ open: false, personality: null })} />
           <div className="relative w-full max-w-md bg-[#0E0B16] rounded-t-2xl shadow-2xl p-6 animate-slideup">

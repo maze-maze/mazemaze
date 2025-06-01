@@ -1,5 +1,5 @@
-/* eslint-disable style/multiline-ternary */
-/* eslint-disable ts/no-use-before-define */
+/* eslint-disable no-alert */
+/* eslint-disable no-console */
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
@@ -66,7 +66,6 @@ function InfoCard({ title, icon: Icon, children }: { title: string, icon: React.
   )
 }
 
-
 export default function CompletePage({
   themeObj,
   character,
@@ -128,105 +127,113 @@ export default function CompletePage({
           <ArrowLeft size={26} />
         </button>
         <p className="text-white font-black text-xl text-center">
-         ポッドキャスト生成完了
+          ポッドキャスト生成完了
         </p>
         {/* 右側の要素がない場合、スペースを確保するために透明な要素を置くか、justify-betweenが機能するように空のdivを配置 */}
-        <div className='h-8 w-[26px]' /> {/* ArrowLeftと同じ幅でバランスを取る */}
+        <div className="h-8 w-[26px]" />
+        {' '}
+        {/* ArrowLeftと同じ幅でバランスを取る */}
       </div>
-     
-    
-      
-      <div className="w-full max-w-3xl overflow-y-auto flex-1 pb-24 px-4"> {/* px-4を追加して左右のパディング */}
-      <div className="p-6 pb-32">
-        {themeObj && (
-          <InfoCard title="テーマ" icon={Palette}>
-            <p className="text-gray-200 text-base">{themeObj.theme}</p> {/* 少しスタイル調整 */}
-          </InfoCard>
-        )}
-        {character && (
-          <InfoCard title="メインキャラクター" icon={User}>
-            <p className="text-gray-300">
-              <strong>名前:</strong>
+
+      <div className="w-full max-w-3xl overflow-y-auto flex-1 pb-24 px-4">
+        {' '}
+        {/* px-4を追加して左右のパディング */}
+        <div className="p-6 pb-32">
+          {themeObj && (
+            <InfoCard title="テーマ" icon={Palette}>
+              <p className="text-gray-200 text-base">{themeObj.theme}</p>
               {' '}
-              {character.name}
-            </p>
-            <p className="text-gray-300 mt-1">
-              <strong>説明:</strong>
-              {' '}
-              {character.description}
-            </p>
-            <p className="text-gray-300 mt-1">
-              <strong>トーン:</strong>
-              {' '}
-              {character.tone}
-            </p>
-          </InfoCard>
-        )}
-        {guestCharacter && (
-          <InfoCard title="ゲストキャラクター" icon={Users}>
-            <p className="text-gray-300">
-              <strong>名前:</strong>
-              {' '}
-              {guestCharacter.name}
-            </p>
-            <p className="text-gray-300 mt-1">
-              <strong>説明:</strong>
-              {' '}
-              {guestCharacter.description}
-            </p>
-            <p className="text-gray-300 mt-1">
-              <strong>トーン:</strong>
-              {' '}
-              {guestCharacter.tone}
-            </p>
-          </InfoCard>
-        )}
-        {structure && (
-          <InfoCard title="構成" icon={BookText}>
-            <div className="space-y-3"> {/* space-yで各要素の間隔を調整 */}
-              <div>
-                <h4 className="font-medium text-gray-200 mb-1">イントロ:</h4>
-                <p className="pl-4 border-l-2 border-primary/60 text-gray-300 text-sm">{structure.intro}</p>
+              {/* 少しスタイル調整 */}
+            </InfoCard>
+          )}
+          {character && (
+            <InfoCard title="メインキャラクター" icon={User}>
+              <p className="text-gray-300">
+                <strong>名前:</strong>
+                {' '}
+                {character.name}
+              </p>
+              <p className="text-gray-300 mt-1">
+                <strong>説明:</strong>
+                {' '}
+                {character.description}
+              </p>
+              <p className="text-gray-300 mt-1">
+                <strong>トーン:</strong>
+                {' '}
+                {character.tone}
+              </p>
+            </InfoCard>
+          )}
+          {guestCharacter && (
+            <InfoCard title="ゲストキャラクター" icon={Users}>
+              <p className="text-gray-300">
+                <strong>名前:</strong>
+                {' '}
+                {guestCharacter.name}
+              </p>
+              <p className="text-gray-300 mt-1">
+                <strong>説明:</strong>
+                {' '}
+                {guestCharacter.description}
+              </p>
+              <p className="text-gray-300 mt-1">
+                <strong>トーン:</strong>
+                {' '}
+                {guestCharacter.tone}
+              </p>
+            </InfoCard>
+          )}
+          {structure && (
+            <InfoCard title="構成" icon={BookText}>
+              <div className="space-y-3">
+                {' '}
+                {/* space-yで各要素の間隔を調整 */}
+                <div>
+                  <h4 className="font-medium text-gray-200 mb-1">イントロ:</h4>
+                  <p className="pl-4 border-l-2 border-primary/60 text-gray-300 text-sm">{structure.intro}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-200 mb-1">セクション:</h4>
+                  <ul className="pl-4 space-y-2">
+                    {structure.sections.map((sec, index) => (
+                      <li key={index} className="pl-4 border-l-2 border-primary/60 py-1">
+                        <p className="font-medium text-gray-200">{sec.title}</p>
+                        <p className="text-gray-400 text-sm">{sec.description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-200 mb-1">アウトロ:</h4>
+                  <p className="pl-4 border-l-2 border-primary/60 text-gray-300 text-sm">{structure.outro}</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-gray-200 mb-1">セクション:</h4>
-                <ul className="pl-4 space-y-2">
-                  {structure.sections.map((sec, index) => (
-                    <li key={index} className="pl-4 border-l-2 border-primary/60 py-1">
-                      <p className="font-medium text-gray-200">{sec.title}</p>
-                      <p className="text-gray-400 text-sm">{sec.description}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-200 mb-1">アウトロ:</h4>
-                <p className="pl-4 border-l-2 border-primary/60 text-gray-300 text-sm">{structure.outro}</p>
-              </div>
+            </InfoCard>
+          )}
+          <InfoCard title="台本" icon={ClipboardList}>
+            <div className="bg-gray-900/60 p-3 sm:p-4 rounded-md max-h-[50vh] sm:max-h-96 overflow-y-auto shadow-inner">
+              {' '}
+              {/* スタイル微調整 */}
+              <pre className="whitespace-pre-wrap text-sm leading-relaxed text-gray-200">
+                {script || '台本が生成されていません。'}
+              </pre>
             </div>
           </InfoCard>
-        )}
-        <InfoCard title="台本" icon={ClipboardList}>
-          <div className="bg-gray-900/60 p-3 sm:p-4 rounded-md max-h-[50vh] sm:max-h-96 overflow-y-auto shadow-inner"> {/* スタイル微調整 */}
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed text-gray-200">
-              {script || '台本が生成されていません。'}
-            </pre>
+
+          {/* アクションボタン */}
+          <div className="mt-10 mb-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Button onClick={onRestart} size="lg" variant="secondary" className="w-full sm:w-auto">
+              もう一度生成する
+            </Button>
+            <a
+              href="/new/recording" // TODO: このパスはプロジェクトに合わせて確認・変更してください
+              className={buttonVariants({ size: 'lg', variant: 'default', className: 'w-full sm:w-auto' })}
+            >
+              <Podcast size={20} className="mr-2" />
+              録音に進む
+            </a>
           </div>
-        </InfoCard>
-        
-        {/* アクションボタン */}
-        <div className="mt-10 mb-6 flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Button onClick={onRestart} size="lg" variant="secondary" className="w-full sm:w-auto">
-            もう一度生成する
-          </Button>
-          <a
-            href="/new/recording" // TODO: このパスはプロジェクトに合わせて確認・変更してください
-            className={buttonVariants({ size: 'lg', variant: 'default', className: "w-full sm:w-auto" })}
-          >
-            <Podcast size={20} className="mr-2" />
-            録音に進む
-          </a>
-        </div>
         </div>
       </div>
     </div>

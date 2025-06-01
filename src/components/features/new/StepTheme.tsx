@@ -1,7 +1,10 @@
+/* eslint-disable unused-imports/no-unused-vars */
 'use client'
-import { Input } from '🎙️/components/ui/input'
-import useEmblaCarousel from 'embla-carousel-react'
 import type { EmblaOptionsType } from 'embla-carousel'
+import { Input } from '🎙️/components/ui/input'
+import { cn } from '🎙️/lib/utils'
+import Autoplay from 'embla-carousel-autoplay'
+import useEmblaCarousel from 'embla-carousel-react'
 import {
   Home,
   Plus,
@@ -11,8 +14,6 @@ import {
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useCarousel } from '../carousel/useCarousel'
-import Autoplay from 'embla-carousel-autoplay'
-import { cn } from '🎙️/lib/utils'
 
 export default function ThemeSelector({
   onSelect,
@@ -48,23 +49,22 @@ export default function ThemeSelector({
   const [transitionGradient, setTransitionGradient] = useState<string | null>(null)
   const transitionRef = useRef<HTMLDivElement>(null)
 
+  // 選択されているスライドのインデックス
+  const [activeIndex, setActiveIndex] = useState<number>(0)
 
-    // 選択されているスライドのインデックス
-    const [activeIndex, setActiveIndex] = useState<number>(0)
-  
-    // スライドのオプション
-    const sliderOption: EmblaOptionsType = { 
-      loop: true, 
-     align:"center"
-    }
-    
-    // カスタムフックからスライド操作用のオブジェクトを取得
-    const slider = useCarousel(setActiveIndex, sliderOption, [
-      Autoplay({
-        delay: 3000,
-        stopOnInteraction: true,
-      }),
-    ])
+  // スライドのオプション
+  const sliderOption: EmblaOptionsType = {
+    loop: true,
+    align: 'center',
+  }
+
+  // カスタムフックからスライド操作用のオブジェクトを取得
+  const slider = useCarousel(setActiveIndex, sliderOption, [
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: true,
+    }),
+  ])
 
   // Emblaのスライド変更時にインデックスを更新
   const onSelectCallback = useCallback(() => {
@@ -217,41 +217,40 @@ export default function ThemeSelector({
 
           {/* AIテーマ表示エリア */}
           <div className="w-full max-w-xl rounded-xl shadow-md overflow-visible">
-          <div className="p-4" ref={slider.sliderRef}>
+            <div className="p-4" ref={slider.sliderRef}>
               <div className="flex">
-                  {themes.map((theme, idx) => (
-                     <div
-                     key={idx}
-                     className="w-fit px-4"
-                  
-                   >
+                {themes.map((theme, idx) => (
+                  <div
+                    key={idx}
+                    className="w-fit px-4"
+                  >
                     <button
                       key={idx}
                       className={cn(
-                        "p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/4 w-40 h-full relative",
+                        'p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-3/4 w-40 h-full relative',
                         activeIndex === idx ? 'scale-120 z-10 ' : 'scale-90 opacity-80 ',
-                        gradients[(idx) % gradients.length]
+                        gradients[(idx) % gradients.length],
                       )}
-                 
+
                       onClick={() => handleSelect(theme, idx)}
                     >
-                    <span className="text-base font-bold">{theme}</span>
-                    <img src="/lama.png" alt="" />
+                      <span className="text-base font-bold">{theme}</span>
+                      <img src="/lama.png" alt="" />
                     </button>
-                    </div>
-                  ))}
-                  
-                </div>
+                  </div>
+                ))}
+
               </div>
-                {/* ページネーション */}
-                <div className="w-full mt-8 flex justify-center">
+            </div>
+            {/* ページネーション */}
+            <div className="w-full mt-8 flex justify-center">
               <div className="flex justify-center gap-2 w-fit px-3 py-2 rounded-full opacity-40 bg-[#BFBFBF]">
                 {themes.map((_, idx) => (
                   <button
                     key={idx}
                     className={cn(
                       'w-2 h-2 rounded-full transition-colors',
-                      activeIndex === idx ? 'bg-primary' : 'bg-gray-500'
+                      activeIndex === idx ? 'bg-primary' : 'bg-gray-500',
                     )}
                     onClick={() => slider.handleToRightScroll && slider.handleToRightScroll(idx)}
                     aria-label={`Go to slide ${idx + 1}`}
@@ -260,21 +259,21 @@ export default function ThemeSelector({
               </div>
             </div>
 
-              {/* ナビゲーションバー */}
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
-                <Link href="/">
-                  <Home className="text-white opacity-80" size={28} />
-                </Link>
-                <Link href="/new">
-                  <div className="flex-1 flex justify-center">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
-                      <Plus className="text-white" size={38} />
-                    </div>
+            {/* ナビゲーションバー */}
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
+              <Link href="/">
+                <Home className="text-white opacity-80" size={28} />
+              </Link>
+              <Link href="/new">
+                <div className="flex-1 flex justify-center">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
+                    <Plus className="text-white" size={38} />
                   </div>
-                </Link>
-                <User className="text-white opacity-80" size={28} />
-              </div>
-          
+                </div>
+              </Link>
+              <User className="text-white opacity-80" size={28} />
+            </div>
+
           </div>
         </>
       )}

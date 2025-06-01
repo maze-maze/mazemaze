@@ -1,7 +1,5 @@
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable unused-imports/no-unused-imports */
-/* eslint-disable no-alert */
-/* eslint-disable no-console */
+
 'use client'
 
 import { Button, buttonVariants } from '🎙️/components/ui/button'
@@ -20,12 +18,12 @@ import {
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import React, { useEffect, useState } from 'react' // useState, useEffect をインポート
+import CompletePage from './StepComplete'
 import GuestCharacterSelector from './StepGuestCharacter'
 import MainCharacterSelector from './StepMainCharacter'
 import ScriptGenerator from './StepScript'
 import StructureSelector from './StepStructure'
 import ThemeSelector from './StepTheme'
-import CompletePage from './StepComplete'
 
 // 型定義 (変更なし)
 interface Character { name: string, description: string, tone: string, self?: boolean }
@@ -67,8 +65,6 @@ function useSessionStorageState<T>(key: string, defaultValue: T): [T, React.Disp
   return [state, setState]
 }
 // ---------------------------------------------
-
-
 
 export default function NewTmp() {
   const [name, setName] = useQueryState('s', { defaultValue: 'theme' })
