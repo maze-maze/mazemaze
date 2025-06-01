@@ -5,13 +5,11 @@ import type { CarouselApi } from '🎙️/components/ui/carousel'
 import { Button } from '🎙️/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem } from '🎙️/components/ui/carousel'
 import { cn } from '🎙️/lib/utils'
-import { Home, HomeIcon, MessageSquareMoreIcon, Plus, PlusIcon, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, User, UserIcon, X } from 'lucide-react'
+import { Home, MessageSquareMoreIcon, Plus, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, User, UserIcon, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import WaveformImage from '../recording/assets/waveform.png'
 import { useRouter } from 'next/navigation'
-
+import { useEffect, useState } from 'react'
 
 const items = [
   {
@@ -86,7 +84,6 @@ export default function ViewPage() {
     return manageModalVisibility(isSearchModalOpen, setSearchModalVisible, setIsSearchModalOpen, isSearchModalOpen)
   }, [isSearchModalOpen])
 
-
   // --- モーダル開閉ハンドラ ---
   const openCommentModal = () => setIsCommentModalOpen(true)
   const closeCommentModal = () => setIsCommentModalOpen(false)
@@ -96,7 +93,6 @@ export default function ViewPage() {
 
   const openSearchModal = () => setIsSearchModalOpen(true)
   const closeSearchModal = () => setIsSearchModalOpen(false)
-
 
   // (音声再生ロジックは変更なしのため省略)
   useEffect(() => {
@@ -123,10 +119,10 @@ export default function ViewPage() {
 
         // クリーンアップ関数内でリスナーを削除
         return () => {
-            audio.removeEventListener('timeupdate', updateProgress);
-            // audio.removeEventListener('loadedmetadata', updateDuration);
-            audio.removeEventListener('ended', resetProgress);
-        };
+          audio.removeEventListener('timeupdate', updateProgress)
+          // audio.removeEventListener('loadedmetadata', updateDuration);
+          audio.removeEventListener('ended', resetProgress)
+        }
       }
     }
     api.on('select', onSelect)
@@ -247,61 +243,74 @@ export default function ViewPage() {
         }}
         setApi={setApi}
       >
-       <CarouselContent className="h-screen">
-       {Array.from({ length: 4 }).map((_, index) => (
+        <CarouselContent className="h-screen">
+          {Array.from({ length: 4 }).map((_, index) => (
 
-            <CarouselItem key={index} className={cn( 'h-full w-full flex flex-col items-center gap-20 pt-36 relative')}>   
-            <div className={cn(items[index].bg,'text-xl flex font-bold gap-2 p-4 rounded-2xl backdrop-blur-sm text-center')}>
-            
-            <Image
-            
-            src="/lama.png"
-            
-            alt=""
-width={40}
-height={40}
-            /> 
-               <p >{items[index].title}</p> 
+            <CarouselItem key={index} className={cn('h-full w-full flex flex-col items-center gap-20 pt-36 relative')}>
+              <div className={cn(items[index].bg, 'text-xl flex font-bold gap-2 p-4 rounded-2xl backdrop-blur-sm text-center')}>
+
+                <Image
+
+                  src="/lama.png"
+
+                  alt=""
+                  width={40}
+                  height={40}
+                />
+                <p>{items[index].title}</p>
               </div>
 
-              <div className='flex flex-col items-center justify-center gap-10 rounded-2xl'> {/* gap調整 */}
-                <div className='flex flex-col items-center justify-center rounded-2xl gap-2'>
+              <div className="flex flex-col items-center justify-center gap-10 rounded-2xl">
+                {' '}
+                {/* gap調整 */}
+                <div className="flex flex-col items-center justify-center rounded-2xl gap-2">
                   <Image
                     src="/lama.png" // パスを確認
                     alt="Lama character"
                     width={140} // サイズ調整
                     height={140}
                   />
-                  <p className='font-bold text-white'>宇宙から来たラマ</p>
+                  <p className="font-bold text-white">宇宙から来たラマ</p>
                 </div>
-                <div className='flex flex-col items-center justify-center p-4 rounded-2xl gap-2 bg-black/20 backdrop-blur-sm'> {/* 背景調整 */}
+                <div className="flex flex-col items-center justify-center p-4 rounded-2xl gap-2 bg-black/20 backdrop-blur-sm">
+                  {' '}
+                  {/* 背景調整 */}
                   <Image
                     src="/character.png" // パスを確認
                     alt="Tommy character"
                     width={140} // サイズ調整
                     height={140}
                   />
-                  <p className='font-bold text-white'>トナカイと暮らしたトミー</p>
+                  <p className="font-bold text-white">トナカイと暮らしたトミー</p>
                 </div>
               </div>
 
-              <div className="absolute right-4 bottom-24 z-10 flex flex-col gap-4"> {/* right, bottom, z-index調整 */}
-                <Button onClick={() => router.push("/111")} size="icon" variant="ghost" className="rounded-full size-12 p-0"> {/* variant, size調整 */}
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-[#3B82F6]  flex items-center justify-center shadow-lg relative overflow-hidden"> {/* shadow調整 */}
+              <div className="absolute right-4 bottom-24 z-10 flex flex-col gap-4">
+                {' '}
+                {/* right, bottom, z-index調整 */}
+                <Button onClick={() => router.push('/111')} size="icon" variant="ghost" className="rounded-full size-12 p-0">
+                  {' '}
+                  {/* variant, size調整 */}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-[#3B82F6]  flex items-center justify-center shadow-lg relative overflow-hidden">
+                    {' '}
+                    {/* shadow調整 */}
                     {/* グラデーションエフェクト用のdivは削除または調整 */}
-                    <UserIcon className="text-white size-6"/> {/* アイコンを直接配置 */}
+                    <UserIcon className="text-white size-6" />
+                    {' '}
+                    {/* アイコンを直接配置 */}
                   </div>
                 </Button>
                 <Button
                   size="icon"
                   variant="ghost"
                   className={cn(
-                    "rounded-full size-12 text-white", // size, text色調整
-                    liked ? "bg-green-500/80" : "bg-black border" // 背景調整
+                    'rounded-full size-12 text-white', // size, text色調整
+                    liked ? 'bg-green-500/80' : 'bg-black border', // 背景調整
                   )}
                   onClick={() => {
                     setLiked(!liked)
-                    if (disliked) setDisliked(false)
+                    if (disliked)
+                      setDisliked(false)
                   }}
                 >
                   <ThumbsUpIcon className="size-6" />
@@ -310,12 +319,13 @@ height={40}
                   size="icon"
                   variant="ghost"
                   className={cn(
-                    "rounded-full size-12 text-white", // size, text色調整
-                    disliked ? "bg-red-500/80" : "bg-black border" // 背景調整
+                    'rounded-full size-12 text-white', // size, text色調整
+                    disliked ? 'bg-red-500/80' : 'bg-black border', // 背景調整
                   )}
                   onClick={() => {
                     setDisliked(!disliked)
-                    if (liked) setLiked(false)
+                    if (liked)
+                      setLiked(false)
                   }}
                 >
                   <ThumbsDownIcon className="size-6" />
@@ -342,7 +352,6 @@ height={40}
         </div>
       </div>
 
-      
       {/* ナビゲーションバー */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
         <Link href="/">
@@ -367,9 +376,9 @@ height={40}
           <div className="fixed inset-0 bg-black/60  z-40 backdrop-blur-sm" onClick={closeCommentModal} />
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50 max-h-[70vh] flex flex-col", // max-h, flex-col
-              "transition-transform duration-300 ease-out",
-              commentModalVisible ? "translate-y-0" : "translate-y-full"
+              'fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50 max-h-[70vh] flex flex-col', // max-h, flex-col
+              'transition-transform duration-300 ease-out',
+              commentModalVisible ? 'translate-y-0' : 'translate-y-full',
             )}
           >
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-700">
@@ -384,7 +393,7 @@ height={40}
               {/* ...たくさんのコメント */}
             </div>
             <div className="mt-4 pt-3 border-t border-gray-700">
-                <input type="text" placeholder="コメントを追加..." className="w-full p-2 rounded bg-gray-800 text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"/>
+              <input type="text" placeholder="コメントを追加..." className="w-full p-2 rounded bg-gray-800 text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500" />
             </div>
             <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
           </div>
@@ -397,9 +406,9 @@ height={40}
           <div className="fixed inset-0 bg-black/60  z-40 backdrop-blur-sm" onClick={closeShareModal} />
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50",
-              "transition-transform duration-300 ease-out",
-              shareModalVisible ? "translate-y-0" : "translate-y-full"
+              'fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50',
+              'transition-transform duration-300 ease-out',
+              shareModalVisible ? 'translate-y-0' : 'translate-y-full',
             )}
           >
             <div className="flex justify-between items-center mb-4">
@@ -423,24 +432,24 @@ height={40}
           <div className="fixed inset-0 bg-black/60  z-40 backdrop-blur-sm" onClick={closeSearchModal} />
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50 max-h-[80vh] flex flex-col", // max-h, flex-col
-              "transition-transform duration-300 ease-out",
-              searchModalVisible ? "translate-y-0" : "translate-y-full"
+              'fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-50 max-h-[80vh] flex flex-col', // max-h, flex-col
+              'transition-transform duration-300 ease-out',
+              searchModalVisible ? 'translate-y-0' : 'translate-y-full',
             )}
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">検索</h2>
               <button onClick={closeSearchModal} className="p-1 text-white"><X size={24} /></button>
             </div>
-            <input type="search" placeholder="キーワードで検索..." className="w-full p-3 rounded bg-gray-800 text-white placeholder-gray-400 mb-4 focus:ring-purple-500 focus:border-purple-500"/>
+            <input type="search" placeholder="キーワードで検索..." className="w-full p-3 rounded bg-gray-800 text-white placeholder-gray-400 mb-4 focus:ring-purple-500 focus:border-purple-500" />
             <div className="overflow-y-auto flex-grow">
-                <h3 className="text-md font-semibold text-gray-400 mt-2 mb-2">おすすめ</h3>
-                {/* おすすめ内容のプレースホルダー */}
-                <ul className="space-y-2">
-                    <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">おすすめトピック１</li>
-                    <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">人気のUMA</li>
-                    <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">最新の異世界グルメ</li>
-                </ul>
+              <h3 className="text-md font-semibold text-gray-400 mt-2 mb-2">おすすめ</h3>
+              {/* おすすめ内容のプレースホルダー */}
+              <ul className="space-y-2">
+                <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">おすすめトピック１</li>
+                <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">人気のUMA</li>
+                <li className="p-2 hover:bg-gray-800 rounded-md cursor-pointer">最新の異世界グルメ</li>
+              </ul>
             </div>
             <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
           </div>
