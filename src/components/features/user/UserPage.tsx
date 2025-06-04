@@ -317,7 +317,7 @@ const usernameFromPath = pathSegments[pathSegments.length - 1] // 最後のセ�
                 </li>
                 <li>
                   <button
-                    onClick={signOut("/user")}
+                    onClick={()=>signOut("/user")}
                     className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg transition-colors duration-150 ease-in-out text-red-400 hover:text-red-300"
                   >
                     <LogOut size={20} className="mr-4" />

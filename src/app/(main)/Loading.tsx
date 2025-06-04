@@ -1,33 +1,6 @@
 
-import PostUserName from '🎙️/components/features/auth/PostUserName'
-import { auth } from '🎙️/lib/auth'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { env } from '🎙️/env.mjs'
-export default async function Page() {
-
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-
-  // ① セッションなし → /login にリダイレクト
-  if (!session || !session.user?.id) {
-    redirect('/login')
-  }
-
-  // ② username を API 経由で取得
-  const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/api/me/username`, {
-    method: 'GET',
-    headers: new Headers(await headers()),
-    cache: 'no-store',
-  })
-
-  const { username } = await res.json()
-
-  // ③ username がすでにあるなら直接そのページへ
-  if (username) {
-    redirect(`/${username}`)
-  }
+import { Loader2 } from 'lucide-react'
+export default async function Load() {
 
   return (
     <>
@@ -109,7 +82,10 @@ export default async function Page() {
             </defs>
           </svg>
         </div>
-       <PostUserName  />
+     
+     <div className="w-full flex flex-1 items-center justify-center mb-20">
+        <Loader2 className="animate-spin size-15"/>
+     </div>
       </div>
     </>
   )
