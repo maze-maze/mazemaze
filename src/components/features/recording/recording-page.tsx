@@ -2,6 +2,7 @@
 
 import { Button } from '🎙️/components/ui/button'
 import { StorageKeys } from '🎙️/lib/storage-keys'
+import { ArrowLeftIcon, CheckIcon, MicIcon, PlayIcon } from 'lucide-react'
 import { useState } from 'react'
 import Background from './background'
 import Character from './character'
@@ -51,57 +52,53 @@ export default function RecordingPage() {
   const isRecording = status !== 'idle' && status !== 'connecting' && !countdown
   const isFinished = status === 'finish' || status === 'disconnected'
 
-  if (isFinished && recordedBlob) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-8 p-6">
-        <div className="flex items-center gap-4">
-          <Button
-            onClick={playRecording}
-            className="flex items-center gap-2"
-          >
-            録音を再生
-          </Button>
-          {/* <Button
-              onClick={() => {
-                const url = URL.createObjectURL(recordedBlob)
-                const link = document.createElement('a')
-                link.href = url
-                link.download = `recording-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.webm`
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(url)
-              }}
-              variant="secondary"
-              className="flex items-center gap-2"
-            >
-              💾 ダウンロード
-            </Button> */}
-        </div>
-        <div className="text-sm text-gray-600 bg-white p-2 rounded border">
-          📊 録音情報:
-          {' '}
-          {Math.round(recordedBlob.size / 1024)}
-          KB |
-          録音時間:
-          {' '}
-          {Math.floor(recordingDuration / 60)}
-          :
-          {(recordingDuration % 60).toString().padStart(2, '0')}
-          {' '}
-          | 形式: WebM
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="grid grid-flow-row auto-rows-max h-dvh relative">
-      <Title title={title} isRecording={isRecording} />
+      <Title title={title} isRecording={isRecording} isFinished={isFinished} />
       <Character character={character} isRecording={isRecording} />
       <Background status={status} isRecording={isRecording} />
       {isRecording && <Scripts script={script} conversation={conversation} />}
       {countdown && <Countdown seconds={countdown} />}
+      {isFinished && recordedBlob && (
+        <div className="w-60 border border-white bg-white/50 backdrop-blur fixed bottom-10 right-1/2 translate-x-1/2 flex flex-col items-center py-3 px-2 justify-center rounded-2xl">
+          <Button className="text-white/90 bg-transparent hover:bg-transparent rounded-full mb-2 mr-2 w-full" aria-label="Finish recording">
+            <ArrowLeftIcon />
+            <span>収録を再開する</span>
+          </Button>
+          <div className="bg-white/20 rounded-xl py-3 px-1.5 flex items-center justify-center flex-col gap-2 w-full">
+            <MicIcon className="size-8 text-white" />
+            <p className="text-center">
+              収録が完了しました
+              <br />
+              お疲れ様でした！
+            </p>
+            <p className="text-sm text-white/90">
+              {Math.round(recordedBlob.size / 1024)}
+              KB |
+              {' '}
+              {Math.floor(recordingDuration / 60)}
+              :
+              {(recordingDuration % 60).toString().padStart(2, '0')}
+              s
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <Button className="text-blue-200 bg-transparent hover:bg-transparent rounded-full" aria-label="Finish recording">
+              <CheckIcon />
+              <span>保存する</span>
+            </Button>
+            <div className="h-3 w-[1px] bg-white/50" />
+            <Button
+              className="text-blue-200 bg-transparent hover:bg-transparent rounded-full"
+              aria-label="Play recording"
+              onClick={playRecording}
+            >
+              <PlayIcon />
+              <span>再生する</span>
+            </Button>
+          </div>
+        </div>
+      )}
       <Controller
         time={`${Math.floor(recordingDuration / 60)}:${(recordingDuration % 60).toString().padStart(2, '0')}`}
         status={status}
