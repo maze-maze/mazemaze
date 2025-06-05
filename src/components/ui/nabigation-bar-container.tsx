@@ -1,18 +1,16 @@
-import SignInPage from '🎙️/components/features/auth/SignInPage'
-import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import NabigationBar from './nabigation-bar'
 
-export default async function Page() {
+export default async function NabigationBarContainer() {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
 
-  // ① セッションがない場合はログインページ表示
   if (!session || !session.user?.id) {
-    return <SignInPage />
+    redirect('/login')
   }
 
   // ② username を API 経由で取得
@@ -26,12 +24,9 @@ export default async function Page() {
   )
 
   const data = await res.json()
+  const username = data?.username || null
 
-  // ③ username の有無で分岐
-  if (!data || !data.username) {
-    redirect('/enter/callback/welcome')
-  }
-  else {
-    redirect(`/${data.username}`)
-  }
+  return (
+    <NabigationBar isSession={!session} username={username} />
+  )
 }

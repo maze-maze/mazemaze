@@ -16,19 +16,22 @@ export default async function MePage() {
   }
 
   // ② username を API 経由で取得
-  const res = await client.api.me.username.$get({}, {
-    headers: {
-      ...Object.fromEntries((await headers()).entries()),
-      'Cache-Control': 'no-store',
+  const res = await client.api.me.username.$get(
+    {},
+    {
+      init: {
+        headers: await headers(),
+      },
     },
-  })
+  )
 
-  const username = await res.json()
+  const data = await res.json()
 
-  if (!username) {
-    redirect(`/enter/callback/welcome`)
+  // ③ username の有無で分岐
+  if (!data || !data.username) {
+    redirect('/enter/callback/welcome')
   }
   else {
-    redirect(`/${username}`)
+    redirect(`/${data.username}`)
   }
 }

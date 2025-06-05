@@ -2,6 +2,7 @@
 'use client'
 import type { EmblaOptionsType } from 'embla-carousel'
 import { Input } from '🎙️/components/ui/input'
+import NabigationBarContainer from '🎙️/components/ui/nabigation-bar-container'
 import { cn } from '🎙️/lib/utils'
 import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
@@ -260,21 +261,7 @@ export default function ThemeSelector({
             </div>
 
             {/* ナビゲーションバー */}
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[280px] h-[64px] flex items-center justify-between px-8 bg-gradient-to-br from-[#5B5B5B] to-[#23232A] rounded-full shadow-2xl z-20" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)' }}>
-              <Link href="/">
-                <Home className="text-white opacity-80" size={28} />
-              </Link>
-              <Link href="/new">
-                <div className="flex-1 flex justify-center">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg">
-                    <Plus className="text-white" size={38} />
-                  </div>
-                </div>
-              </Link>
-              <Link href="/user">
-                <User className="text-white opacity-80" size={28} />
-              </Link>
-            </div>
+            <NabigationBarContainer />
 
           </div>
         </>

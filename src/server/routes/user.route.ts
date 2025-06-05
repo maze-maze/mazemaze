@@ -19,7 +19,7 @@ export const getusernameRoute = createRoute({
       description: '値がありません',
       content: {
         'application/json': {
-          schema: ErrorSchema,
+          schema: z.null(),
         },
       },
     },
