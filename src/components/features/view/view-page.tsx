@@ -5,9 +5,8 @@ import type { CarouselApi } from '🎙️/components/ui/carousel'
 import { Button } from '🎙️/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem } from '🎙️/components/ui/carousel'
 import { cn } from '🎙️/lib/utils'
-import { Home, MessageSquareMoreIcon, Plus, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, User, UserIcon, X } from 'lucide-react'
+import { MessageSquareMoreIcon, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, UserIcon, X } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Background from '../layout/backgeound'
@@ -155,8 +154,7 @@ export default function ViewPage() {
   return (
     <div className="relative bg-[#0E0B16] h-screen flex flex-col items-center w-full ">
 
-      
-      <Header Icon={SearchIcon} onIconClick={openSearchModal}/>
+      <Header Icon={SearchIcon} onIconClick={openSearchModal} />
 
       <Background />
       <Carousel
@@ -277,7 +275,7 @@ export default function ViewPage() {
       </div>
 
       {/* ナビゲーションバー */}
-      <NavigationBar/>
+      <NavigationBar />
 
       {/* --- モーダル群 --- */}
       {/* コメントモーダル */}

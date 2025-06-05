@@ -1,6 +1,5 @@
 // app/me/page.tsx
 
-import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'

@@ -1,13 +1,11 @@
-/* eslint-disable ts/no-use-before-define */
-/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { useEffect, useState } from 'react'
+import ScriptCard from './script-card'
+import ScriptError from './script-error'
+import ScriptFooter from './script-footer'
 import ScriptHeader from './script-header'
 import ScriptLoading from './script-loading'
-import ScriptError from './script-error'
-import ScriptCard from './script-card'
-import ScriptFooter from './script-footer'
 
 // 型定義
 interface Character {
@@ -18,13 +16,13 @@ interface Character {
 
 interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 
 interface ScriptSections {
   intro: string
-  sections: { title: string; content: string }[]
+  sections: { title: string, content: string }[]
   outro: string
 }
 
@@ -63,9 +61,9 @@ export default function ScriptGenerator({
   // ---------------------
   const parseScriptIntoSections = (
     scriptContent: string,
-    currentStructure: Structure
+    currentStructure: Structure,
   ): ScriptSections => {
-    const sections = currentStructure.sections.map((s) => ({
+    const sections = currentStructure.sections.map(s => ({
       title: s.title,
       content: '',
     }))
@@ -79,7 +77,7 @@ export default function ScriptGenerator({
     // 1. アウトロを抽出
     const outroKeywords = ['アウトロ', 'おわりに', 'まとめ']
     const outroPattern = new RegExp(
-      `(##\\s*)?(${outroKeywords.join('|')})[:：]?([\\s\\S]*)`
+      `(##\\s*)?(${outroKeywords.join('|')})[:：]?([\\s\\S]*)`,
     )
     const outroMatch = scriptContent.match(outroPattern)
     let scriptWithoutOutro = scriptContent
@@ -95,7 +93,7 @@ export default function ScriptGenerator({
       const titlePattern = escapeRegex(sec.title)
       const pattern = new RegExp(
         `(##\\s*)?セクション${i + 1}[:：]?.*?${titlePattern}([\\s\\S]*)`,
-        'i'
+        'i',
       )
       const match = remaining.match(pattern)
       if (match && typeof match.index !== 'undefined') {
@@ -107,22 +105,22 @@ export default function ScriptGenerator({
     // 3. 残りをイントロとする
     const introKeywords = ['イントロ', 'はじめに', '導入']
     const introPattern = new RegExp(
-      `(##\\s*)?(${introKeywords.join('|')})[:：]?([\\s\\S]*)`
+      `(##\\s*)?(${introKeywords.join('|')})[:：]?([\\s\\S]*)`,
     )
     const introMatch = remaining.match(introPattern)
     intro = introMatch ? introMatch[3].trim() : remaining
 
     // 4. フォールバック
     if (
-      !intro.trim() &&
-      !outro.trim() &&
-      !sections.some((s) => s.content.trim())
+      !intro.trim()
+      && !outro.trim()
+      && !sections.some(s => s.content.trim())
     ) {
       console.warn('Script parsing likely failed. Displaying full script.')
       intro = scriptContent
       outro = '（アウトロの内容をここに記述）'
       sections.forEach(
-        (s) => (s.content = `（${s.title}のスクリプトをここに記述）`)
+        s => (s.content = `（${s.title}のスクリプトをここに記述）`),
       )
     }
 
@@ -131,8 +129,8 @@ export default function ScriptGenerator({
       sections: sections.map((s, idx) => ({
         ...s,
         content:
-          s.content.trim() ||
-          `（${currentStructure.sections[idx].title}の内容）`,
+          s.content.trim()
+          || `（${currentStructure.sections[idx].title}の内容）`,
       })),
       outro: outro.trim() || '（アウトロの内容をここに記述）',
     }
@@ -178,7 +176,7 @@ export default function ScriptGenerator({
       if (!res.ok) {
         const errJson = await res.json()
         throw new Error(
-          `API error: ${res.status} - ${errJson.error || res.statusText}`
+          `API error: ${res.status} - ${errJson.error || res.statusText}`,
         )
       }
 
@@ -187,26 +185,29 @@ export default function ScriptGenerator({
         const parsed = parseScriptIntoSections(data.script, structure)
         setScriptSections(parsed)
         onGenerate(generateFullScript(parsed))
-      } else {
+      }
+      else {
         throw new Error('APIからスクリプトが返されませんでした。')
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error fetching script:', err)
       setError(
         `スクリプト生成中にエラーが発生しました: ${
           err instanceof Error ? err.message : String(err)
-        }`
+        }`,
       )
       // フォールバック
       setScriptSections({
         intro: '（イントロをここに記述）',
-        sections: structure.sections.map((s) => ({
+        sections: structure.sections.map(s => ({
           title: s.title,
           content: `（${s.title}の内容を記述してください）`,
         })),
         outro: '（アウトロをここに記述）',
       })
-    } finally {
+    }
+    finally {
       setLoading(false)
       setGenerating(false)
     }
@@ -220,10 +221,10 @@ export default function ScriptGenerator({
   // scriptSections が更新されたら親に渡す
   useEffect(() => {
     if (
-      !loading &&
-      (scriptSections.intro ||
-        scriptSections.sections.length > 0 ||
-        scriptSections.outro)
+      !loading
+      && (scriptSections.intro
+        || scriptSections.sections.length > 0
+        || scriptSections.outro)
     ) {
       onGenerate(generateFullScript(scriptSections))
     }
@@ -275,7 +276,7 @@ export default function ScriptGenerator({
               title="イントロ"
               content={scriptSections.intro}
               editMode={editMode}
-              onContentChange={(val) => updateScriptSection('intro', val)}
+              onContentChange={val => updateScriptSection('intro', val)}
               isSection={false}
             />
 
@@ -286,7 +287,7 @@ export default function ScriptGenerator({
                 title={`セクション ${idx + 1}: ${sec.title}`}
                 content={sec.content}
                 editMode={editMode}
-                onContentChange={(val) => updateSection(idx, val)}
+                onContentChange={val => updateSection(idx, val)}
                 isSection={true}
               />
             ))}
@@ -296,7 +297,7 @@ export default function ScriptGenerator({
               title="アウトロ"
               content={scriptSections.outro}
               editMode={editMode}
-              onContentChange={(val) => updateScriptSection('outro', val)}
+              onContentChange={val => updateScriptSection('outro', val)}
               isSection={false}
             />
           </div>
@@ -307,9 +308,9 @@ export default function ScriptGenerator({
       {!loading && !generating && (
         <ScriptFooter
           disabled={
-            !scriptSections.intro ||
-            scriptSections.sections.length === 0 ||
-            !scriptSections.outro
+            !scriptSections.intro
+            || scriptSections.sections.length === 0
+            || !scriptSections.outro
           }
           onNext={onNext}
         />

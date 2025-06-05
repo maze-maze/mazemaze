@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { PlusCircle } from 'lucide-react'
@@ -9,7 +8,8 @@ interface Props {
 }
 
 export default function AddSectionButton({ onClick, editMode }: Props) {
-  if (!editMode) return null
+  if (!editMode)
+    return null
 
   return (
     <div className="flex justify-center my-2 h-6 items-center">

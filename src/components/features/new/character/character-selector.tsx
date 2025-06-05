@@ -1,13 +1,12 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import type { EmblaOptionsType } from 'embla-carousel'
+import type { Personality } from './types'
 import { useChat } from 'ai/react'
 import AutoPlay from 'embla-carousel-autoplay'
-import type { EmblaOptionsType } from 'embla-carousel'
-import { cn } from '🎙️/lib/utils'
 
-import type { Personality } from './types'
-import Header from './header'
+import { useEffect, useRef, useState } from 'react'
 import CharacterCarousel from './character-carousel'
+import Header from './header'
 import Loader from './loader'
 import SuggestionModal from './suggestion-modal'
 
@@ -18,7 +17,7 @@ interface Props {
   onSelect: (p: Personality) => void
   onNext: () => void
   onBack: () => void
-  disableSelf?: boolean   // ← 追加
+  disableSelf?: boolean // ← 追加
 }
 
 export default function CharacterSelector({
@@ -28,16 +27,16 @@ export default function CharacterSelector({
   onSelect,
   onNext,
   onBack,
-  disableSelf = false,   // ← デフォルトを false に設定
+  disableSelf = false, // ← デフォルトを false に設定
 }: Props) {
   const [personalities, setPersonalities] = useState<Personality[]>([])
   const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState<Personality | null>(null)
-  const [editMode, setEditMode] = useState(false)
+  const [, setSelected] = useState<Personality | null>(null)
+  const [, setEditMode] = useState(false)
   const [showSuggestionModal, setShowSuggestionModal] = useState(false)
   const [aiSuggestions, setAiSuggestions] = useState<Personality[]>([])
-  const [showList, setShowList] = useState(true)
-  const [showChat, setShowChat] = useState(false)
+  const [, setShowList] = useState(true)
+  const [, setShowChat] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
@@ -52,10 +51,11 @@ export default function CharacterSelector({
     onFinish: (message) => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
       if (message.role === 'assistant' && messages.length <= 2) {
-        const regex =
-          /\*\*候補\d+: ([^*]+)\*\* - 説明: ([^-]+) - トーン: ([^\n]+)(?=\n\n|\n\*\*|$)/g
+        const regex
+          = /\*\*候補\d+: ([^*]+)\*\* - 説明: ([^-]+) - トーン: ([^\n]+)(?=\n\n|\n\*\*|$)/g
         let m: RegExpExecArray | null
         const extracted: Personality[] = []
+        // eslint-disable-next-line no-cond-assign
         while ((m = regex.exec(message.content)) !== null) {
           extracted.push({
             name: m[1].trim(),
@@ -64,7 +64,7 @@ export default function CharacterSelector({
           })
         }
         if (extracted.length) {
-          setPersonalities(extracted.map((p) => ({ ...p, custom: false })))
+          setPersonalities(extracted.map(p => ({ ...p, custom: false })))
           setLoading(false)
           setAiSuggestions(extracted)
           setShowSuggestionModal(true)
@@ -83,14 +83,16 @@ export default function CharacterSelector({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ theme }),
         })
-        if (!res.ok) throw new Error()
+        if (!res.ok)
+          throw new Error('Failed to fetch characters')
         const data = await res.json()
         if (Array.isArray(data) && data.length) {
           setPersonalities(data)
           setLoading(false)
           return
         }
-      } catch {
+      }
+      catch {
         // API が空 or エラー → AI に依頼
       }
       handleSubmit(new Event('submit') as any, {
@@ -143,7 +145,7 @@ export default function CharacterSelector({
       {/* カルーセル or ローディング */}
       {!loading && !isChatLoading && (
         <CharacterCarousel
-          slides={allSlides}               // selfCard が除外された配列を渡す
+          slides={allSlides} // selfCard が除外された配列を渡す
           activeIndex={activeIndex}
           setActiveIndex={setActiveIndex}
           emblaOptions={sliderOption}
@@ -151,7 +153,8 @@ export default function CharacterSelector({
           onSlideClick={(p) => {
             if (p.custom) {
               setEditMode(true)
-            } else {
+            }
+            else {
               handleSelect(p)
             }
           }}
@@ -175,7 +178,7 @@ export default function CharacterSelector({
           suggestions={aiSuggestions}
           onClose={() => setShowSuggestionModal(false)}
           onChoose={(p) => {
-            setPersonalities((prev) => [{ ...p, custom: false }, ...prev])
+            setPersonalities(prev => [{ ...p, custom: false }, ...prev])
             setShowSuggestionModal(false)
             setShowList(true)
           }}

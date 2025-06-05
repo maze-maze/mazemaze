@@ -1,4 +1,4 @@
-import { ThemeCard } from "./theme-card"
+import { ThemeCard } from './theme-card'
 
 // テーマカードコンポーネント
 export // AIテーマ表示用コンポーネント

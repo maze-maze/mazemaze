@@ -1,5 +1,4 @@
 import SignInPage from '🎙️/components/features/auth/SignInPage'
-import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'

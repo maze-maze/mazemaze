@@ -1,7 +1,7 @@
 import Background from '../layout/backgeound'
-import { SignInButton } from './SignInButton'
 import Header from '../layout/header'
 import NavigationBar from '../layout/navigation-bar'
+import { SignInButton } from './SignInButton'
 
 export default function SignInPage() {
   // 表示するテーマリストをアクティブなタブに応じて決定
@@ -9,7 +9,7 @@ export default function SignInPage() {
     <div className="relative bg-[#0E0B16] min-h-screen flex flex-col items-center w-full h-full">
 
       {/* ヘッダー部分 - 次へボタンを右上に配置 */}
-      <Header/>
+      <Header />
 
       <Background />
 

@@ -1,8 +1,6 @@
-
 'use client'
 
-import { Personality } from './types'
-
+import type { Personality } from './types'
 
 interface Props {
   suggestions: Personality[]
@@ -26,7 +24,10 @@ export default function SuggestionModal({ suggestions, onClose, onChoose }: Prop
           <div key={i} className="mb-4">
             <p className="font-bold text-white">{p.name}</p>
             <p className="text-sm text-gray-200">{p.description}</p>
-            <p className="text-sm text-gray-200">トーン: {p.tone}</p>
+            <p className="text-sm text-gray-200">
+              トーン:
+              {p.tone}
+            </p>
             <button
               className="mt-2 text-primary"
               onClick={() => onChoose(p)}
@@ -37,7 +38,8 @@ export default function SuggestionModal({ suggestions, onClose, onChoose }: Prop
         ))}
       </div>
 
-      <style jsx>{`
+      <style jsx>
+        {`
         .animate-slideup {
           animation: slideup-modal 0.32s cubic-bezier(.4, 1.4, .6, 1) both;
         }
@@ -51,7 +53,8 @@ export default function SuggestionModal({ suggestions, onClose, onChoose }: Prop
             opacity: 1;
           }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }

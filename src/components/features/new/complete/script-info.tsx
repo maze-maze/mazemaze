@@ -1,9 +1,9 @@
 // src/components/complete-page/script-info.tsx
 'use client'
 
+import { ClipboardList } from 'lucide-react'
 import React from 'react'
 import InfoCard from './info-card'
-import { ClipboardList } from 'lucide-react'
 
 interface ScriptInfoProps {
   script?: string | null

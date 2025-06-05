@@ -1,9 +1,9 @@
 // src/components/complete-page/structure-info.tsx
 'use client'
 
+import { BookText } from 'lucide-react'
 import React from 'react'
 import InfoCard from './info-card'
-import { BookText } from 'lucide-react'
 
 interface Section {
   title: string
@@ -21,7 +21,8 @@ interface StructureInfoProps {
 }
 
 export default function StructureInfo({ structure }: StructureInfoProps) {
-  if (!structure) return null
+  if (!structure)
+    return null
 
   return (
     <InfoCard title="構成" icon={BookText}>

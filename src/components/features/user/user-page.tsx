@@ -2,18 +2,18 @@
 /* eslint-disable no-console */
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import Background from '../layout/backgeound'
-import NavigationBar from '../layout/navigation-bar'
+import { AlignJustify } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useQueryState } from 'nuqs'
+import React, { useState } from 'react'
+import Background from '../layout/backgeound'
 
+import Header from '../layout/header'
+import NavigationBar from '../layout/navigation-bar'
+import MenuModal from './menu-modal'
 import ProfileInfo from './profile-info'
 import TabSwitcher from './tab-switcher'
 import ThemeGrid from './theme-grid'
-import MenuModal from './menu-modal'
-import Header from '../layout/header'
-import { AlignJustify } from 'lucide-react'
 
 export default function UserPage({ name }: { name: string }) {
   // モックデータ

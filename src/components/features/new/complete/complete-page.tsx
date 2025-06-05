@@ -4,13 +4,13 @@
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
-import React from 'react'
-import ThemeInfo from './theme-info'
-import CharacterInfo from './character-info'
-import StructureInfo from './structure-info'
-import ScriptInfo from './script-info'
-import ActionButtons from './action-buttons'
 import { ArrowLeft } from 'lucide-react'
+import React from 'react'
+import ActionButtons from './action-buttons'
+import CharacterInfo from './character-info'
+import ScriptInfo from './script-info'
+import StructureInfo from './structure-info'
+import ThemeInfo from './theme-info'
 
 // 型定義
 interface Character {
@@ -22,7 +22,7 @@ interface Character {
 
 interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 
@@ -68,26 +68,27 @@ export default function CompletePage({
     try {
       console.log(
         `${StorageKeys.THEME}:`,
-        sessionStorage.getItem(StorageKeys.THEME)
+        sessionStorage.getItem(StorageKeys.THEME),
       )
       console.log(
         `${StorageKeys.MAIN}:`,
-        sessionStorage.getItem(StorageKeys.MAIN)
+        sessionStorage.getItem(StorageKeys.MAIN),
       )
       console.log(
         `${StorageKeys.GUEST}:`,
-        sessionStorage.getItem(StorageKeys.GUEST)
+        sessionStorage.getItem(StorageKeys.GUEST),
       )
       console.log(
         `${StorageKeys.STRUCTURE}:`,
-        sessionStorage.getItem(StorageKeys.STRUCTURE)
+        sessionStorage.getItem(StorageKeys.STRUCTURE),
       )
       console.log(
         `${StorageKeys.SCRIPT}:`,
-        sessionStorage.getItem(StorageKeys.SCRIPT)
+        sessionStorage.getItem(StorageKeys.SCRIPT),
       )
       alert('現在の状態とセッションストレージの内容をコンソールに出力しました。')
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Failed to access session storage:', e)
       alert('セッションストレージへのアクセスに失敗しました。')
     }

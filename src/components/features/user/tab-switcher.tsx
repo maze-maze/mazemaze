@@ -1,9 +1,9 @@
 // src/components/user-page/tab-switcher.tsx
 'use client'
 
-import React from 'react'
 import { cn } from '🎙️/lib/utils'
 import { useQueryState } from 'nuqs'
+import React from 'react'
 
 interface TabSwitcherProps {
   // nothing needed; hooks are internal
@@ -20,7 +20,7 @@ export default function TabSwitcher(_: TabSwitcherProps) {
             'px-6 py-2 rounded-full font-medium transition-colors duration-200 ease-in-out',
             activeTab === 'posts'
               ? 'bg-white text-gray-800'
-              : 'text-white hover:bg-gray-700/70'
+              : 'text-white hover:bg-gray-700/70',
           )}
           onClick={() => setActiveTab('posts')}
         >
@@ -31,7 +31,7 @@ export default function TabSwitcher(_: TabSwitcherProps) {
             'px-6 py-2 rounded-full font-medium transition-colors duration-200 ease-in-out',
             activeTab === 'likes'
               ? 'bg-white text-gray-800'
-              : 'text-white hover:bg-gray-700/70'
+              : 'text-white hover:bg-gray-700/70',
           )}
           onClick={() => setActiveTab('likes')}
         >

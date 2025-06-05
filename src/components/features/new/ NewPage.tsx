@@ -9,15 +9,12 @@ import { StorageKeys } from '🎙️/lib/storage-keys'
 import { useQueryState } from 'nuqs'
 import React, { useEffect, useState } from 'react' // useState, useEffect をインポート
 
-
-
-import StructureSelector from './structure/structure-selector'
-import ThemeSelector from './theme'
 import GuestCharacterSelector from './character/guest'
 import MainCharacterSelector from './character/main'
-import { ScriptGenerator } from './script'
 import { CompletePage } from './complete'
-
+import { ScriptGenerator } from './script'
+import StructureSelector from './structure/structure-selector'
+import ThemeSelector from './theme'
 
 // 型定義
 interface Character {
@@ -28,7 +25,7 @@ interface Character {
 }
 interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 interface ThemeObject {
@@ -39,7 +36,7 @@ interface ThemeObject {
 // --- セッションストレージ用のカスタムフック ---
 function useSessionStorageState<T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
     if (typeof window === 'undefined') {
@@ -48,7 +45,8 @@ function useSessionStorageState<T>(
     try {
       const storedValue = window.sessionStorage.getItem(key)
       return storedValue ? JSON.parse(storedValue) : defaultValue
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Error reading sessionStorage key “${key}”:`, error)
       return defaultValue
     }
@@ -58,10 +56,12 @@ function useSessionStorageState<T>(
     try {
       if (state === null || state === undefined) {
         window.sessionStorage.removeItem(key)
-      } else {
+      }
+      else {
         window.sessionStorage.setItem(key, JSON.stringify(state))
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Error writing sessionStorage key “${key}”:`, error)
     }
   }, [key, state])
@@ -77,17 +77,17 @@ export default function NewPage() {
   // --- useSessionStorageState を使用 ---
   const [themeObj, setThemeObj] = useSessionStorageState<ThemeObject | null>(
     StorageKeys.THEME,
-    null
+    null,
   )
   const [character, setCharacter] = useSessionStorageState<
     Character | null
   >(StorageKeys.MAIN, null)
-  const [guestCharacter, setGuestCharacter] =
-    useSessionStorageState<Character | null>(StorageKeys.GUEST, null)
-  const [structure, setStructure] =
-    useSessionStorageState<Structure | null>(StorageKeys.STRUCTURE, null)
-  const [script, setScript] =
-    useSessionStorageState<string | null>(StorageKeys.SCRIPT, null)
+  const [guestCharacter, setGuestCharacter]
+    = useSessionStorageState<Character | null>(StorageKeys.GUEST, null)
+  const [structure, setStructure]
+    = useSessionStorageState<Structure | null>(StorageKeys.STRUCTURE, null)
+  const [script, setScript]
+    = useSessionStorageState<string | null>(StorageKeys.SCRIPT, null)
   // ------------------------------------
 
   const handleRestart = () => {
@@ -128,7 +128,7 @@ export default function NewPage() {
         <GuestCharacterSelector
           theme={themeObj.theme}
           gradient={themeObj.gradient}
-          disableSelf={isMainSelf} 
+          disableSelf={isMainSelf}
           onSelect={(selectedGuest) => {
             setGuestCharacter(selectedGuest)
             setName('structure')

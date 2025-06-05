@@ -1,8 +1,8 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { authClient } from '🎙️/lib/auth-client'
 import { Home, Plus, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { authClient } from '🎙️/lib/auth-client'
+import { useEffect, useState } from 'react'
 
 export default function NavigationBar() {
   const [session, setSession] = useState<any>(null)
@@ -32,14 +32,16 @@ export default function NavigationBar() {
   }, [])
 
   const navigate = (route: 'user' | '/new') => {
-    if (isLoading) return
+    if (isLoading)
+      return
     if (!session?.user?.id) {
       router.push('/login')
       return
     }
     if (route === 'user') {
       router.push(username ? `/${username}` : '/enter/callback/welcome')
-    } else {
+    }
+    else {
       router.push(route)
     }
   }
@@ -64,7 +66,7 @@ export default function NavigationBar() {
       </button>
 
       <button onClick={() => navigate('user')} disabled={isLoading}>
-        <User className={`text-white`} size={28} />
+        <User className="text-white" size={28} />
       </button>
     </div>
   )

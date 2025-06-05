@@ -1,9 +1,9 @@
 // src/components/complete-page/theme-info.tsx
 'use client'
 
+import { Palette } from 'lucide-react'
 import React from 'react'
 import InfoCard from './info-card'
-import { Palette } from 'lucide-react'
 
 interface ThemeInfoProps {
   theme: string

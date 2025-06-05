@@ -1,5 +1,3 @@
-/* eslint-disable ts/no-use-before-define */
-/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { ChevronRight, FileText, MenuSquare } from 'lucide-react'
@@ -56,21 +54,23 @@ export default function ScriptCard({
 
       {isExpanded && (
         <div className="mt-4 pl-9">
-          {editMode ? (
-            <textarea
-              ref={textAreaRef}
-              value={content}
-              onChange={(e) => onContentChange(e.target.value)}
-              className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
-              placeholder={`${title}の台本内容...`}
-            />
-          ) : (
-            <div className="text-gray-200 text-base leading-relaxed whitespace-pre-wrap bg-gray-800/30 p-4 rounded-md">
-              {content || (
-                <span className="text-gray-500">内容がありません...</span>
+          {editMode
+            ? (
+                <textarea
+                  ref={textAreaRef}
+                  value={content}
+                  onChange={e => onContentChange(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
+                  placeholder={`${title}の台本内容...`}
+                />
+              )
+            : (
+                <div className="text-gray-200 text-base leading-relaxed whitespace-pre-wrap bg-gray-800/30 p-4 rounded-md">
+                  {content || (
+                    <span className="text-gray-500">内容がありません...</span>
+                  )}
+                </div>
               )}
-            </div>
-          )}
         </div>
       )}
     </div>

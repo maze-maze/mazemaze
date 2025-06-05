@@ -1,26 +1,17 @@
-/* eslint-disable style/multiline-ternary */
-/* eslint-disable ts/no-use-before-define */
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { Button } from '🎙️/components/ui/button'
-import { Input } from '🎙️/components/ui/input'
-import { Textarea } from '🎙️/components/ui/textarea'
 import {
   ArrowLeft,
   CheckIcon,
-  ChevronRight,
   Loader2,
-  MoveDown,
-  MoveUp,
   PenIcon,
-  PlusCircle,
-  Trash2,
 } from 'lucide-react'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
-import StructureCard from './structure-card'
 import AddSectionButton from './add-section-button'
+import StructureCard from './structure-card'
 
 // 型定義
 interface Character {
@@ -32,7 +23,7 @@ interface Character {
 
 export interface Structure {
   intro: string
-  sections: { title: string; description: string }[]
+  sections: { title: string, description: string }[]
   outro: string
 }
 
@@ -81,7 +72,7 @@ export default function StructureSelector({
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(
-          `API error: ${res.status} - ${errorData.error || res.statusText}`
+          `API error: ${res.status} - ${errorData.error || res.statusText}`,
         )
       }
 
@@ -89,15 +80,17 @@ export default function StructureSelector({
 
       if (data && data.intro && Array.isArray(data.sections) && data.outro) {
         setStructure(data)
-      } else {
+      }
+      else {
         throw new Error('APIから有効な構成が返されませんでした。')
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error fetching/generating structure:', err)
       setError(
         `構成の取得または生成中にエラーが発生しました: ${
           err instanceof Error ? err.message : String(err)
-        }`
+        }`,
       )
       // エラー時はデフォルト構造を設定
       const defaultStructure: Structure = {
@@ -123,7 +116,8 @@ export default function StructureSelector({
           '今回のポッドキャストのまとめと、リスナーへのメッセージ、次回の予告など。',
       }
       setStructure(defaultStructure)
-    } finally {
+    }
+    finally {
       setLoading(false)
     }
   }
@@ -136,8 +130,8 @@ export default function StructureSelector({
   // structure が更新されるたびに親に伝える
   useEffect(() => {
     if (
-      !loading &&
-      (structure.intro || structure.sections.length > 0 || structure.outro)
+      !loading
+      && (structure.intro || structure.sections.length > 0 || structure.outro)
     ) {
       onSelect(structure)
     }
@@ -145,13 +139,13 @@ export default function StructureSelector({
 
   // 構成を更新する関数
   const updateStructure = (field: 'intro' | 'outro', value: string) => {
-    setStructure((prev) => ({ ...prev, [field]: value }))
+    setStructure(prev => ({ ...prev, [field]: value }))
   }
 
   // セクションを更新する関数
   const updateSection = (
     index: number,
-    updatedFields: { title?: string; description?: string }
+    updatedFields: { title?: string, description?: string },
   ) => {
     setStructure((prev) => {
       const newSections = [...prev.sections]
@@ -177,7 +171,8 @@ export default function StructureSelector({
   // セクションを削除する関数
   const removeSection = (index: number) => {
     setStructure((prev) => {
-      if (prev.sections.length <= 1) return prev
+      if (prev.sections.length <= 1)
+        return prev
       const newSections = prev.sections.filter((_, i) => i !== index)
       return { ...prev, sections: newSections }
     })
@@ -185,7 +180,8 @@ export default function StructureSelector({
 
   // セクションを上に移動
   const moveSectionUp = (index: number) => {
-    if (index === 0) return
+    if (index === 0)
+      return
     setStructure((prev) => {
       const newSections = [...prev.sections]
       ;[newSections[index - 1], newSections[index]] = [
@@ -198,7 +194,8 @@ export default function StructureSelector({
 
   // セクションを下に移動
   const moveSectionDown = (index: number) => {
-    if (index === structure.sections.length - 1) return
+    if (index === structure.sections.length - 1)
+      return
     setStructure((prev) => {
       const newSections = [...prev.sections]
       ;[newSections[index], newSections[index + 1]] = [
@@ -264,7 +261,7 @@ export default function StructureSelector({
               title="イントロ"
               content={structure.intro}
               editMode={editMode}
-              onContentChange={(value) => updateStructure('intro', value)}
+              onContentChange={value => updateStructure('intro', value)}
               isSection={false}
             />
 
@@ -279,12 +276,10 @@ export default function StructureSelector({
                   content={section.title}
                   description={section.description}
                   editMode={editMode}
-                  onContentChange={(value) =>
-                    updateSection(index, { title: value })
-                  }
-                  onDescriptionChange={(value) =>
-                    updateSection(index, { description: value })
-                  }
+                  onContentChange={value =>
+                    updateSection(index, { title: value })}
+                  onDescriptionChange={value =>
+                    updateSection(index, { description: value })}
                   isSection={true}
                   onRemove={() => removeSection(index)}
                   canRemove={structure.sections.length > 1}
@@ -305,7 +300,7 @@ export default function StructureSelector({
               title="アウトロ"
               content={structure.outro}
               editMode={editMode}
-              onContentChange={(value) => updateStructure('outro', value)}
+              onContentChange={value => updateStructure('outro', value)}
               isSection={false}
             />
           </div>
@@ -339,9 +334,9 @@ export default function StructureSelector({
             className="font-bold text-lg px-8 py-2 rounded-full transition text-gray-900 hover:text-black"
             onClick={onNext}
             disabled={
-              !structure.intro ||
-              structure.sections.length === 0 ||
-              !structure.outro
+              !structure.intro
+              || structure.sections.length === 0
+              || !structure.outro
             }
           >
             決定

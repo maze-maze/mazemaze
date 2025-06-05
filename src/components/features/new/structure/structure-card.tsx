@@ -1,12 +1,11 @@
-/* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { Input } from '🎙️/components/ui/input'
 import { Textarea } from '🎙️/components/ui/textarea'
 import {
+  ChevronRight,
   MoveDown,
   MoveUp,
-  ChevronRight,
   Trash2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -59,44 +58,48 @@ export default function StructureCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-1 min-w-0">
           {/* セクション移動ボタン */}
-          {isSection ? (
-            <div className="flex flex-col mr-3">
-              <button
-                onClick={onMoveUp}
-                disabled={!canMoveUp || !editMode}
-                className={`text-gray-400 hover:text-white ${
-                  !canMoveUp || !editMode ? 'cursor-not-allowed opacity-30' : ''
-                }`}
-                aria-label="Move section up"
-              >
-                <MoveUp size={16} />
-              </button>
-              <button
-                onClick={onMoveDown}
-                disabled={!canMoveDown || !editMode}
-                className={`text-gray-400 hover:text-white ${
-                  !canMoveDown || !editMode ? 'cursor-not-allowed opacity-30' : ''
-                }`}
-                aria-label="Move section down"
-              >
-                <MoveDown size={16} />
-              </button>
-            </div>
-          ) : (
-            <div className="w-6 h-6 mr-3" />
-          )}
+          {isSection
+            ? (
+                <div className="flex flex-col mr-3">
+                  <button
+                    onClick={onMoveUp}
+                    disabled={!canMoveUp || !editMode}
+                    className={`text-gray-400 hover:text-white ${
+                      !canMoveUp || !editMode ? 'cursor-not-allowed opacity-30' : ''
+                    }`}
+                    aria-label="Move section up"
+                  >
+                    <MoveUp size={16} />
+                  </button>
+                  <button
+                    onClick={onMoveDown}
+                    disabled={!canMoveDown || !editMode}
+                    className={`text-gray-400 hover:text-white ${
+                      !canMoveDown || !editMode ? 'cursor-not-allowed opacity-30' : ''
+                    }`}
+                    aria-label="Move section down"
+                  >
+                    <MoveDown size={16} />
+                  </button>
+                </div>
+              )
+            : (
+                <div className="w-6 h-6 mr-3" />
+              )}
 
-          {editMode ? (
-            <Input
-              type="text"
-              value={content}
-              onChange={(e) => onContentChange(e.target.value)}
-              className="font-semibold text-gray-100 text-lg w-full bg-transparent border-b border-gray-600 focus:outline-none focus:ring-0 focus:border-white p-1 truncate"
-              placeholder={isSection ? 'セクションタイトル' : title}
-            />
-          ) : (
-            <h4 className="font-semibold text-gray-100 text-lg truncate">{title}</h4>
-          )}
+          {editMode
+            ? (
+                <Input
+                  type="text"
+                  value={content}
+                  onChange={e => onContentChange(e.target.value)}
+                  className="font-semibold text-gray-100 text-lg w-full bg-transparent border-b border-gray-600 focus:outline-none focus:ring-0 focus:border-white p-1 truncate"
+                  placeholder={isSection ? 'セクションタイトル' : title}
+                />
+              )
+            : (
+                <h4 className="font-semibold text-gray-100 text-lg truncate">{title}</h4>
+              )}
         </div>
 
         <div className="flex items-center gap-2 ml-2 flex-shrink-0">
@@ -131,28 +134,29 @@ export default function StructureCard({
 
       {(isExpanded || !isSection) && (
         <div className="mt-3 pl-9">
-          {editMode ? (
-            <Textarea
-              ref={textAreaRef}
-              value={isSection ? description : content}
-              onChange={(e) =>
-                isSection && onDescriptionChange
-                  ? onDescriptionChange(e.target.value)
-                  : onContentChange(e.target.value)
-              }
-              className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
-              placeholder={
-                isSection
-                  ? 'セクションの具体的な内容や説明'
-                  : `${title}の内容説明`
-              }
-              rows={isSection ? 3 : 2}
-            />
-          ) : (
-            <p className="text-gray-300 text-sm whitespace-pre-wrap bg-gray-800/20 p-3 rounded-md">
-              {isSection ? description : content}
-            </p>
-          )}
+          {editMode
+            ? (
+                <Textarea
+                  ref={textAreaRef}
+                  value={isSection ? description : content}
+                  onChange={e =>
+                    isSection && onDescriptionChange
+                      ? onDescriptionChange(e.target.value)
+                      : onContentChange(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-md text-sm bg-gray-900/50 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none overflow-hidden"
+                  placeholder={
+                    isSection
+                      ? 'セクションの具体的な内容や説明'
+                      : `${title}の内容説明`
+                  }
+                  rows={isSection ? 3 : 2}
+                />
+              )
+            : (
+                <p className="text-gray-300 text-sm whitespace-pre-wrap bg-gray-800/20 p-3 rounded-md">
+                  {isSection ? description : content}
+                </p>
+              )}
         </div>
       )}
     </div>

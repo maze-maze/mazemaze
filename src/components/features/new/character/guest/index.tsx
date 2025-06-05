@@ -1,8 +1,7 @@
 'use client'
 
-import CharacterSelector from "../character-selector"
-import { Personality } from "../types"
-
+import type { Personality } from '../types'
+import CharacterSelector from '../character-selector'
 
 interface Props {
   theme: string
@@ -10,7 +9,7 @@ interface Props {
   onSelect: (p: Personality) => void
   onNext: () => void
   onBack: () => void
-  disableSelf?: boolean  // ← 追加
+  disableSelf?: boolean // ← 追加
 }
 
 export default function GuestCharacterSelector({

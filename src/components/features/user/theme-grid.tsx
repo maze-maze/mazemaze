@@ -1,8 +1,8 @@
 // src/components/user-page/theme-grid.tsx
 'use client'
 
-import React from 'react'
 import { cn } from '🎙️/lib/utils'
+import React from 'react'
 
 interface ThemeGridProps {
   displayThemes: string[]
@@ -25,7 +25,7 @@ export default function ThemeGrid({ displayThemes, gradients }: ThemeGridProps) 
           <button
             className={cn(
               'p-4 gap-3 rounded-lg flex flex-col items-center justify-center text-center transition w-40 h-52 relative',
-              gradients[idx % gradients.length]
+              gradients[idx % gradients.length],
             )}
           >
             <span className="text-base font-bold text-white">{themeItem}</span>

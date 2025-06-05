@@ -17,7 +17,10 @@ export default function ProfileInfo({ displayName, username }: ProfileInfoProps)
         <div className="absolute top-2 left-4 w-8 h-4 rounded-full bg-white/30 blur-md" />
       </div>
       <h1 className="text-white text-2xl font-bold mb-1">{displayName}</h1>
-      <p className="text-gray-400 text-sm mb-8">@{username}</p>
+      <p className="text-gray-400 text-sm mb-8">
+        @
+        {username}
+      </p>
     </div>
   )
 }

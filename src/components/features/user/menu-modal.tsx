@@ -1,14 +1,14 @@
 // src/components/user-page/menu-modal.tsx
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { signOut } from '🎙️/lib/auth-client'
 import { cn } from '🎙️/lib/utils'
 import {
   CreditCard,
   LogOut,
-  X
+  X,
 } from 'lucide-react'
-import { signOut } from '🎙️/lib/auth-client'
+import React, { useEffect, useState } from 'react'
 
 interface MenuModalProps {
   isOpen: boolean
@@ -23,12 +23,14 @@ export default function MenuModal({ isOpen, onClose, onBilling }: MenuModalProps
     if (isOpen) {
       const timer = setTimeout(() => setVisible(true), 10)
       return () => clearTimeout(timer)
-    } else {
+    }
+    else {
       setVisible(false)
     }
   }, [isOpen])
 
-  if (!isOpen) return null
+  if (!isOpen)
+    return null
 
   return (
     <>
@@ -43,7 +45,7 @@ export default function MenuModal({ isOpen, onClose, onBilling }: MenuModalProps
       <div
         className={cn(
           'fixed bottom-0 left-0 right-0 bg-[#0E0B16] text-white p-5 rounded-t-2xl shadow-2xl z-40 transition-transform duration-300 ease-out',
-          visible ? 'translate-y-0' : 'translate-y-full'
+          visible ? 'translate-y-0' : 'translate-y-full',
         )}
         role="dialog"
         aria-modal="true"
@@ -61,7 +63,10 @@ export default function MenuModal({ isOpen, onClose, onBilling }: MenuModalProps
           <ul className="space-y-2">
             <li>
               <button
-                onClick={() => { onBilling(); onClose() }}
+                onClick={() => {
+                  onBilling()
+                  onClose()
+                }}
                 className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg transition-colors duration-150 ease-in-out text-gray-200"
               >
                 <CreditCard size={20} className="mr-4 text-sky-400" />

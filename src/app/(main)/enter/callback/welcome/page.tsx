@@ -1,7 +1,6 @@
 import PostUserName from '🎙️/components/features/auth/PostUserName'
 import Background from '🎙️/components/features/layout/backgeound'
 import Header from '🎙️/components/features/layout/header'
-import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'
