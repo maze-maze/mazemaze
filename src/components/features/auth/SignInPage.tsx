@@ -1,7 +1,7 @@
-import NabigationBarContainer from '🎙️/components/ui/nabigation-bar-container'
 import Background from '../layout/backgeound'
 import { SignInButton } from './SignInButton'
 import Header from '../layout/header'
+import NavigationBar from '../layout/navigation-bar'
 
 export default function SignInPage() {
   // 表示するテーマリストをアクティブなタブに応じて決定
@@ -21,7 +21,7 @@ export default function SignInPage() {
       </div>
 
       {/* ナビゲーションバー */}
-      <NabigationBarContainer />
+      <NavigationBar />
 
     </div>
   )
