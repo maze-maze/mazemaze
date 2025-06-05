@@ -1,6 +1,7 @@
 import SignInPage from '🎙️/components/features/auth/SignInPage'
 import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
+import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -14,14 +15,15 @@ export default async function Page() {
     return <SignInPage />
   }
 
-  // ② セッションがある場合、username を取得
-  const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/api/me/username`, {
-    method: 'GET',
-    headers: new Headers(await headers()), // cookieを引き継ぐ
-    cache: 'no-store',
+  // ② username を API 経由で取得
+  const res = await client.api.me.username.$get({}, {
+    headers: {
+      ...Object.fromEntries((await headers()).entries()),
+      'Cache-Control': 'no-store',
+    },
   })
 
-  const { username } = await res.json()
+  const username = await res.json()
 
   // ③ username の有無で分岐
   if (!username) {
