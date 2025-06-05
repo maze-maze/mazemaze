@@ -1,11 +1,10 @@
-
 import PostUserName from '🎙️/components/features/auth/PostUserName'
+import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { env } from '🎙️/env.mjs'
-export default async function Page() {
 
+export default async function Page() {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -109,7 +108,7 @@ export default async function Page() {
             </defs>
           </svg>
         </div>
-       <PostUserName  />
+        <PostUserName />
       </div>
     </>
   )

@@ -1,8 +1,8 @@
 import SignInPage from '🎙️/components/features/auth/SignInPage'
+import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { env } from '🎙️/env.mjs'
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -26,7 +26,8 @@ export default async function Page() {
   // ③ username の有無で分岐
   if (!username) {
     redirect('/enter/callback/welcome')
-  } else {
+  }
+  else {
     redirect(`/${username}`)
   }
 }

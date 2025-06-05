@@ -1,4 +1,3 @@
-import SignInPage from '🎙️/components/features/auth/SignInPage'
 import UserPage from '🎙️/components/features/user/UserPage'
 import { auth } from '🎙️/lib/auth'
 import { headers } from 'next/headers'
@@ -13,8 +12,7 @@ export default async function Page() {
     redirect('/login')
   }
 
-
   return (
-    <UserPage name={session.user.name}  />
+    <UserPage name={session.user.name} />
   )
 }

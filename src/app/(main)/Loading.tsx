@@ -1,7 +1,6 @@
-
 import { Loader2 } from 'lucide-react'
-export default async function Load() {
 
+export default async function Load() {
   return (
     <>
       <div className="relative bg-[#0E0B16] min-h-screen flex flex-col items-center w-full h-full">
@@ -82,10 +81,10 @@ export default async function Load() {
             </defs>
           </svg>
         </div>
-     
-     <div className="w-full flex flex-1 items-center justify-center mb-20">
-        <Loader2 className="animate-spin size-15"/>
-     </div>
+
+        <div className="w-full flex flex-1 items-center justify-center mb-20">
+          <Loader2 className="animate-spin size-15" />
+        </div>
       </div>
     </>
   )

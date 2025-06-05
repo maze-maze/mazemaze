@@ -1,6 +1,6 @@
-import { createRoute,z } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 import { ErrorSchema } from '../models/error.schema'
-import { usernameInsertSchema, usernameSchema, UserCheckQuerySchema, } from '../models/user.schema'
+import { UserCheckQuerySchema, usernameInsertSchema, usernameSchema } from '../models/user.schema'
 
 export const getusernameRoute = createRoute({
   path: '/',
@@ -68,17 +68,17 @@ export const setusernameRoute = createRoute({
 })
 
 export const checkUsernameRoute = createRoute({
-  path: "/",
-  method: "get",
-  description: "ユーザー名の重複チェック",
+  path: '/',
+  method: 'get',
+  description: 'ユーザー名の重複チェック',
   request: {
     query: UserCheckQuerySchema,
   },
   responses: {
     200: {
-      description: "取得成功",
+      description: '取得成功',
       content: {
-        "application/json": {
+        'application/json': {
           schema: z.object({
             available: z.boolean(),
           }),
@@ -86,4 +86,4 @@ export const checkUsernameRoute = createRoute({
       },
     },
   },
-});
+})

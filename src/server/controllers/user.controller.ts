@@ -69,21 +69,20 @@ export const setusernameHandler: RouteHandler<typeof setusernameRoute> = async (
   return c.json({ username }, 201)
 }
 
-
 export const checkUsernameHandler: RouteHandler<typeof checkUsernameRoute> = async (c) => {
   const { username } = c.req.query()
 
   if (!username) {
-    return c.json({ available: false });
+    return c.json({ available: false })
   }
 
   const result = await db
     .select()
     .from(user)
     .where(eq(user.username, username))
-    .limit(1);
+    .limit(1)
 
-  const isAvailable = result.length === 0;
+  const isAvailable = result.length === 0
 
-  return c.json({ available: isAvailable }, 200);
+  return c.json({ available: isAvailable }, 200)
 }
