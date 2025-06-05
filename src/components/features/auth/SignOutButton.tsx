@@ -5,7 +5,7 @@ import { signOut } from '🎙️/lib/auth-client'
 export function SignOutButton() {
   return (
     <Button
-      onClick={() => signOut()}
+      onClick={() => signOut('/user')}
       type="submit"
       size="lg"
       variant="outline"
