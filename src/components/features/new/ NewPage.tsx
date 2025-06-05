@@ -5,35 +5,40 @@
 import { Button, buttonVariants } from '🎙️/components/ui/button'
 // import { useLocationState, jsonSerializer } from "@location-state/core"; // 不要になるので削除
 import { StorageKeys } from '🎙️/lib/storage-keys'
-import {
-  ArrowLeft,
-  BookText,
-  ClipboardList,
-  Palette,
-  Podcast,
-  Save,
-  User,
-  Users,
-} from 'lucide-react'
-import Link from 'next/link'
+
 import { useQueryState } from 'nuqs'
 import React, { useEffect, useState } from 'react' // useState, useEffect をインポート
-import CompletePage from './StepComplete'
-import GuestCharacterSelector from './StepGuestCharacter'
-import MainCharacterSelector from './StepMainCharacter'
-import ScriptGenerator from './StepScript'
-import StructureSelector from './StepStructure'
-import ThemeSelector from './StepTheme'
 
-// 型定義 (変更なし)
-interface Character { name: string, description: string, tone: string, self?: boolean }
-interface Structure { intro: string, sections: { title: string, description: string }[], outro: string }
-interface ThemeObject { theme: string, gradient: string }
+import GuestCharacterSelector from './character/guest'
+import MainCharacterSelector from './character/main'
+import { CompletePage } from './complete'
+import { ScriptGenerator } from './script'
+import StructureSelector from './structure/structure-selector'
+import ThemeSelector from './theme'
+
+// 型定義
+interface Character {
+  name: string
+  description: string
+  tone: string
+  self?: boolean
+}
+interface Structure {
+  intro: string
+  sections: { title: string, description: string }[]
+  outro: string
+}
+interface ThemeObject {
+  theme: string
+  gradient: string
+}
 
 // --- セッションストレージ用のカスタムフック ---
-function useSessionStorageState<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+function useSessionStorageState<T>(
+  key: string,
+  defaultValue: T,
+): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
-    // クライアントサイドでのみ sessionStorage を読む
     if (typeof window === 'undefined') {
       return defaultValue
     }
@@ -48,7 +53,6 @@ function useSessionStorageState<T>(key: string, defaultValue: T): [T, React.Disp
   })
 
   useEffect(() => {
-    // state が変更されたら sessionStorage に書き込む
     try {
       if (state === null || state === undefined) {
         window.sessionStorage.removeItem(key)
@@ -60,22 +64,30 @@ function useSessionStorageState<T>(key: string, defaultValue: T): [T, React.Disp
     catch (error) {
       console.error(`Error writing sessionStorage key “${key}”:`, error)
     }
-  }, [key, state]) // key と state が変更されたら実行
+  }, [key, state])
 
   return [state, setState]
 }
 // ---------------------------------------------
 
-export default function NewTmp() {
+export default function NewPage() {
   const [name, setName] = useQueryState('s', { defaultValue: 'theme' })
   const step = name
 
   // --- useSessionStorageState を使用 ---
-  const [themeObj, setThemeObj] = useSessionStorageState<ThemeObject | null>(StorageKeys.THEME, null)
-  const [character, setCharacter] = useSessionStorageState<Character | null>(StorageKeys.MAIN, null)
-  const [guestCharacter, setGuestCharacter] = useSessionStorageState<Character | null>(StorageKeys.GUEST, null)
-  const [structure, setStructure] = useSessionStorageState<Structure | null>(StorageKeys.STRUCTURE, null)
-  const [script, setScript] = useSessionStorageState<string | null>(StorageKeys.SCRIPT, null)
+  const [themeObj, setThemeObj] = useSessionStorageState<ThemeObject | null>(
+    StorageKeys.THEME,
+    null,
+  )
+  const [character, setCharacter] = useSessionStorageState<
+    Character | null
+  >(StorageKeys.MAIN, null)
+  const [guestCharacter, setGuestCharacter]
+    = useSessionStorageState<Character | null>(StorageKeys.GUEST, null)
+  const [structure, setStructure]
+    = useSessionStorageState<Structure | null>(StorageKeys.STRUCTURE, null)
+  const [script, setScript]
+    = useSessionStorageState<string | null>(StorageKeys.SCRIPT, null)
   // ------------------------------------
 
   const handleRestart = () => {
@@ -86,6 +98,9 @@ export default function NewTmp() {
     setScript(null)
     setName('theme')
   }
+
+  // 「メインキャラクターが self（＝SomaTakata）かどうか」を判定するフラグ
+  const isMainSelf = !!(character && character.self)
 
   return (
     <main className="">
@@ -98,6 +113,7 @@ export default function NewTmp() {
           onNext={() => setName('main-character')}
         />
       )}
+
       {step === 'main-character' && themeObj && (
         <MainCharacterSelector
           theme={themeObj.theme}
@@ -107,10 +123,12 @@ export default function NewTmp() {
           onBack={() => setName('theme')}
         />
       )}
+
       {step === 'guest-character' && themeObj && character && (
         <GuestCharacterSelector
           theme={themeObj.theme}
           gradient={themeObj.gradient}
+          disableSelf={isMainSelf}
           onSelect={(selectedGuest) => {
             setGuestCharacter(selectedGuest)
             setName('structure')
@@ -119,6 +137,7 @@ export default function NewTmp() {
           onBack={() => setName('main-character')}
         />
       )}
+
       {step === 'structure' && themeObj && character && (
         <StructureSelector
           theme={themeObj.theme}
@@ -130,6 +149,7 @@ export default function NewTmp() {
           onBack={() => setName('guest-character')}
         />
       )}
+
       {step === 'script' && themeObj && character && structure && (
         <ScriptGenerator
           theme={themeObj.theme}
@@ -141,6 +161,7 @@ export default function NewTmp() {
           onBack={() => setName('structure')}
         />
       )}
+
       {step === 'complete' && (
         <CompletePage
           themeObj={themeObj}

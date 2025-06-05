@@ -1,7 +1,7 @@
 // app/me/page.tsx
 
-import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
+import { client } from '🎙️/lib/hono'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -14,18 +14,23 @@ export default async function MePage() {
     redirect('/login')
   }
 
-  const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/api/me/username`, {
-    method: 'GET',
-    headers: new Headers(await headers()),
-    cache: 'no-store',
-  })
+  // ② username を API 経由で取得
+  const res = await client.api.me.username.$get(
+    {},
+    {
+      init: {
+        headers: await headers(),
+      },
+    },
+  )
 
-  const { username } = await res.json()
+  const data = await res.json()
 
-  if (!username) {
-    redirect(`/enter/callback/welcome`)
+  // ③ username の有無で分岐
+  if (!data || !data.username) {
+    redirect('/enter/callback/welcome')
   }
   else {
-    redirect(`/${username}`)
+    redirect(`/${data.username}`)
   }
 }

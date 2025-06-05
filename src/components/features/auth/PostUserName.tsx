@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from '🎙️/components/ui/form'
 import { Input } from '🎙️/components/ui/input'
+import { client } from '🎙️/lib/hono'
 import { redirect } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -49,12 +50,13 @@ export default function PostUserName() {
   const onSubmit = async (data: FormData) => {
     const { username } = data
 
-    await fetch('/api/me/username', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username }),
+    const res = await client.api.me.username.$post({
+      json: { username },
     })
-    redirect('/user')
+
+    if (res.ok) {
+      redirect('/user')
+    }
   }
 
   return (

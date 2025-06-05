@@ -27,7 +27,7 @@ export const getusernameHandler: RouteHandler<typeof getusernameRoute> = async (
     .limit(1)
 
   if (result.length === 0 || !result[0].username) {
-    return c.json({ error: 'Not Found' }, 404)
+    return c.json(null, 404)
   }
 
   return c.json({ username: result[0].username }, 200)
