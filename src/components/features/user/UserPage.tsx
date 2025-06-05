@@ -2,7 +2,6 @@
 
 'use client'
 
-import NabigationBarContainer from '🎙️/components/ui/nabigation-bar-container'
 import { signOut } from '🎙️/lib/auth-client'
 import { cn } from '🎙️/lib/utils'
 import {
@@ -20,6 +19,7 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import Background from '../layout/backgeound'
 import Header from '../layout/header'
+import NavigationBar from '../layout/navigation-bar'
 
 export default function UserPage({ name }: { name: string }) {
   // モックデータ
@@ -93,7 +93,7 @@ export default function UserPage({ name }: { name: string }) {
 
   // 表示するテーマリストをアクティブなタブに応じて決定
   return (
-    <div className="relative bg-[#0E0B16] min-h-screen flex flex-col items-center w-full h-full">
+    <div className="relative bg-[#0E0B16] min-h-screen flex flex-col items-center w-full h-full pt-10">
 
       <Header Icon={AlignJustifyIcon} onIconClick={handleOpenMenu} />
 
@@ -118,7 +118,7 @@ export default function UserPage({ name }: { name: string }) {
       </div>
 
       {/* タブ部分 */}
-      <div className="sticky top-0 left-0 right-0 flex justify-center z-20  py-4 w-full">
+      <div className="sticky top-15 left-0 right-0 flex justify-center z-20  py-4 w-full">
         <div className="flex bg-gray-800/50 rounded-full p-1">
           <button
             className={cn(
@@ -171,7 +171,7 @@ export default function UserPage({ name }: { name: string }) {
       </div>
 
       {/* ナビゲーションバー */}
-      {/* <NabigationBarContainer /> */}
+      <NavigationBar/>
 
       {/* --- ハンバーガーメニュー用モーダル --- */}
       {isMenuOpen && (

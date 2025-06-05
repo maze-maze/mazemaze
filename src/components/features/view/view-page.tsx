@@ -4,7 +4,6 @@
 import type { CarouselApi } from '🎙️/components/ui/carousel'
 import { Button } from '🎙️/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem } from '🎙️/components/ui/carousel'
-import NabigationBarContainer from '🎙️/components/ui/nabigation-bar-container'
 import { cn } from '🎙️/lib/utils'
 import { Home, MessageSquareMoreIcon, Plus, SearchIcon, Share2Icon, ThumbsDownIcon, ThumbsUpIcon, User, UserIcon, X } from 'lucide-react'
 import Image from 'next/image'
@@ -13,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Background from '../layout/backgeound'
 import Header from '../layout/header'
+import NavigationBar from '../layout/navigation-bar'
 
 const items = [
   {
@@ -277,7 +277,7 @@ export default function ViewPage() {
       </div>
 
       {/* ナビゲーションバー */}
-      {/* <NabigationBarContainer /> */}
+      <NavigationBar/>
 
       {/* --- モーダル群 --- */}
       {/* コメントモーダル */}
