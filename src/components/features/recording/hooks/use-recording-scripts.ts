@@ -6,7 +6,7 @@ export function useRecordingScripts() {
     title: string
     character: string
     script: string
-    userName?: string
+    username?: string
     guest: {
       name: string
       description: string
@@ -15,7 +15,7 @@ export function useRecordingScripts() {
     title: '',
     character: '',
     script: '',
-    userName: '',
+    username: '',
     guest: {
       name: '',
       description: '',
@@ -32,7 +32,7 @@ export function useRecordingScripts() {
       title: JSON.parse(theme).theme,
       character: 'character',
       script,
-      userName: JSON.parse(mainCharacter).name,
+      username: JSON.parse(mainCharacter).name,
       guest: {
         name: JSON.parse(guestCharacter).name,
         description: JSON.parse(guestCharacter).description,
@@ -44,7 +44,7 @@ export function useRecordingScripts() {
     title: data.title,
     character: 'character',
     script: data.script,
-    userName: data.userName,
+    username: data.username,
     guest: data.guest,
     //     title: '謎の未確認生物UMA探訪記',
     //     character: 'character',
@@ -84,7 +84,7 @@ export function useRecordingScripts() {
 
     // 椎名:
     // ありがとうございます、並木さん。それでは、次回の放送では、具体的なUMAを一種類取り上げて、深掘りしていきたいと思います。お楽しみに！`,
-    //     userName: `椎名 誠`,
+    //     username: `椎名 誠`,
     //     guest: `
     //     名前: 並木 伸一郎 (なみき しんいちろう)
     // キャラクター: 冷静かつ客観的にUMAについて語る専門家。豊富な知識と調査経験を持ち、信憑性の高い情報を提供する。椎名さんとの掛け合いで、よりUMAの奥深さを引き出す。

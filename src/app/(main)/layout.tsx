@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import Load from './Loading'
 
 export default function MainLayout({
   children,
@@ -7,7 +8,7 @@ export default function MainLayout({
 }>) {
   return (
     <div className="max-w-md mx-auto relative">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Load />}>
         {children}
       </Suspense>
     </div>

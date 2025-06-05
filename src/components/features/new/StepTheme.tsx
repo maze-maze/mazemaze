@@ -88,7 +88,7 @@ export default function ThemeSelector({
   const handleSelect = (theme: string, idx?: number) => {
     setSelected(theme)
     // カードごとのグラデーション
-    const gradient = idx === 0 ? 'bg-gradient-to-b from-black to-gray-800' : gradients[(idx! - 1) % gradients.length]
+    const gradient = gradients[(idx!) % gradients.length]
     setTransitionGradient(gradient)
     setIsTransitioning(true)
     document.body.style.overflow = 'hidden'
@@ -271,7 +271,7 @@ export default function ThemeSelector({
                   </div>
                 </div>
               </Link>
-              <Link href="/1111">
+              <Link href="/user">
                 <User className="text-white opacity-80" size={28} />
               </Link>
             </div>

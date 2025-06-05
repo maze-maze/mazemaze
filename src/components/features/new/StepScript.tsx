@@ -90,7 +90,7 @@ export default function ScriptGenerator({
     // 1. アウトロを探す
     const outroKeywords = ['アウトロ', 'おわりに', 'まとめ']
     const outroPattern
-      = new RegExp(`(##\\s*)?(${outroKeywords.join('|')})[:：]?([\\s\\S]*)`, 'i')
+      = new RegExp(`(##\\s*)?(${outroKeywords.join('|')})[:：]?([\\s\\S]*)`)
     const outroMatch = scriptContent.match(outroPattern)
     let scriptWithoutOutro = scriptContent
     if (outroMatch && typeof outroMatch.index !== 'undefined') {
@@ -119,7 +119,7 @@ export default function ScriptGenerator({
     // 3. 残りをイントロとする
     const introKeywords = ['イントロ', 'はじめに', '導入']
     const introPattern
-      = new RegExp(`(##\\s*)?(${introKeywords.join('|')})[:：]?([\\s\\S]*)`, 'i')
+      = new RegExp(`(##\\s*)?(${introKeywords.join('|')})[:：]?([\\s\\S]*)`)
     const introMatch = remainingScript.match(introPattern)
     intro = introMatch ? introMatch[3].trim() : remainingScript
 
