@@ -1,4 +1,5 @@
 import PostUserName from '🎙️/components/features/auth/PostUserName'
+import Background from '🎙️/components/features/layout/backgeound'
 import { env } from '🎙️/env.mjs'
 import { auth } from '🎙️/lib/auth'
 import { client } from '🎙️/lib/hono'
@@ -42,74 +43,7 @@ export default async function Page() {
 
         </div>
 
-        <div className="absolute top-10 right-0">
-          <svg width="103" height="173" viewBox="0 0 103 173" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M168.919 47.0368L131.938 83.9525L172.43 116.98L120.177 116.934L125.455 168.919L88.539 131.938L55.5116 172.43L55.5579 120.177L3.57222 125.455L40.5533 88.5389L0.0618858 55.5115L52.3147 55.5578L47.0369 3.57214L83.9525 40.5532L116.98 0.0618098L116.934 52.3147L168.919 47.0368Z" fill="url(#paint0_linear_514_7870)" />
-            <defs>
-              <linearGradient id="paint0_linear_514_7870" x1="164.71" y1="45.2676" x2="2.11371" y2="122.381" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div className="absolute top-64 left-8">
-          <svg width="34" height="50" viewBox="0 0 34 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M27.0582 42.676C20.2726 49.5583 11.2648 51.6799 6.9387 47.4147C2.61263 43.1494 4.6065 34.1125 11.3921 27.2301C18.1777 20.3477 27.1856 18.2261 31.5116 22.4914C35.8377 26.7566 33.8438 35.7936 27.0582 42.676Z" fill="url(#paint0_linear_514_7871)" />
-            <path d="M22.6755 22.9075C15.8899 29.7899 6.88208 31.9115 2.55601 27.6462C-1.77006 23.381 0.223811 14.344 7.00944 7.46165C13.7951 0.579273 22.8029 -1.54233 27.1289 2.72292C31.455 6.98817 29.4611 16.0251 22.6755 22.9075Z" fill="url(#paint1_linear_514_7871)" />
-            <defs>
-              <linearGradient id="paint0_linear_514_7871" x1="32.1281" y1="8.72658" x2="0.36947" y2="40.9381" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-              <linearGradient id="paint1_linear_514_7871" x1="32.1281" y1="8.72658" x2="0.36947" y2="40.9381" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-        </div>
-
-        <div className="absolute top-16 left-12">
-          <svg width="46" height="54" viewBox="0 0 46 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18.1832 3.4102L29.5044 13.594L40.8256 23.7778L22.6426 27.188L4.45962 30.5981L11.3214 17.0041L18.1832 3.4102Z" fill="url(#paint0_linear_514_7872)" />
-            <path d="M26.9708 50.2657L33.8982 37.0214L40.8256 23.7771L22.6426 27.1873L4.45962 30.5974L15.7152 40.4315L26.9708 50.2657Z" fill="url(#paint1_linear_514_7872)" />
-            <defs>
-              <linearGradient id="paint0_linear_514_7872" x1="17.5814" y1="3.93261" x2="21.9666" y2="27.3148" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-              <linearGradient id="paint1_linear_514_7872" x1="26.2227" y1="50.0085" x2="21.9665" y2="27.314" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#E9E8E8" />
-                <stop offset="1" stopColor="#777575" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div className="absolute bottom-28 left-0">
-          <svg width="85" height="105" viewBox="0 0 85 105" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32.5" cy="52.5" r="52.5" fill="url(#paint0_linear_514_7875)" />
-            <defs>
-              <linearGradient id="paint0_linear_514_7875" x1="30.548" y1="1.74698" x2="30.548" y2="105" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-        </div>
-        <div className="absolute bottom-42 right-2">
-          <svg width="82" height="84" viewBox="0 0 82 84" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.2093 15.9844L15.8689 26.6701C14.1437 40.4231 27.7019 51.0516 40.6453 46.0927V46.0927C51.4603 41.9491 63.3624 48.7357 65.3045 60.1533L66.6807 68.2442" stroke="url(#paint0_linear_514_7876)" strokeWidth="30" strokeLinecap="round" strokeLinejoin="round" />
-            <defs>
-              <linearGradient id="paint0_linear_514_7876" x1="23.2217" y1="14.8658" x2="46.6176" y2="75.9312" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#777575" />
-                <stop offset="1" stopColor="#E9E8E8" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+        <Background />
         <PostUserName />
       </div>
     </>
