@@ -9,7 +9,6 @@ import Object5 from './assets/ob-5.svg'
 export default function Background() {
   return (
     <>
-      {/* SVG1: width="103" height="173" */}
       <Image
         src={Object1}
         alt=""
@@ -18,7 +17,6 @@ export default function Background() {
         className={cn('absolute top-64 left-8')}
       />
 
-      {/* SVG2: width="34" height="50" */}
       <Image
         src={Object2}
         alt=""
@@ -27,7 +25,6 @@ export default function Background() {
         className={cn('absolute bottom-28 left-0')}
       />
 
-      {/* SVG3: width="46" height="54" */}
       <Image
         src={Object3}
         alt=""
@@ -36,7 +33,6 @@ export default function Background() {
         className={cn('absolute top-16 left-12')}
       />
 
-      {/* SVG4: width="85" height="105" */}
       <Image
         src={Object4}
         alt=""
@@ -45,7 +41,6 @@ export default function Background() {
         className={cn('absolute top-10 right-0')}
       />
 
-      {/* SVG5: width="82" height="84" */}
       <Image
         src={Object5}
         alt=""
