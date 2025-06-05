@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { ErrorSchema } from '../models/error.schema'
-import { UserCheckQuerySchema, usernameInsertSchema, usernameSchema } from '../models/user.schema'
+import { UserCheckQuerySchema } from '../models/user.schema'
 
 export const getusernameRoute = createRoute({
   path: '/',
@@ -11,7 +11,9 @@ export const getusernameRoute = createRoute({
       description: '取得成功',
       content: {
         'application/json': {
-          schema: usernameSchema,
+          schema: z.object({
+            username: z.string().nullable(),
+          }),
         },
       },
     },
@@ -34,7 +36,9 @@ export const setusernameRoute = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: usernameInsertSchema,
+          schema: z.object({
+            username: z.string().nullable(),
+          }),
         },
       },
     },
@@ -44,7 +48,9 @@ export const setusernameRoute = createRoute({
       description: '設定成功',
       content: {
         'application/json': {
-          schema: usernameSchema,
+          schema: z.object({
+            username: z.string().nullable(),
+          }),
         },
       },
     },
