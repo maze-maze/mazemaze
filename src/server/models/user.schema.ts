@@ -1,6 +1,6 @@
+import { z } from '@hono/zod-openapi'
 import { user } from '🎙️/db/schema'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
 
 export const UserSelectSchema = createSelectSchema(user)
 export const UserInsertSchema = createInsertSchema(user, {
@@ -17,4 +17,8 @@ export const UsernameInsertSchema = UserInsertSchema.pick({
 
 export const UserCheckQuerySchema = z.object({
   username: z.string(),
-})
+}).openapi('UserCheckQuery')
+
+export const UserCheckResponseSchema = z.object({
+  available: z.boolean(),
+}).openapi('UserCheckResponse')

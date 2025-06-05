@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { ErrorSchema } from '../models/error.schema'
-import { UserCheckQuerySchema, UsernameInsertSchema, UsernameSelectSchema } from '../models/user.schema'
+import { UserCheckQuerySchema, UserCheckResponseSchema, UsernameInsertSchema, UsernameSelectSchema } from '../models/user.schema'
 
 export const getusernameRoute = createRoute({
   path: '/',
@@ -81,7 +81,7 @@ export const checkUsernameRoute = createRoute({
       description: '取得成功',
       content: {
         'application/json': {
-          schema: UserCheckQuerySchema,
+          schema: UserCheckResponseSchema,
         },
       },
     },
