@@ -1,6 +1,6 @@
 export default function Header({ Icon, onIconClick }: { Icon?: React.ComponentType<{ className?: string }>, onIconClick?: () => void }) {
   return (
-    <div className="w-full fixed top-0 left-0 right-0 z-50 py-5 flex items-center justify-center">
+    <div className="w-full fixed top-0 left-0 right-0 z-20 py-5 flex items-center justify-center">
       {/* 中央に配置したいロゴSVG */}
       <svg
         width="140"
