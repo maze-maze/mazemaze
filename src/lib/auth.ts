@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { db } from '🎙️/db'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'

@@ -41,6 +41,14 @@ function FormField<
   )
 }
 
+interface FormItemContextValue {
+  id: string
+}
+
+const FormItemContext = React.createContext<FormItemContextValue>(
+  {} as FormItemContextValue,
+)
+
 function useFormField() {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
@@ -63,14 +71,6 @@ function useFormField() {
     ...fieldState,
   }
 }
-
-interface FormItemContextValue {
-  id: string
-}
-
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
-)
 
 function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
   const id = React.useId()

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 export const authClient = createAuthClient()
 
 export async function signIn(callbackURL: string) {
-  const data = await authClient.signIn.social({
+  const _data = await authClient.signIn.social({
     provider: 'github',
     callbackURL,
   })
