@@ -7,11 +7,11 @@ export const UserInsertSchema = createInsertSchema(user, {
   username: schema => schema.min(3).max(10),
 })
 
-export const usernameSchema = UserSelectSchema.pick({
+export const UsernameSelectSchema = UserSelectSchema.pick({
   username: true,
 })
 
-export const usernameInsertSchema = UserInsertSchema.pick({
+export const UsernameInsertSchema = UserInsertSchema.pick({
   username: true,
 })
 
