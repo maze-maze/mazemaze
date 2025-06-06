@@ -6,7 +6,7 @@
 
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation' // useRouterをインポート
-import  { useState } from 'react' // useStateをインポート
+import { useState } from 'react' // useStateをインポート
 import React from 'react'
 import ActionButtons from './action-buttons'
 import CharacterInfo from './character-info'
@@ -30,7 +30,7 @@ interface Structure {
 
 interface ThemeObject {
   theme: string
-    gradient: string
+  gradient: string
 }
 
 const StorageKeys = {
@@ -38,7 +38,7 @@ const StorageKeys = {
   MAIN: 'mainCharacterKey',
   GUEST: 'guestCharacterKey',
   STRUCTURE: 'structureKey',
-  SCRIPT: 'scriptKey'
+  SCRIPT: 'scriptKey',
 }
 
 interface CompletePageProps {
@@ -53,60 +53,60 @@ interface CompletePageProps {
 }
 
 export default function CompletePage({
-    themeObj,
-    character,
-    guestCharacter,
-    structure,
-    script,
-    onBack,
-    onRestart,
-  }: CompletePageProps) {
-    const router = useRouter() // routerインスタンスを取得
-    const [isSaving, setIsSaving] = useState(false) // ローディング状態
-  
-    // 「録音に進む」ボタンが押されたときの処理
-    const handleProceedToRecording = async () => {
-      if (!themeObj || !script || !character) {
-        alert('エピソードのデータが不完全です。')
-        return
-      }
-  
-      setIsSaving(true)
-      try {
-        const response = await fetch('/api/episodes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: themeObj.theme,
-            gradient: themeObj.gradient,
-            script,
-            mainCharacter: character,
-            guestCharacter: guestCharacter,
-            // gradient: '...' // 必要なら追加
-          }),
-        })
-  
-        if (!response.ok) {
-          throw new Error('エピソードの作成に失敗しました。')
-        }
-  
-        const data = await response.json()
-        const { episodeId } = data
-  
-        // episodeIdをクエリパラメータとして付けて録音ページに遷移
-        router.push(`/new/recording?episodeId=${episodeId}`)
-  
-      } catch (error) {
-        console.error(error)
-        alert((error as Error).message)
-        setIsSaving(false)
-      }
+  themeObj,
+  character,
+  guestCharacter,
+  structure,
+  script,
+  onBack,
+  onRestart,
+}: CompletePageProps) {
+  const router = useRouter() // routerインスタンスを取得
+  const [isSaving, setIsSaving] = useState(false) // ローディング状態
+
+  // 「録音に進む」ボタンが押されたときの処理
+  const handleProceedToRecording = async () => {
+    if (!themeObj || !script || !character) {
+      alert('エピソードのデータが不完全です。')
+      return
     }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch('/api/episodes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: themeObj.theme,
+          gradient: themeObj.gradient,
+          script,
+          mainCharacter: character,
+          guestCharacter,
+          // gradient: '...' // 必要なら追加
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('エピソードの作成に失敗しました。')
+      }
+
+      const data = await response.json()
+      const { episodeId } = data
+
+      // episodeIdをクエリパラメータとして付けて録音ページに遷移
+      router.push(`/new/recording?episodeId=${episodeId}`)
+    }
+    catch (error) {
+      console.error(error)
+      alert((error as Error).message)
+      setIsSaving(false)
+    }
+  }
   const handleCheckSessionStorage = () => {
     console.log('--- Current State (in React) ---')
     console.log('Theme:', themeObj?.theme)
     console.log('Main Character:', character)
-    console.log("gradient:", themeObj?.gradient)
+    console.log('gradient:', themeObj?.gradient)
     console.log('Guest Character:', guestCharacter)
     console.log('Structure:', structure)
     console.log('Script:', script)
@@ -181,8 +181,8 @@ export default function CompletePage({
           />
           <StructureInfo structure={structure} />
           <ScriptInfo script={script} />
-          <ActionButtons 
-            onRestart={onRestart} 
+          <ActionButtons
+            onRestart={onRestart}
             onProceedToRecording={handleProceedToRecording}
             isSaving={isSaving}
           />

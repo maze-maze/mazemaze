@@ -1,7 +1,7 @@
 // server/models/recording.schema.ts
 import { z } from '@hono/zod-openapi'
-import { createSelectSchema } from 'drizzle-zod'
 import { recording } from '🎙️/db/schema'
+import { createSelectSchema } from 'drizzle-zod'
 
 export const RecordingCreateRequestSchema = z.object({
   episodeId: z.string(),

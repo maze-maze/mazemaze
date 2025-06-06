@@ -1,11 +1,11 @@
 // server/routes/episode.route.ts
 
 import { createRoute } from '@hono/zod-openapi'
-import { ErrorSchema } from '../models/error.schema'
 import {
   EpisodeCreateRequestSchema,
   EpisodeCreateResponseSchema,
 } from '../models/episode.schema'
+import { ErrorSchema } from '../models/error.schema'
 
 export const createEpisodeRoute = createRoute({
   path: '/',
@@ -25,7 +25,7 @@ export const createEpisodeRoute = createRoute({
       description: 'エピソードの作成に成功',
       content: {
         'application/json': {
-          schema: EpisodeCreateResponseSchema, 
+          schema: EpisodeCreateResponseSchema,
         },
       },
     },

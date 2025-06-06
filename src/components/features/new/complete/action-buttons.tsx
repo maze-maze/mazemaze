@@ -30,12 +30,14 @@ export default function ActionButtons({ onRestart, onProceedToRecording, isSavin
         onClick={onProceedToRecording} // 変更
         disabled={isSaving} // 追加
       >
-        {isSaving ? '準備中...' : (
-          <>
-            <Podcast size={20} className="mr-2" />
-            録音に進む
-          </>
-        )}
+        {isSaving
+          ? '準備中...'
+          : (
+              <>
+                <Podcast size={20} className="mr-2" />
+                録音に進む
+              </>
+            )}
       </Button>
     </div>
   )

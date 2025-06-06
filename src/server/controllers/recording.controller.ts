@@ -8,7 +8,8 @@ import { eq } from 'drizzle-orm'
 
 export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> = async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers })
-  if (!session) return c.json({ error: 'Unauthorized' }, 401)
+  if (!session)
+    return c.json({ error: 'Unauthorized' }, 401)
 
   const body = c.req.valid('json')
 
@@ -23,15 +24,16 @@ export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> =
         mimeType: 'audio/webm',
       })
       .returning()
-    
+
     // 同時にepisodeテーブルのaudioUrlとdurationも更新
     await db.update(episodeSchema).set({
-        audioUrl: body.audioUrl,
-        duration: body.duration.toString(), // ★★★ エラー対策
+      audioUrl: body.audioUrl,
+      duration: body.duration.toString(), // ★★★ エラー対策
     }).where(eq(episodeSchema.id, body.episodeId))
 
     return c.json(newRecording, 201)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Recording creation error:', error)
     return c.json({ error: 'Internal Server Error' }, 500)
   }

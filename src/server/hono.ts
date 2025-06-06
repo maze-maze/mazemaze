@@ -6,13 +6,13 @@ import { env } from '🎙️/env.mjs'
 import { basicAuth } from 'hono/basic-auth'
 // --- episodeのimportを追加 ---
 import { createEpisodeHandler } from './controllers/episode.controller'
-import { createEpisodeRoute } from './routes/episode.route'
+import { createRecordingHandler } from './controllers/recording.controller' // 追加
 // --- userのimport ---
 import { checkUsernameHandler, getusernameHandler, setusernameHandler } from './controllers/user.controller'
-import { checkUsernameRoute, getusernameRoute, setusernameRoute } from './routes/user.route'
+import { createEpisodeRoute } from './routes/episode.route'
 
-import { createRecordingHandler } from './controllers/recording.controller' // 追加
 import { createRecordingRoute } from './routes/recording.route' // 追加
+import { checkUsernameRoute, getusernameRoute, setusernameRoute } from './routes/user.route'
 
 export const app = new OpenAPIHono().basePath('/api')
 
@@ -28,10 +28,9 @@ const checkUserApp = new OpenAPIHono()
 const episodeApp = new OpenAPIHono()
   .openapi(createEpisodeRoute, createEpisodeHandler)
 
-  // --- Recording App (新規追加) ---
+// --- Recording App (新規追加) ---
 const recordingApp = new OpenAPIHono()
-.openapi(createRecordingRoute, createRecordingHandler)
-
+  .openapi(createRecordingRoute, createRecordingHandler)
 
 // --- Main AppにepisodeAppを登録 ---
 const mainApp = new OpenAPIHono()
@@ -53,7 +52,6 @@ app.doc('/specification', {
   })
   return auth(c, next)
 }).get('/doc', swaggerUI({ url: '/api/specification' }))
-
 
 export type AppType = typeof _route
 export default app
