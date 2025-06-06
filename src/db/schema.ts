@@ -62,7 +62,7 @@ export const verification = pgTable('verification', {
 /// エピソード（投稿）
 export const episode = pgTable('episode', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  username: text('user_name').notNull().references(() => user.username, { onDelete: 'cascade' }),
 
   title: text('title').notNull(), // エピソード名（テーマと同義）
   gradient: text('gradient'), // 背景グラデーション情報
@@ -107,7 +107,7 @@ export const recording = pgTable('recording', {
 export const comment = pgTable('comment', {
   id: text('id').primaryKey(),
   episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  username: text('user_name').notNull().references(() => user.username, { onDelete: 'cascade' }),
 
   text: text('text').notNull(), // コメント本文
 
@@ -118,7 +118,7 @@ export const comment = pgTable('comment', {
 export const reaction = pgTable('reaction', {
   id: text('id').primaryKey(),
   episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  username: text('user_name').notNull().references(() => user.username, { onDelete: 'cascade' }),
 
   type: text('type').notNull(), // 'like' or 'bad'
 
