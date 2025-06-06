@@ -57,6 +57,7 @@ export default function NavigationBar() {
       </button>
 
       <button onClick={() => navigate('/new')} disabled={isLoading}>
+
         <div
           className={`w-10 h-10 rounded-xl flex items-center justify-center
                       bg-gradient-to-b from-[#BFBFBF] to-[#888888] shadow-lg`}
