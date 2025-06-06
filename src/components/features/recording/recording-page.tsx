@@ -1,9 +1,8 @@
 /* eslint-disable no-alert */
 'use client'
 
-import { Button } from '🎙️/components/ui/button'
 import { StorageKeys } from '🎙️/lib/storage-keys'
-import { ArrowLeftIcon, CheckIcon, MicIcon, PlayIcon } from 'lucide-react'
+import { PlayIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import MicImage from './assets/mingcute_mic-ai-fill.svg'
