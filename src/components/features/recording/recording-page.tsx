@@ -63,7 +63,7 @@ export default function RecordingPage() {
       {countdown && <Countdown seconds={countdown} />}
       {isFinished && recordedBlob && (
 
-        <div className="fixed bottom-0 right-1/2 translate-x-1/2 bg-white h-1/2 rounded-t-4xl w-full max-w-md flex flex-col items-center justify-center gap-4">
+        <div className="fixed bottom-0 right-1/2 translate-x-1/2 bg-white min-h-1/2 py-3 rounded-t-4xl w-full max-w-md flex flex-col items-center justify-center gap-4">
           <Image
             src={MicImage}
             alt="マイク"
