@@ -76,6 +76,15 @@ export default function RecordingPage() {
               <PlayIcon className="text-white" fill="#fff" />
             </div>
             <p className="text-black">再生する</p>
+            <p className="text-black/60 text-sm">
+              {Math.floor(recordingDuration / 60)}
+              :
+              {(recordingDuration % 60).toString().padStart(2, '0')}
+              s |
+              {' '}
+              {Math.round(recordedBlob.size / 1024)}
+              KB
+            </p>
           </button>
           <p className="text-center text-black/60 font-bold text-2xl">
             収録が完了しました！
