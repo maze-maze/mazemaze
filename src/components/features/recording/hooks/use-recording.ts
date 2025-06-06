@@ -3,6 +3,7 @@
 
 import type { Conversation, Status } from '🎙️/lib/types/recording'
 import { useEffect, useRef, useState } from 'react'
+import { createClient } from '🎙️/utils/supabase/client'
 
 // ヘルパー関数：イベントハンドラ内で安全に使用できるID生成関数
 function generateUniqueId() {
@@ -23,6 +24,8 @@ interface UseWebRTCAudioSessionReturn {
   playRecording: () => void
   recordingDuration: number
   countdown: number | null
+  isSaving: boolean
+  saveRecording: (episodeId: string) => Promise<void>
 }
 
 export default function useWebRTCAudioSession(
@@ -41,6 +44,12 @@ export default function useWebRTCAudioSession(
   const recordingStartTimeRef = useRef<number | null>(null)
   const recordingIntervalRef = useRef<number | null>(null)
   const countdownIntervalRef = useRef<number | null>(null)
+
+   // --- 保存処理中の状態を追加 ---
+   const [isSaving, setIsSaving] = useState(false)
+
+   // --- Supabaseクライアントをインスタンス化 ---
+   const supabase = createClient()
 
   // 音声ミックス用の参照
   const mixedAudioContextRef = useRef<AudioContext | null>(null)
@@ -450,69 +459,49 @@ export default function useWebRTCAudioSession(
   /**
    * 録音を開始する関数（ユーザー+AI音声）
    */
+  // mediaRecorder.onstop 内で setRecordedBlob している部分は重要なので変更なし
   function startRecording(userStream: MediaStream) {
     try {
-      // 混合音声コンテキストが既に設定されていない場合のみ設定
       if (!mixedAudioContextRef.current) {
         setupMixedAudioContext(userStream)
       }
-
-      // 混合ストリームを使用（AI音声が追加された後）
       let recordingStream = userStream
       if (destinationRef.current) {
         recordingStream = destinationRef.current.stream
-        console.log('混合ストリームで録音を開始します（ユーザー+AI音声）')
       }
-      else {
-        console.log('ユーザー音声のみで録音を開始します')
-      }
-
       const mediaRecorder = new MediaRecorder(recordingStream, {
         mimeType: 'audio/webm',
       })
       mediaRecorderRef.current = mediaRecorder
-
       const chunks: Blob[] = []
-
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data)
         }
       }
-
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/webm' })
         setRecordedBlob(blob)
         setStatus('finish')
-
-        // 録音時間の計測を停止
         if (recordingIntervalRef.current) {
           clearInterval(recordingIntervalRef.current)
           recordingIntervalRef.current = null
         }
-
-        console.log('録音が完了しました（ユーザー+AI音声）。録音時間:', recordingDuration, '秒')
+        console.log('録音が完了しました。録音時間:', recordingDuration, '秒')
       }
-
       mediaRecorder.start()
       setStatus('recording')
       recordingStartTimeRef.current = Date.now()
-
-      // 録音時間を1秒ごとに更新
       recordingIntervalRef.current = window.setInterval(() => {
         if (recordingStartTimeRef.current) {
           const elapsed = Math.floor((Date.now() - recordingStartTimeRef.current) / 1000)
           setRecordingDuration(elapsed)
         }
       }, 1000)
-
-      console.log('録音を開始しました（ユーザー+AI音声対応）')
-    }
-    catch (error) {
+    } catch (error) {
       console.error('録音開始エラー:', error)
     }
   }
-
   /**
    * 録音を停止する関数
    */
@@ -543,6 +532,73 @@ export default function useWebRTCAudioSession(
     }
     else {
       console.warn('再生する録音がありません')
+    }
+  }
+
+
+  // --- ★★★ ここからが新規・修正の主要部分 ★★★ ---
+
+  /**
+   * 録音されたBlobをSupabaseにアップロードし、API経由でDBに保存する
+   * @param episodeId - 保存対象のエピソードID
+   */
+  async function saveRecording(episodeId: string) {
+    if (!recordedBlob) {
+      alert('保存する録音データがありません。')
+      return
+    }
+    if (isSaving) return
+
+    setIsSaving(true)
+
+    try {
+      // 1. ユーザー情報を取得
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('ユーザーが認証されていません。')
+
+      // 2. ファイルパスを一意に決定 (例: userId/timestamp.webm)
+      const filePath = `${user.id}/${Date.now()}.webm`
+
+      // 3. Supabase Storageにアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('recordings') // Supabaseで作成したバケット名
+        .upload(filePath, recordedBlob, {
+          contentType: 'audio/webm',
+          upsert: false,
+        })
+
+      if (uploadError) throw uploadError
+
+      // 4. アップロードしたファイルの公開URLを取得
+      const { data: { publicUrl } } = supabase.storage
+        .from('recordings')
+        .getPublicUrl(filePath)
+      
+      // 5. /api/recordings エンドポイントにデータを送信
+      const response = await fetch('/api/recordings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          episodeId,
+          audioUrl: publicUrl,
+          duration: recordingDuration,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'データベースへの保存に失敗しました。')
+      }
+
+      const newRecording = await response.json()
+      console.log('録音情報の保存成功！:', newRecording)
+      alert('録音の保存が完了しました！')
+
+    } catch (error) {
+      console.error('録音の保存エラー:', error)
+      alert((error as Error).message)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -767,5 +823,7 @@ export default function useWebRTCAudioSession(
     playRecording,
     recordingDuration,
     countdown,
+    isSaving,
+    saveRecording,
   }
 }

@@ -1,0 +1,27 @@
+// server/routes/recording.route.ts
+import { createRoute } from '@hono/zod-openapi'
+import { ErrorSchema } from '../models/error.schema'
+import { RecordingCreateRequestSchema, RecordingResponseSchema } from '../models/recording.schema'
+
+export const createRecordingRoute = createRoute({
+  path: '/',
+  method: 'post',
+  description: '録音ファイル情報を保存します',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: RecordingCreateRequestSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: '録音情報の保存に成功',
+      content: { 'application/json': { schema: RecordingResponseSchema } },
+    },
+    401: { description: '認証が必要です', content: { 'application/json': { schema: ErrorSchema } } },
+    500: { description: 'サーバーエラー', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
