@@ -46,6 +46,6 @@ export default function Controller({
         </div>
       )
     default:
-      return <p>{status}</p>
+      return null
   }
 }
