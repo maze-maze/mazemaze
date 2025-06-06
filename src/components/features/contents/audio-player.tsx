@@ -1,8 +1,8 @@
 'use client'
 
+import { Button } from '🎙️/components/ui/button'
 import { PauseIcon, PlayIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { Button } from '🎙️/components/ui/button'
 
 export default function AudioPlayer({ audioUrl }: { audioUrl: string }) {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -22,15 +22,17 @@ export default function AudioPlayer({ audioUrl }: { audioUrl: string }) {
   return (
     <div>
       <audio ref={audioRef} src={audioUrl} />
-      {isPlaying ? (
-        <Button onClick={handlePause} className='size-24 rounded-full'>
-          <PauseIcon className='size-12' fill='#000' />
-        </Button>
-      ) : (
-        <Button onClick={handlePlay} className='size-24 rounded-full'>
-          <PlayIcon className='size-12' fill='#000' />
-        </Button>
-      )}
+      {isPlaying
+        ? (
+            <Button onClick={handlePause} className="size-24 rounded-full">
+              <PauseIcon className="size-12" fill="#000" />
+            </Button>
+          )
+        : (
+            <Button onClick={handlePlay} className="size-24 rounded-full">
+              <PlayIcon className="size-12" fill="#000" />
+            </Button>
+          )}
     </div>
   )
 }

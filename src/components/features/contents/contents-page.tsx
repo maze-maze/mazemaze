@@ -1,12 +1,12 @@
+import Background from '../layout/backgeound'
+import AudioPlayer from './audio-player'
+import BackButton from './back-button'
+import Character from './character'
 import { getContents } from './get-contents'
 import Title from './title'
-import Character from './character'
-import AudioPlayer from './audio-player'
-import Background from '../layout/backgeound'
-import BackButton from './back-button'
 
 export default async function ContentsPage({ userId, contentsId }: { userId: string, contentsId: string }) {
-  const contents = await getContents(userId, contentsId)
+  const contents = await getContents(contentsId)
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-4 h-dvh">

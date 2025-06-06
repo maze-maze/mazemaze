@@ -1,8 +1,6 @@
 'use server'
 
-export async function getContents(userId: string, contentsId: string) {
-  console.log("getContents called with userId:", userId, "and contentsId:", contentsId)
-
+export async function getContents(contentsId: string) {
   const contents = {
     episodeInfo: {
       title: `Episode ${contentsId}`,
@@ -26,8 +24,8 @@ export async function getContents(userId: string, contentsId: string) {
         name: `Guest ${contentsId}`,
         imageUrl: '/characters/guest.png',
         // ...
-      }
-    }
+      },
+    },
   }
   return contents
 }
