@@ -15,6 +15,13 @@
       "when": 1748779446769,
       "tag": "0001_ambiguous_colleen_wing",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749201371807,
+      "tag": "0002_deep_blue_marvel",
+      "breakpoints": true
     }
   ]
 }

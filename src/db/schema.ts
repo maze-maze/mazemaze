@@ -1,4 +1,10 @@
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -7,8 +13,8 @@ export const user = pgTable('user', {
   emailVerified: boolean('email_verified').$defaultFn(() => false).notNull(),
   username: text('user_name').unique(),
   image: text('image'),
-  createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-  updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()).notNull(),
 })
 
 export const session = pgTable('session', {
@@ -43,6 +49,94 @@ export const verification = pgTable('verification', {
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
-  updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
+})
+
+/*
+  ─────────────────────────────────────────────────────────────────────
+   以下、ポッドキャスト／エピソード関連テーブルを追加
+  ─────────────────────────────────────────────────────────────────────
+*/
+
+/// エピソード（投稿）
+export const episode = pgTable('episode', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+
+  title: text('title').notNull(), // エピソード名（テーマと同義）
+  gradient: text('gradient'), // 背景グラデーション情報
+  script: text('script').notNull(), // 全文台本
+
+  audioUrl: text('audio_url'), // 録音音声ファイルの URL
+  duration: text('duration'), // 録音時間（例: "90" 秒や "01:30" など）
+
+  likesCount: integer('likes_count').default(0),
+  badsCount: integer('bads_count').default(0),
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()).notNull(),
+})
+
+/// キャラクター情報（メイン / ゲスト）
+export const character = pgTable('character', {
+  id: text('id').primaryKey(),
+  episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
+
+  role: text('role').notNull(), // 'main' or 'guest'
+  name: text('name').notNull(),
+  description: text('description'),
+  tone: text('tone'),
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+})
+
+/// 録音ファイル情報
+export const recording = pgTable('recording', {
+  id: text('id').primaryKey(),
+  episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
+
+  audioUrl: text('audio_url').notNull(),
+  mimeType: text('mime_type'),
+  duration: text('duration'), // 録音時間（例: "00:45"）
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+})
+
+/// コメント
+export const comment = pgTable('comment', {
+  id: text('id').primaryKey(),
+  episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+
+  text: text('text').notNull(), // コメント本文
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+})
+
+/// リアクション（いいね / バッド）
+export const reaction = pgTable('reaction', {
+  id: text('id').primaryKey(),
+  episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+
+  type: text('type').notNull(), // 'like' or 'bad'
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
+})
+
+/// クリップ（自動生成ショートクリップ） - 1エピソードにつき1つ
+export const clip = pgTable('clip', {
+  id: text('id').primaryKey(),
+  episodeId: text('episode_id')
+    .notNull()
+    .references(() => episode.id, { onDelete: 'cascade' })
+    .unique(), // 1:1 制約
+
+  title: text('title').notNull(), // クリップ用タイトル
+  summaryScript: text('summary_script'), // 要約された台本
+  audioUrl: text('audio_url'), // ショートクリップ音声URL
+  duration: text('duration'), // 例: "00:30"
+
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
 })
