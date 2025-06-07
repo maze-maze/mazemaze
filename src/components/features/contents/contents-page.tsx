@@ -18,10 +18,10 @@ export default async function ContentsPage({ contentsId }: { contentsId: string 
       </Link>
       <Background />
       <Title title={contents.episodeInfo.title} imageUrl={contents.episodeInfo.imageUrl} />
-      <Character name={contents.characterInfo.mainCharacter.name} imageUrl={contents.characterInfo.mainCharacter.imageUrl} />
-      <Character name={contents.characterInfo.guestCharacter.name} imageUrl={contents.characterInfo.guestCharacter.imageUrl} />
+      <Character name={contents.characterInfo.mainCharacter!.name} imageUrl={contents.characterInfo.mainCharacter!.imageUrl} />
+      <Character name={contents.characterInfo.guestCharacter!.name} imageUrl={contents.characterInfo.guestCharacter!.imageUrl} />
       <div className="flex justify-center items-center mt-10 gap-4">
-        <AudioPlayer audioUrl={contents.recordingInfo.audioUrl} />
+        <AudioPlayer audioUrl={contents.recordingInfo!.audioUrl} />
       </div>
     </div>
   )
