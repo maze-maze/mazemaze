@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import Background from '../layout/backgeound'
+import Header from '../layout/header'
 import AudioPlayer from './audio-player'
 import BackButton from './back-button'
 import Character from './character'
@@ -11,6 +13,9 @@ export default async function ContentsPage({ userId, contentsId }: { userId: str
   if(contents === null) return
    return (
     <div className="flex flex-col items-center justify-center gap-4 p-4 h-dvh">
+      <Link href="/">
+        <Header />
+      </Link>
       <Background />
       <Title title={contents.episodeInfo.title} imageUrl={contents.episodeInfo.imageUrl} />
       <Character name={contents.characterInfo.mainCharacter.name} imageUrl={contents.characterInfo.mainCharacter.imageUrl} />
