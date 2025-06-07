@@ -41,6 +41,7 @@ export async function getEpisodesByUsername(username: string) {
       title: episode.title,
       gradient: episode.gradient,
       duration: firstRecording?.duration ? Number.parseInt(firstRecording.duration, 10) : 0,
+      // eslint-disable-next-line style/multiline-ternary
       mainCharacter: mainCharacter ? {
         name: mainCharacter.name,
         imageUrl: '/characters/character.png', // 固定値

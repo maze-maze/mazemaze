@@ -28,7 +28,7 @@ export default function UserPage() {
   // --- State定義 ---
   const [displayName, setDisplayName] = useState('')
   const [episodes, setEpisodes] = useState<Episode[]>([])
-  const [likedThemes, setLikedThemes] = useState<Episode[]>([])
+  const likedThemes: never[] = []
   const [isLoading, setIsLoading] = useState(true)
 
   const [activeTab] = useQueryState('tab', { defaultValue: 'posts' })
