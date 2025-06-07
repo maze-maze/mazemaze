@@ -115,7 +115,7 @@ export default function CharacterSelector({
 
   // self 用カード（SomaTakata）
   const selfCard: Personality = {
-    name: 'SomaTakata',
+    name: 'Ryu',
     description: 'とある大学生',
     tone: '自由',
     self: true,
