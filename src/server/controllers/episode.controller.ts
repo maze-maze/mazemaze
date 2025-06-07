@@ -5,13 +5,29 @@ import type { createEpisodeRoute } from '../routes/episode.route'
 import { db } from '🎙️/db'
 import { character as characterSchema, episode as episodeSchema } from '🎙️/db/schema' // characterも追加
 import { auth } from '🎙️/lib/auth'
+import { client } from '🎙️/lib/hono'
+import { headers } from 'next/headers'
 
 export const createEpisodeHandler: RouteHandler<typeof createEpisodeRoute> = async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers })
   if (!session || !session.user?.id) {
     return c.json({ error: 'Unauthorized' }, 401)
   }
-  const userId = session.user.id
+  const res = await client.api.me.username.$get(
+    {},
+    {
+      init: {
+        headers: await headers(),
+      },
+    },
+  )
+
+  const data = await res.json()
+
+  if (!data || !data.username) {
+    return c.json({ error: 'Username not found' }, 400)
+  }
+
   const body = c.req.valid('json')
 
   try {
@@ -22,7 +38,7 @@ export const createEpisodeHandler: RouteHandler<typeof createEpisodeRoute> = asy
       // 1. Episodeを挿入
       await tx.insert(episodeSchema).values({
         id: newEpisodeId,
-        userId,
+        username: data.username!,
         title: body.title,
         script: body.script,
         gradient: body.gradient,

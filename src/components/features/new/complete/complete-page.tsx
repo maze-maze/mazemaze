@@ -94,7 +94,7 @@ export default function CompletePage({
       const { episodeId } = data
 
       // episodeIdをクエリパラメータとして付けて録音ページに遷移
-      router.push(`/new/recording?episodeId=${episodeId}`)
+      window.location.href = `/new/recording?episodeId=${episodeId}`
     }
     catch (error) {
       console.error(error)
