@@ -6,19 +6,19 @@ import React from 'react'
 // ★★★ 1. 受け取るデータの型を定義します ★★★
 // episodeオブジェクトにはgradientやtitleが含まれています
 interface Episode {
-  id: string;
-  title: string;
-  gradient: string | null;
+  id: string
+  title: string
+  gradient: string | null
   mainCharacter: {
-    name: string;
-    imageUrl: string;
-  } | null;
+    name: string
+    imageUrl: string
+  } | null
 }
 
 // ★★★ 2. propsの型を更新します ★★★
 // 不要になった `gradients` を削除し、`displayThemes` の型を `Episode[]` に変更
 interface ThemeGridProps {
-  displayThemes: Episode[];
+  displayThemes: Episode[]
 }
 
 export default function ThemeGrid({ displayThemes }: ThemeGridProps) {
@@ -33,7 +33,7 @@ export default function ThemeGrid({ displayThemes }: ThemeGridProps) {
   return (
     <>
       {/* ★★★ 3. map処理を更新します ★★★ */}
-      {displayThemes.map((episode) => (
+      {displayThemes.map(episode => (
         <button
           // keyにはユニークなepisode.idを使用
           key={episode.id}
@@ -41,7 +41,7 @@ export default function ThemeGrid({ displayThemes }: ThemeGridProps) {
             'p-4 w-full gap-3 rounded-lg flex flex-col items-center justify-center text-center transition aspect-2/3 relative',
             // episodeオブジェクトから直接gradientクラスを取得します
             // もしgradientが設定されていなければ、デフォルトの背景色を適用します
-            episode.gradient ?? 'bg-gradient-to-b from-gray-700 to-gray-900'
+            episode.gradient ?? 'bg-gradient-to-b from-gray-700 to-gray-900',
           )}
         >
           {/* episodeオブジェクトからタイトルを表示 */}

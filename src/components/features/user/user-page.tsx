@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation'
 import { useQueryState } from 'nuqs'
 import React, { useEffect, useState } from 'react'
 
-// ★★★ 隣のactions.tsからサーバー関数をインポート ★★★
-import { getEpisodesByUsername, getUserProfile } from './actions'
 import Background from '../layout/backgeound'
 import Header from '../layout/header'
 import NavigationBar from '../layout/navigation-bar'
+// ★★★ 隣のactions.tsからサーバー関数をインポート ★★★
+import { getEpisodesByUsername, getUserProfile } from './actions'
 import MenuModal from './menu-modal'
 import ProfileInfo from './profile-info'
 import TabSwitcher from './tab-switcher'
@@ -39,7 +39,8 @@ export default function UserPage() {
 
   // --- データ取得処理 ---
   useEffect(() => {
-    if (!usernameFromPath) return
+    if (!usernameFromPath)
+      return
 
     const fetchData = async () => {
       setIsLoading(true)
@@ -53,10 +54,12 @@ export default function UserPage() {
         // 取得したデータをStateにセット
         setEpisodes(fetchedEpisodes)
         setDisplayName(userProfile?.name ?? usernameFromPath)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Failed to fetch user data:', error)
         setDisplayName('ユーザーが見つかりません')
-      } finally {
+      }
+      finally {
         setIsLoading(false)
       }
     }
@@ -80,11 +83,13 @@ export default function UserPage() {
       <TabSwitcher />
 
       <div className="grid grid-cols-2 gap-4 px-6 mt-4 mb-40 w-full z-10">
-        {isLoading ? (
-          <p className="text-white col-span-2 text-center">読み込み中...</p>
-        ) : (
-          <ThemeGrid displayThemes={displayThemes} />
-        )}
+        {isLoading
+          ? (
+              <p className="text-white col-span-2 text-center">読み込み中...</p>
+            )
+          : (
+              <ThemeGrid displayThemes={displayThemes} />
+            )}
       </div>
 
       <NavigationBar />

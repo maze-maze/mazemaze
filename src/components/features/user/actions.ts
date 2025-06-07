@@ -32,7 +32,7 @@ export async function getEpisodesByUsername(username: string) {
   })
 
   // 取得したデータをクライアントで使いやすい形式に整形
-  const formattedEpisodes = episodesData.map(episode => {
+  const formattedEpisodes = episodesData.map((episode) => {
     const mainCharacter = episode.characters.find(c => c.role === 'main')
     const firstRecording = episode.recordings[0]
 
@@ -40,7 +40,7 @@ export async function getEpisodesByUsername(username: string) {
       id: episode.id,
       title: episode.title,
       gradient: episode.gradient,
-      duration: firstRecording?.duration ? parseInt(firstRecording.duration, 10) : 0,
+      duration: firstRecording?.duration ? Number.parseInt(firstRecording.duration, 10) : 0,
       mainCharacter: mainCharacter ? {
         name: mainCharacter.name,
         imageUrl: '/characters/character.png', // 固定値
