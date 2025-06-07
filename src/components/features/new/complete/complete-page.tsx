@@ -1,4 +1,4 @@
-// src/components/complete-page/complete-page.tsx
+/* eslint-disable import/no-duplicates */
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 /* eslint-disable unused-imports/no-unused-vars */

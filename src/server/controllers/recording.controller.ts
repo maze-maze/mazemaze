@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/process */
 import type { RouteHandler } from '@hono/zod-openapi'
 // ★★★ getRecordingsByEpisodeRouteをインポート ★★★
 import type { createRecordingRoute, getRecordingsByEpisodeRoute } from '../routes/recording.route'

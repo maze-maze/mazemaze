@@ -1,3 +1,4 @@
+/* eslint-disable node/prefer-global/process */
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {

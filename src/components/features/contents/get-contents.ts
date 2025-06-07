@@ -1,3 +1,4 @@
+/* eslint-disable style/multiline-ternary */
 'use server'
 
 import { db } from '🎙️/db'

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { RouteHandler } from '@hono/zod-openapi'
 import type { createEpisodeRoute, getEpisodeRoute } from '../routes/episode.route'
 import { db } from '🎙️/db'

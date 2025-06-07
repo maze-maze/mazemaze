@@ -6,7 +6,7 @@ import Character from './character'
 import { getContents } from './get-contents'
 import Title from './title'
 
-export default async function ContentsPage({ userId, contentsId }: { userId: string, contentsId: string }) {
+export default async function ContentsPage({ contentsId }: { contentsId: string }) {
   const contents = await getContents(contentsId)
 
   if (contents === null)
