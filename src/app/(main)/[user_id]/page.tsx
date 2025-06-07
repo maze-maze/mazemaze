@@ -13,6 +13,6 @@ export default async function Page() {
   }
 
   return (
-    <UserPage name={session.user.name} />
+    <UserPage />
   )
 }
