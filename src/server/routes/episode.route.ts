@@ -1,13 +1,13 @@
 import { createRoute } from '@hono/zod-openapi'
 // ★★★ zをインポート ★★★
 import { z } from 'zod'
-import { ErrorSchema } from '../models/error.schema'
 import {
   EpisodeCreateRequestSchema,
   EpisodeCreateResponseSchema,
   // ★★★ EpisodeGetResponseSchemaをインポート ★★★
   EpisodeGetResponseSchema,
 } from '../models/episode.schema'
+import { ErrorSchema } from '../models/error.schema'
 
 // ★★★ ここから追加 ★★★
 export const getEpisodeRoute = createRoute({

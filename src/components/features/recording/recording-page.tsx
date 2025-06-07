@@ -4,9 +4,9 @@
 import { StorageKeys } from '🎙️/lib/storage-keys'
 import { PlayIcon } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react' // useEffectを追加
 import MicImage from './assets/mingcute_mic-ai-fill.svg'
-import { useRouter, useSearchParams } from 'next/navigation' 
 import Background from './background'
 import Character from './character'
 import Controller from './controller'
@@ -49,7 +49,7 @@ export default function RecordingPage() {
       const guestObj = JSON.parse(guestItem)
       const mainObj = JSON.parse(mainItem)
       const scriptText = JSON.parse(scriptItem)
-      
+
       // promptを構築
       const newPrompt = `
 ## 概要
@@ -74,12 +74,11 @@ export default function RecordingPage() {
       // stateを更新
       setPrompt(newPrompt)
       setIsReady(true) // 準備完了フラグを立てる
-
-    } catch (e) {
-        console.error("セッションデータの解析に失敗しました:", e);
-        alert('セッションデータの形式が正しくありません。');
     }
-
+    catch (e) {
+      console.error('セッションデータの解析に失敗しました:', e)
+      alert('セッションデータの形式が正しくありません。')
+    }
   }, []) // 空の依存配列[]で、マウント時に一度だけ実行
 
   const {
@@ -103,34 +102,34 @@ export default function RecordingPage() {
     return <div>セッションデータを読み込み中...</div>
   }
 
-// ★★★ 3. 保存処理のハンドラを正しく定義
-const handleSaveRecording = async () => {
-  if (!episodeId) {
-    alert('エピソードIDが見つかりません。保存できません。')
-    return
-  }
-  // 変更点: usernameもチェック
-  if (!username) {
-    alert('ユーザー名が取得できません。保存できません。')
-    return
-  }
+  // ★★★ 3. 保存処理のハンドラを正しく定義
+  const handleSaveRecording = async () => {
+    if (!episodeId) {
+      alert('エピソードIDが見つかりません。保存できません。')
+      return
+    }
+    // 変更点: usernameもチェック
+    if (!username) {
+      alert('ユーザー名が取得できません。保存できません。')
+      return
+    }
 
-  try {
+    try {
     // 変更点: saveRecordingにusernameを渡す
-    await saveRecording(episodeId, username)
-    
-    // alert('保存が完了しました！')
-    router.push(`/episode/${episodeId}`)
+      await saveRecording(episodeId, username)
 
-  } catch (error) {
+      // alert('保存が完了しました！')
+      router.push(`/episode/${episodeId}`)
+    }
+    catch (error) {
     // フックからスローされたエラーをキャッチ
-    alert((error as Error).message)
+      alert((error as Error).message)
+    }
   }
-}
 
-if (!isReady) {
-  return <div>セッションデータを読み込み中...</div>
-}
+  if (!isReady) {
+    return <div>セッションデータを読み込み中...</div>
+  }
 
   // 準備が整ったら、メインのコンポーネントを表示
   return (
@@ -171,7 +170,7 @@ if (!isReady) {
           </p>
           <div className="flex items-center gap-6 mt-2">
             <button className="py-4 px-8 bg-gray-200 text-black font-bold rounded-full" onClick={() => { alert('まだ開発してないよ😢') }}>収録に戻る</button>
-            <button 
+            <button
               className="py-4 px-10 bg-black text-white font-bold rounded-full disabled:opacity-50"
               onClick={handleSaveRecording}
               disabled={isSaving}

@@ -2,8 +2,8 @@
 'use client'
 
 import type { Conversation, Status } from '🎙️/lib/types/recording'
-import { useEffect, useRef, useState } from 'react'
 import { createClient } from '🎙️/utils/supabase/client'
+import { useEffect, useRef, useState } from 'react'
 
 // ヘルパー関数：イベントハンドラ内で安全に使用できるID生成関数
 function generateUniqueId() {
@@ -25,7 +25,7 @@ interface UseWebRTCAudioSessionReturn {
   recordingDuration: number
   countdown: number | null
   isSaving: boolean
-  saveRecording: (episodeId: string,  username: string) => Promise<void>
+  saveRecording: (episodeId: string, username: string) => Promise<void>
 }
 
 export default function useWebRTCAudioSession(
@@ -45,11 +45,11 @@ export default function useWebRTCAudioSession(
   const recordingIntervalRef = useRef<number | null>(null)
   const countdownIntervalRef = useRef<number | null>(null)
 
-   // --- 保存処理中の状態を追加 ---
-   const [isSaving, setIsSaving] = useState(false)
+  // --- 保存処理中の状態を追加 ---
+  const [isSaving, setIsSaving] = useState(false)
 
-   // --- Supabaseクライアントをインスタンス化 ---
-   const supabase = createClient()
+  // --- Supabaseクライアントをインスタンス化 ---
+  const supabase = createClient()
 
   // 音声ミックス用の参照
   const mixedAudioContextRef = useRef<AudioContext | null>(null)
@@ -498,7 +498,8 @@ export default function useWebRTCAudioSession(
           setRecordingDuration(elapsed)
         }
       }, 1000)
-    } catch (error) {
+    }
+    catch (error) {
       console.error('録音開始エラー:', error)
     }
   }
@@ -535,76 +536,78 @@ export default function useWebRTCAudioSession(
     }
   }
 
-
- /**
+  /**
    * 録音されたBlobをSupabaseにアップロードし、API経由でDBに保存する
    * @param episodeId - 保存対象のエピソードID
    * @param username - ファイルパスに使用するユーザー名
    */
- async function saveRecording(episodeId: string, username: string) { // 変更点: username引数を追加
-  if (!recordedBlob) {
-    alert('保存する録音データがありません。')
-    return
-  }
-  if (isSaving) return
+  async function saveRecording(episodeId: string, username: string) { // 変更点: username引数を追加
+    if (!recordedBlob) {
+      alert('保存する録音データがありません。')
+      return
+    }
+    if (isSaving)
+      return
 
-  setIsSaving(true)
+    setIsSaving(true)
 
-  try {
+    try {
     // 変更点: supabase.auth.getUser() を削除
 
-    // --- usernameのチェック ---
-    if (!username) {
-      throw new Error('ユーザー名が取得できませんでした。ファイルパスを作成できません。')
-    }
+      // --- usernameのチェック ---
+      if (!username) {
+        throw new Error('ユーザー名が取得できませんでした。ファイルパスを作成できません。')
+      }
 
-    // 2. ファイルパスを一意に決定 (例: username/timestamp.webm)
-    const filePath = `${username}/${Date.now()}.webm` // 変更点: user.id の代わりに username を使用
+      // 2. ファイルパスを一意に決定 (例: username/timestamp.webm)
+      const filePath = `${username}/${Date.now()}.webm` // 変更点: user.id の代わりに username を使用
 
-    // 3. Supabase Storageにアップロード
-    const { error: uploadError } = await supabase.storage
-      .from('recordings') // Supabaseで作成したバケット名
-      .upload(filePath, recordedBlob, {
-        contentType: 'audio/webm',
-        upsert: false,
+      // 3. Supabase Storageにアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('recordings') // Supabaseで作成したバケット名
+        .upload(filePath, recordedBlob, {
+          contentType: 'audio/webm',
+          upsert: false,
+        })
+
+      if (uploadError)
+        throw uploadError
+
+      // 4. アップロードしたファイルの公開URLを取得
+      const { data: { publicUrl } } = supabase.storage
+        .from('recordings')
+        .getPublicUrl(filePath)
+
+      // 5. /api/recordings エンドポイントにデータを送信 (ここは変更なし)
+      const response = await fetch('/api/recordings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          episodeId,
+          audioUrl: publicUrl,
+          duration: recordingDuration,
+        }),
       })
 
-    if (uploadError) throw uploadError
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.log(errorData)
+        throw new Error(errorData.error || 'データベースへの保存に失敗しました。')
+      }
 
-    // 4. アップロードしたファイルの公開URLを取得
-    const { data: { publicUrl } } = supabase.storage
-      .from('recordings')
-      .getPublicUrl(filePath)
-    
-    // 5. /api/recordings エンドポイントにデータを送信 (ここは変更なし)
-    const response = await fetch('/api/recordings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        episodeId,
-        audioUrl: publicUrl,
-        duration: recordingDuration,
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.log(errorData)
-      throw new Error(errorData.error || 'データベースへの保存に失敗しました。')
+      const newRecording = await response.json()
+      console.log('録音情報の保存成功！:', newRecording)
+      // alert('録音の保存が完了しました！') // 呼び出し元で制御するためコメントアウト
     }
-
-    const newRecording = await response.json()
-    console.log('録音情報の保存成功！:', newRecording)
-    // alert('録音の保存が完了しました！') // 呼び出し元で制御するためコメントアウト
-
-  } catch (error) {
-    console.error('録音の保存エラー:', error)
-    // エラーを再スローして、呼び出し元でキャッチできるようにする
-    throw error
-  } finally {
-    setIsSaving(false)
+    catch (error) {
+      console.error('録音の保存エラー:', error)
+      // エラーを再スローして、呼び出し元でキャッチできるようにする
+      throw error
+    }
+    finally {
+      setIsSaving(false)
+    }
   }
-}
 
   /**
    * 新しいセッションを開始:

@@ -1,8 +1,8 @@
 // server/models/episode.schema.ts
 import { z } from '@hono/zod-openapi'
-import { createSelectSchema } from 'drizzle-zod'
 // ★★★ character, episode スキーマをインポート ★★★
 import { character as characterSchema, episode as episodeSchema } from '🎙️/db/schema'
+import { createSelectSchema } from 'drizzle-zod'
 
 // キャラクター情報のスキーマ
 const CharacterSchema = z.object({
@@ -22,7 +22,6 @@ export const EpisodeGetResponseSchema = EpisodeResponseSchema.extend({
   characters: z.array(CharacterResponseSchema),
 }).openapi('EpisodeGetResponse')
 // ★★★ ここまで追加 ★★★
-
 
 // クライアントから受け取るリクエストボディのスキーマ
 export const EpisodeCreateRequestSchema = z.object({

@@ -1,12 +1,12 @@
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
 import type { RouteHandler } from '@hono/zod-openapi'
 // ★★★ getRecordingsByEpisodeRouteをインポート ★★★
 import type { createRecordingRoute, getRecordingsByEpisodeRoute } from '../routes/recording.route'
-import { episode as episodeSchema, recording as recordingSchema } from '🎙️/db/schema'
-import { eq } from 'drizzle-orm'
 // ★★★ RLSが有効なDBクライアントをインポート ★★★
 import { db as rlsDb } from '🎙️/db'
+import { episode as episodeSchema, recording as recordingSchema } from '🎙️/db/schema'
+import { eq } from 'drizzle-orm'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
 
 // ★★★ ここから追加 ★★★
 /**
@@ -41,8 +41,8 @@ export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> =
   // 1. service_roleキーを使って、RLSをバイパスできるDBクライアントを生成
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const databaseUrl = process.env.DATABASE_URL!.replace(
-      process.env.SUPABASE_ANON_KEY!,
-      serviceRoleKey,
+    process.env.SUPABASE_ANON_KEY!,
+    serviceRoleKey,
   )
   const serviceDbClient = postgres(databaseUrl)
   const db = drizzle(serviceDbClient)
@@ -65,13 +65,13 @@ export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> =
 
     // episodeテーブルの更新も同じdbインスタンスで行う
     await db.update(episodeSchema).set({
-        audioUrl: body.audioUrl,
-        duration: body.duration.toString(),
+      audioUrl: body.audioUrl,
+      duration: body.duration.toString(),
     }).where(eq(episodeSchema.id, body.episodeId))
 
     return c.json(newRecording, 201)
-    
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Recording creation error:', error)
     return c.json({ error: 'Internal Server Error' }, { status: 500 })
   }

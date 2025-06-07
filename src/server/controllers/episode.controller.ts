@@ -1,46 +1,45 @@
 import type { RouteHandler } from '@hono/zod-openapi'
+import type { createEpisodeRoute, getEpisodeRoute } from '../routes/episode.route'
 import { db } from '🎙️/db'
 import { character as characterSchema, episode as episodeSchema } from '🎙️/db/schema'
-import { eq } from 'drizzle-orm'
-import type { createEpisodeRoute, getEpisodeRoute } from '../routes/episode.route'
-
 // (createEpisodeHandlerで利用する他のimportはそのまま)
 import { auth } from '🎙️/lib/auth'
-import { client } from '🎙️/lib/hono'
-import { headers } from 'next/headers'
 
+import { client } from '🎙️/lib/hono'
+import { eq } from 'drizzle-orm'
+import { headers } from 'next/headers'
 
 /**
  * IDで指定されたエピソードを一件取得するハンドラー
  */
 export const getEpisodeHandler: RouteHandler<typeof getEpisodeRoute> = async (c) => {
-    const { id } = c.req.valid('param')
-  
-    try {
-      const episode = await db.query.episode.findFirst({
-        where: eq(episodeSchema.id, id),
-        with: {
-          characters: true,
-        },
-      })
-  
-      // ★★★ このデバッグコードを追加してください ★★★
-      console.log('--- 実行時に取得したデータ ---')
-      console.log(JSON.stringify(episode, null, 2))
-      // ★★★ ここまで ★★★
-  
-      if (!episode) {
-        return c.json({ error: 'Episode not found' }, 404)
-      }
-  
-      // 型エラーが解決しない場合、最終手段として型アサーション(as)を使います
-      return c.json(episode , 200)
-  
-    } catch (error) {
-      console.error('Get episode error:', error)
-      return c.json({ error: 'Internal Server Error' }, 500)
+  const { id } = c.req.valid('param')
+
+  try {
+    const episode = await db.query.episode.findFirst({
+      where: eq(episodeSchema.id, id),
+      with: {
+        characters: true,
+      },
+    })
+
+    // ★★★ このデバッグコードを追加してください ★★★
+    console.log('--- 実行時に取得したデータ ---')
+    console.log(JSON.stringify(episode, null, 2))
+    // ★★★ ここまで ★★★
+
+    if (!episode) {
+      return c.json({ error: 'Episode not found' }, 404)
     }
+
+    // 型エラーが解決しない場合、最終手段として型アサーション(as)を使います
+    return c.json(episode, 200)
   }
+  catch (error) {
+    console.error('Get episode error:', error)
+    return c.json({ error: 'Internal Server Error' }, 500)
+  }
+}
 
 /**
  * 新しいエピソードを作成するハンドラー

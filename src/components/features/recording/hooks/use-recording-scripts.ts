@@ -34,7 +34,7 @@ export function useRecordingScripts() {
       title: JSON.parse(theme).theme,
       character: 'character',
       script,
-      username: username,
+      username,
       guest: {
         name: JSON.parse(guestCharacter).name,
         description: JSON.parse(guestCharacter).description,
