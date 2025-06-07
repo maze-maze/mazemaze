@@ -1,23 +1,53 @@
-// server/controllers/recording.controller.ts
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import type { RouteHandler } from '@hono/zod-openapi'
-import type { createRecordingRoute } from '../routes/recording.route'
+// ★★★ getRecordingsByEpisodeRouteをインポート ★★★
+import type { createRecordingRoute, getRecordingsByEpisodeRoute } from '../routes/recording.route'
 import { episode as episodeSchema, recording as recordingSchema } from '🎙️/db/schema'
 import { eq } from 'drizzle-orm'
+// ★★★ RLSが有効なDBクライアントをインポート ★★★
+import { db as rlsDb } from '🎙️/db'
 
+// ★★★ ここから追加 ★★★
+/**
+ * 指定されたエピソードIDに紐づく録音情報の一覧を取得するハンドラー
+ */
+export const getRecordingsByEpisodeHandler: RouteHandler<
+  typeof getRecordingsByEpisodeRoute
+> = async (c) => {
+  // クエリパラメータからepisodeIdを取得
+  const { episodeId } = c.req.valid('query')
+
+  try {
+    // RLSが有効な通常のdbインスタンスで読み取りを実行
+    const recordings = await rlsDb
+      .select()
+      .from(recordingSchema)
+      .where(eq(recordingSchema.episodeId, episodeId))
+
+    return c.json(recordings, 200)
+  }
+  catch (error) {
+    console.error('Get recordings error:', error)
+    throw error
+  }
+}
+// ★★★ ここまで追加 ★★★
+
+/**
+ * 新しい録音情報を作成するハンドラー
+ */
 export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> = async (c) => {
   // 1. service_roleキーを使って、RLSをバイパスできるDBクライアントを生成
-  //    SupabaseのDB接続文字列は環境変数に設定されていることを前提とします
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const databaseUrl = process.env.DATABASE_URL!.replace(
-      process.env.SUPABASE_ANON_KEY!, // anon_key部分を
-      serviceRoleKey, // service_roleキーに置き換える
+      process.env.SUPABASE_ANON_KEY!,
+      serviceRoleKey,
   )
   const serviceDbClient = postgres(databaseUrl)
   const db = drizzle(serviceDbClient)
 
-  // 2. リクエストボディからデータを取得（userIdも含まれている）
+  // 2. リクエストボディからデータを取得
   const body = c.req.valid('json')
 
   try {
@@ -27,7 +57,6 @@ export const createRecordingHandler: RouteHandler<typeof createRecordingRoute> =
       .values({
         id: crypto.randomUUID(),
         episodeId: body.episodeId,
-        userId: body.userId, // ★★★ フロントから渡されたuserIdを使用
         audioUrl: body.audioUrl,
         duration: body.duration.toString(),
         mimeType: 'audio/webm',

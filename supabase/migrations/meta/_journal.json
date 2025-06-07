@@ -36,6 +36,13 @@
       "when": 1749257602631,
       "tag": "0004_deep_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749268005705,
+      "tag": "0005_handy_tarot",
+      "breakpoints": true
     }
   ]
 }

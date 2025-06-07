@@ -22,7 +22,7 @@ export default function RecordingPage() {
   const [prompt, setPrompt] = useState('')
   const [isReady, setIsReady] = useState(false) // データ読み込み完了フラグ
 
-  const { title, character, script, username, userId } = useRecordingScripts()
+  const { title, character, script, username } = useRecordingScripts()
   const [voice] = useState('ash')
 
   const searchParams = useSearchParams()
@@ -103,36 +103,35 @@ export default function RecordingPage() {
     return <div>セッションデータを読み込み中...</div>
   }
 
-  const handleSaveRecording = async () => {
-    if (!episodeId) {
-      alert('エピソードIDが見つかりません。保存できません。')
-      return
-    }
-    if (!username) {
-      alert('ユーザー名が取得できません。保存できません。')
-      return
-    }
-    if (!userId) {
-      alert('ユーザーIDが取得できません。保存できません。')
-      return
-    }
-
-    try {
-      // ★★★ 3. saveRecordingに3つの引数をすべて渡す ★★★
-      await saveRecording(episodeId, userId, username)
-      
-      alert('保存が完了しました！')
-      router.push(`/episode/${episodeId}`)
-
-    } catch (error) {
-      alert((error as Error).message)
-    }
+// ★★★ 3. 保存処理のハンドラを正しく定義
+const handleSaveRecording = async () => {
+  if (!episodeId) {
+    alert('エピソードIDが見つかりません。保存できません。')
+    return
+  }
+  // 変更点: usernameもチェック
+  if (!username) {
+    alert('ユーザー名が取得できません。保存できません。')
+    return
   }
 
-  // ★★★ 重複していたif文を削除 ★★★
-  if (!isReady) {
-    return <div>セッションデータを読み込み中...</div>
+  try {
+    // 変更点: saveRecordingにusernameを渡す
+    await saveRecording(episodeId, username)
+    
+    // alert('保存が完了しました！')
+    router.push(`/episode/${episodeId}`)
+
+  } catch (error) {
+    // フックからスローされたエラーをキャッチ
+    alert((error as Error).message)
   }
+}
+
+if (!isReady) {
+  return <div>セッションデータを読み込み中...</div>
+}
+
   // 準備が整ったら、メインのコンポーネントを表示
   return (
     <div className="grid grid-flow-row auto-rows-max h-dvh relative">

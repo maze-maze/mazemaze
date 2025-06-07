@@ -1,5 +1,8 @@
 // server/models/episode.schema.ts
 import { z } from '@hono/zod-openapi'
+import { createSelectSchema } from 'drizzle-zod'
+// ★★★ character, episode スキーマをインポート ★★★
+import { character as characterSchema, episode as episodeSchema } from '🎙️/db/schema'
 
 // キャラクター情報のスキーマ
 const CharacterSchema = z.object({
@@ -8,6 +11,19 @@ const CharacterSchema = z.object({
   tone: z.string(),
 })
 
+// ★★★ ここから追加 ★★★
+// DBから取得する際のキャラクター情報のスキーマ
+const CharacterResponseSchema = createSelectSchema(characterSchema)
+// DBから取得する際のエピソード情報のスキーマ
+const EpisodeResponseSchema = createSelectSchema(episodeSchema)
+
+// エピソード取得APIの成功レスポンスのスキーマ
+export const EpisodeGetResponseSchema = EpisodeResponseSchema.extend({
+  characters: z.array(CharacterResponseSchema),
+}).openapi('EpisodeGetResponse')
+// ★★★ ここまで追加 ★★★
+
+
 // クライアントから受け取るリクエストボディのスキーマ
 export const EpisodeCreateRequestSchema = z.object({
   title: z.string().min(1, 'タイトルは必須です'),
@@ -15,8 +31,6 @@ export const EpisodeCreateRequestSchema = z.object({
   gradient: z.string().optional(),
   mainCharacter: CharacterSchema,
   guestCharacter: CharacterSchema.optional(),
-  // durationは不要なら削除
-  // duration: z.number().int().positive('再生時間は正の整数である必要があります').optional(),
 }).openapi('EpisodeCreateRequest')
 
 // APIからの成功レスポンスのスキーマ

@@ -1,3 +1,5 @@
+// db/schema.ts
+import { relations } from 'drizzle-orm'
 import {
   boolean,
   integer,
@@ -96,7 +98,6 @@ export const recording = pgTable('recording', {
   id: text('id').primaryKey(),
   episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
 
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   audioUrl: text('audio_url').notNull(),
   mimeType: text('mime_type'),
   duration: text('duration'), // 録音時間（例: "00:45"）
@@ -141,3 +142,31 @@ export const clip = pgTable('clip', {
 
   createdAt: timestamp('created_at').$defaultFn(() => new Date()).notNull(),
 })
+
+export const episodeRelations = relations(episode, ({ many, one }) => ({
+  // episodeは複数のcharacterを持つ
+  characters: many(character),
+  // episodeは複数のrecordingを持つ
+  recordings: many(recording),
+  // episodeは一人のauthor(user)を持つ
+  author: one(user, {
+    fields: [episode.username],
+    references: [user.username],
+  }),
+}))
+
+export const characterRelations = relations(character, ({ one }) => ({
+  // characterは一つのepisodeに属する
+  episode: one(episode, {
+    fields: [character.episodeId],
+    references: [episode.id],
+  }),
+}))
+
+export const recordingRelations = relations(recording, ({ one }) => ({
+  // recordingは一つのepisodeに属する
+  episode: one(episode, {
+    fields: [recording.episodeId],
+    references: [episode.id],
+  }),
+}))

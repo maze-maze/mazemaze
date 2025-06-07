@@ -1,16 +1,42 @@
-// server/routes/episode.route.ts
-
 import { createRoute } from '@hono/zod-openapi'
+// ★★★ zをインポート ★★★
+import { z } from 'zod'
+import { ErrorSchema } from '../models/error.schema'
 import {
   EpisodeCreateRequestSchema,
   EpisodeCreateResponseSchema,
+  // ★★★ EpisodeGetResponseSchemaをインポート ★★★
+  EpisodeGetResponseSchema,
 } from '../models/episode.schema'
-import { ErrorSchema } from '../models/error.schema'
+
+// ★★★ ここから追加 ★★★
+export const getEpisodeRoute = createRoute({
+  path: '/{id}',
+  method: 'get',
+  description: 'IDで指定されたエピソードを一件取得します',
+  request: {
+    params: z.object({
+      id: z.string().openapi({
+        param: { name: 'id', in: 'path' },
+        example: '00000000-0000-0000-0000-000000000000',
+      }),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'エピソードの取得に成功',
+      content: { 'application/json': { schema: EpisodeGetResponseSchema } },
+    },
+    404: { description: 'エピソードが見つかりません', content: { 'application/json': { schema: ErrorSchema } } },
+    500: { description: 'サーバーエラー', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+// ★★★ ここまで追加 ★★★
 
 export const createEpisodeRoute = createRoute({
   path: '/',
   method: 'post',
-  description: '新しいエピソードを作成し、音声情報を保存します',
+  description: '新しいエピソードを作成します',
   request: {
     body: {
       content: {
