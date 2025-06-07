@@ -4,4 +4,5 @@ export const StorageKeys = {
   GUEST: 'podcast-guest-character',
   STRUCTURE: 'podcast-structure',
   SCRIPT: 'podcast-script',
+  USERNAME: 'podcast-username',
 } as const

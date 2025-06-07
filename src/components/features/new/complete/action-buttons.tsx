@@ -1,15 +1,17 @@
 // src/components/complete-page/action-buttons.tsx
 'use client'
 
-import { Button, buttonVariants } from '🎙️/components/ui/button'
+import { Button } from '🎙️/components/ui/button'
 import { Podcast } from 'lucide-react'
 import React from 'react'
 
 interface ActionButtonsProps {
   onRestart: () => void
+  onProceedToRecording: () => void // 追加
+  isSaving: boolean // 追加
 }
 
-export default function ActionButtons({ onRestart }: ActionButtonsProps) {
+export default function ActionButtons({ onRestart, onProceedToRecording, isSaving }: ActionButtonsProps) {
   return (
     <div className="mt-10 mb-6 flex flex-col sm:flex-row justify-center items-center gap-4">
       <Button
@@ -17,20 +19,26 @@ export default function ActionButtons({ onRestart }: ActionButtonsProps) {
         size="lg"
         variant="secondary"
         className="w-full sm:w-auto"
+        disabled={isSaving}
       >
         もう一度生成する
       </Button>
-      <a
-        href="/new/recording"
-        className={buttonVariants({
-          size: 'lg',
-          variant: 'default',
-          className: 'w-full sm:w-auto',
-        })}
+      <Button
+        size="lg"
+        variant="default"
+        className="w-full sm:w-auto"
+        onClick={onProceedToRecording} // 変更
+        disabled={isSaving} // 追加
       >
-        <Podcast size={20} className="mr-2" />
-        録音に進む
-      </a>
+        {isSaving
+          ? '準備中...'
+          : (
+              <>
+                <Podcast size={20} className="mr-2" />
+                録音に進む
+              </>
+            )}
+      </Button>
     </div>
   )
 }

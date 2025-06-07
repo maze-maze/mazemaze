@@ -4,7 +4,8 @@
 import { StorageKeys } from '🎙️/lib/storage-keys'
 import { PlayIcon } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react' // useEffectを追加
 import MicImage from './assets/mingcute_mic-ai-fill.svg'
 import Background from './background'
 import Character from './character'
@@ -16,31 +17,69 @@ import Scripts from './scripts'
 import Title from './title'
 
 export default function RecordingPage() {
-  if (typeof window === 'undefined')
-    return null
+  const router = useRouter()
+  // 1. sessionStorageから読み込むデータをstateとして定義
+  const [prompt, setPrompt] = useState('')
+  const [isReady, setIsReady] = useState(false) // データ読み込み完了フラグ
 
-  const { title, character, script } = useRecordingScripts()
+  const { title, character, script, username } = useRecordingScripts()
   const [voice] = useState('ash')
-  const [prompt] = useState(`
-    ## 概要
-    これから${JSON.parse(window.sessionStorage.getItem(StorageKeys.THEME)!).theme}というタイトルのポッドキャストを収録します。
 
-    ## ルール
-    これから説明する、「役割」と「収録内容」に沿うことが重要です。絶対にこのルールに従ってください。
+  const searchParams = useSearchParams()
+  const episodeId = searchParams.get('episodeId')
 
-    ## 役割
-    あなたはポッドキャストのゲスト（${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).name}）です。
-    メインパーソナリティの${JSON.parse(window.sessionStorage.getItem(StorageKeys.MAIN)!).name}と共にポッドキャストを収録します。
+  // 2. useEffectを使って、クライアントサイドでのみデータを読み込む
+  useEffect(() => {
+    // sessionStorageから安全にデータを取得
+    const themeItem = sessionStorage.getItem(StorageKeys.THEME)
+    const guestItem = sessionStorage.getItem(StorageKeys.GUEST)
+    const mainItem = sessionStorage.getItem(StorageKeys.MAIN)
+    const scriptItem = sessionStorage.getItem(StorageKeys.SCRIPT)
 
-    あなたの名前と詳細は以下の通りです。この人物像になりきって話を進めてください。
-    名前：${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).name}
-    詳細：${JSON.parse(window.sessionStorage.getItem(StorageKeys.GUEST)!).description}
+    // 必要なデータが揃っているか確認
+    if (!themeItem || !guestItem || !mainItem || !scriptItem) {
+      alert('セッションデータが不完全です。前のページに戻ってください。')
+      // window.history.back(); // 必要に応じて前のページに戻す
+      return
+    }
 
-    ## 収録内容
-    そして、以下の台本に沿って収録を行います。絶対にこの台本に沿って話を進めてください。
-    タイトル: ${JSON.parse(window.sessionStorage.getItem(StorageKeys.THEME)!).theme}
-    台本: ${JSON.parse(window.sessionStorage.getItem(StorageKeys.SCRIPT)!)}
-    `)
+    // JSON.parseはtry...catchで囲むとより安全
+    try {
+      const themeObj = JSON.parse(themeItem)
+      const guestObj = JSON.parse(guestItem)
+      const mainObj = JSON.parse(mainItem)
+      const scriptText = JSON.parse(scriptItem)
+
+      // promptを構築
+      const newPrompt = `
+## 概要
+これから${themeObj.theme}というタイトルのポッドキャストを収録します。
+
+## ルール
+これから説明する、「役割」と「収録内容」に沿うことが重要です。絶対にこのルールに従ってください。
+
+## 役割
+あなたはポッドキャストのゲスト（${guestObj.name}）です。
+メインパーソナリティの${mainObj.name}と共にポッドキャストを収録します。
+
+あなたの名前と詳細は以下の通りです。この人物像になりきって話を進めてください。
+名前：${guestObj.name}
+詳細：${guestObj.description}
+
+## 収録内容
+そして、以下の台本に沿って収録を行います。絶対にこの台本に沿って話を進めてください。
+タイトル: ${themeObj.theme}
+台本: ${scriptText}
+`
+      // stateを更新
+      setPrompt(newPrompt)
+      setIsReady(true) // 準備完了フラグを立てる
+    }
+    catch (e) {
+      console.error('セッションデータの解析に失敗しました:', e)
+      alert('セッションデータの形式が正しくありません。')
+    }
+  }, []) // 空の依存配列[]で、マウント時に一度だけ実行
 
   const {
     status,
@@ -50,10 +89,49 @@ export default function RecordingPage() {
     playRecording,
     recordingDuration,
     countdown,
+    isSaving,
+    saveRecording,
   } = useWebRTCAudioSession(voice, prompt)
+
   const isRecording = status !== 'idle' && status !== 'connecting' && !countdown
   const isFinished = status === 'finish' || status === 'disconnected'
 
+  // 3. データの準備が整うまで何も表示しないか、ローディング画面を表示する
+  if (!isReady) {
+    // サーバーとクライアントで最初の描画が一致するように、ローディング表示などを返す
+    return <div>セッションデータを読み込み中...</div>
+  }
+
+  // ★★★ 3. 保存処理のハンドラを正しく定義
+  const handleSaveRecording = async () => {
+    if (!episodeId) {
+      alert('エピソードIDが見つかりません。保存できません。')
+      return
+    }
+    // 変更点: usernameもチェック
+    if (!username) {
+      alert('ユーザー名が取得できません。保存できません。')
+      return
+    }
+
+    try {
+    // 変更点: saveRecordingにusernameを渡す
+      await saveRecording(episodeId, username)
+
+      // alert('保存が完了しました！')
+      router.push(`/episode/${episodeId}`)
+    }
+    catch (error) {
+    // フックからスローされたエラーをキャッチ
+      alert((error as Error).message)
+    }
+  }
+
+  if (!isReady) {
+    return <div>セッションデータを読み込み中...</div>
+  }
+
+  // 準備が整ったら、メインのコンポーネントを表示
   return (
     <div className="grid grid-flow-row auto-rows-max h-dvh relative">
       <Title title={title} isRecording={isRecording} isFinished={isFinished} />
@@ -62,7 +140,6 @@ export default function RecordingPage() {
       {isRecording && <Scripts script={script} conversation={conversation} />}
       {countdown && <Countdown seconds={countdown} />}
       {isFinished && recordedBlob && (
-
         <div className="fixed bottom-0 right-1/2 translate-x-1/2 bg-white min-h-1/2 py-3 rounded-t-4xl w-full max-w-md flex flex-col items-center justify-center gap-4">
           <Image
             src={MicImage}
@@ -93,47 +170,15 @@ export default function RecordingPage() {
           </p>
           <div className="flex items-center gap-6 mt-2">
             <button className="py-4 px-8 bg-gray-200 text-black font-bold rounded-full" onClick={() => { alert('まだ開発してないよ😢') }}>収録に戻る</button>
-            <button className="py-4 px-10 bg-black text-white font-bold rounded-full">保存する</button>
+            <button
+              className="py-4 px-10 bg-black text-white font-bold rounded-full disabled:opacity-50"
+              onClick={handleSaveRecording}
+              disabled={isSaving}
+            >
+              {isSaving ? '保存中...' : '保存する'}
+            </button>
           </div>
         </div>
-        // <div className="w-60 border border-white bg-white/50 backdrop-blur fixed bottom-10 right-1/2 translate-x-1/2 flex flex-col items-center py-3 px-2 justify-center rounded-2xl">
-        //   <Button className="text-white/90 bg-transparent hover:bg-transparent rounded-full mb-2 mr-2 w-full" aria-label="Finish recording">
-        //     <ArrowLeftIcon />
-        //     <span>収録を再開する</span>
-        //   </Button>
-        //   <div className="bg-white/20 rounded-xl py-3 px-1.5 flex items-center justify-center flex-col gap-2 w-full">
-        //     <MicIcon className="size-8 text-white" />
-        //     <p className="text-center">
-        //       収録が完了しました
-        //       <br />
-        //       お疲れ様でした！
-        //     </p>
-        //     <p className="text-sm text-white/90">
-        //       {Math.round(recordedBlob.size / 1024)}
-        //       KB |
-        //       {' '}
-        //       {Math.floor(recordingDuration / 60)}
-        //       :
-        //       {(recordingDuration % 60).toString().padStart(2, '0')}
-        //       s
-        //     </p>
-        //   </div>
-        //   <div className="flex items-center gap-2 mt-2">
-        //     <Button className="text-blue-200 bg-transparent hover:bg-transparent rounded-full" aria-label="Finish recording">
-        //       <CheckIcon />
-        //       <span>保存する</span>
-        //     </Button>
-        //     <div className="h-3 w-[1px] bg-white/50" />
-        //     <Button
-        //       className="text-blue-200 bg-transparent hover:bg-transparent rounded-full"
-        //       aria-label="Play recording"
-        //       onClick={playRecording}
-        //     >
-        //       <PlayIcon />
-        //       <span>再生する</span>
-        //     </Button>
-        //   </div>
-        // </div>
       )}
       <Controller
         time={`${Math.floor(recordingDuration / 60)}:${(recordingDuration % 60).toString().padStart(2, '0')}`}

@@ -1,70 +1,95 @@
-// src/components/user-page/user-page.tsx
 /* eslint-disable no-console */
 'use client'
 
 import { AlignJustify } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useQueryState } from 'nuqs'
-import React, { useState } from 'react'
-import Background from '../layout/backgeound'
+import React, { useEffect, useState } from 'react'
 
+import Background from '../layout/backgeound'
 import Header from '../layout/header'
 import NavigationBar from '../layout/navigation-bar'
+// ★★★ 隣のactions.tsからサーバー関数をインポート ★★★
+import { getEpisodesByUsername, getUserProfile } from './actions'
 import MenuModal from './menu-modal'
 import ProfileInfo from './profile-info'
 import TabSwitcher from './tab-switcher'
 import ThemeGrid from './theme-grid'
 
-export default function UserPage({ name }: { name: string }) {
-  // モックデータ
-  const [themes] = useState<string[]>([
-    '謎の未確認生物 UMA探訪記',
-    '異世界転生グルメ紀行',
-    '昭和レトロ喫茶の魅力',
-    '宇宙人と語る夜',
-    'AIが選ぶ名作映画',
-  ])
-  const [likedThemes] = useState<string[]>([
-    '昭和レトロ喫茶の魅力',
-    'AIが選ぶ名作映画',
-    '異世界転生グルメ紀行',
-  ])
-  const gradients = [
-    'bg-gradient-to-b from-red-500 to-pink-300',
-    'bg-gradient-to-b from-blue-600 to-blue-200',
-    'bg-gradient-to-b from-yellow-400 to-yellow-200',
-    'bg-gradient-to-b from-green-400 to-green-200',
-    'bg-gradient-to-b from-purple-400 to-purple-200',
-  ]
+// ★★★ サーバー関数から型を定義 ★★★
+type Episode = Awaited<ReturnType<typeof getEpisodesByUsername>>[number]
+
+export default function UserPage() {
+  // --- パスからユーザー名を取得 ---
+  const pathname = usePathname()
+  const segments = pathname.split('/')
+  const usernameFromPath = segments[segments.length - 1]
+
+  // --- State定義 ---
+  const [displayName, setDisplayName] = useState('')
+  const [episodes, setEpisodes] = useState<Episode[]>([])
+  const likedThemes: never[] = []
+  const [isLoading, setIsLoading] = useState(true)
 
   const [activeTab] = useQueryState('tab', { defaultValue: 'posts' })
-  const displayThemes = activeTab === 'posts' ? themes : likedThemes
+  const displayThemes = activeTab === 'posts' ? episodes : likedThemes
 
   // モーダル状態
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // --- データ取得処理 ---
+  useEffect(() => {
+    if (!usernameFromPath)
+      return
+
+    const fetchData = async () => {
+      setIsLoading(true)
+      try {
+        // ★★★ ここのデータ取得処理を正しく記述 ★★★
+        const [fetchedEpisodes, userProfile] = await Promise.all([
+          getEpisodesByUsername(usernameFromPath),
+          getUserProfile(usernameFromPath),
+        ])
+
+        // 取得したデータをStateにセット
+        setEpisodes(fetchedEpisodes)
+        setDisplayName(userProfile?.name ?? usernameFromPath)
+      }
+      catch (error) {
+        console.error('Failed to fetch user data:', error)
+        setDisplayName('ユーザーが見つかりません')
+      }
+      finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [usernameFromPath])
 
   const handleBilling = () => {
     console.log('Billing clicked')
     setMenuOpen(false)
   }
-
   const handleOpenMenu = () => setMenuOpen(true)
   const handleCloseMenu = () => setMenuOpen(false)
-
-  const pathname = usePathname()
-  const segments = pathname.split('/')
-  const usernameFromPath = segments[segments.length - 1]
 
   return (
     <div className="relative bg-[#0E0B16] min-h-screen flex flex-col items-center w-full h-full pt-10">
       <Header Icon={AlignJustify} onIconClick={handleOpenMenu} />
       <Background />
 
-      <ProfileInfo displayName={name} username={usernameFromPath} />
+      <ProfileInfo displayName={displayName} username={usernameFromPath} />
       <TabSwitcher />
 
       <div className="grid grid-cols-2 gap-4 px-6 mt-4 mb-40 w-full z-10">
-        <ThemeGrid displayThemes={displayThemes} gradients={gradients} />
+        {isLoading
+          ? (
+              <p className="text-white col-span-2 text-center">読み込み中...</p>
+            )
+          : (
+              <ThemeGrid displayThemes={displayThemes} />
+            )}
       </div>
 
       <NavigationBar />

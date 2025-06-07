@@ -25,14 +25,14 @@ export function useRecordingScripts() {
   useEffect(() => {
     const theme = window.sessionStorage.getItem(StorageKeys.THEME)!
     const script = window.sessionStorage.getItem(StorageKeys.SCRIPT)!
-    const mainCharacter = window.sessionStorage.getItem(StorageKeys.MAIN)!
     const guestCharacter = window.sessionStorage.getItem(StorageKeys.GUEST)!
+    const username = window.sessionStorage.getItem(StorageKeys.USERNAME)!
 
     setData({
       title: JSON.parse(theme).theme,
       character: 'character',
       script,
-      username: JSON.parse(mainCharacter).name,
+      username,
       guest: {
         name: JSON.parse(guestCharacter).name,
         description: JSON.parse(guestCharacter).description,

@@ -1,10 +1,12 @@
-// src/components/complete-page/complete-page.tsx
+/* eslint-disable import/no-duplicates */
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 /* eslint-disable unused-imports/no-unused-vars */
 'use client'
 
 import { ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation' // useRouterをインポート
+import { useState } from 'react' // useStateをインポート
 import React from 'react'
 import ActionButtons from './action-buttons'
 import CharacterInfo from './character-info'
@@ -28,6 +30,7 @@ interface Structure {
 
 interface ThemeObject {
   theme: string
+  gradient: string
 }
 
 const StorageKeys = {
@@ -42,6 +45,7 @@ interface CompletePageProps {
   themeObj: ThemeObject | null
   character: Character | null
   guestCharacter: Character | null
+  gradient?: string // オプションとして追加
   structure: Structure | null
   script: string | null
   onBack: () => void
@@ -57,10 +61,52 @@ export default function CompletePage({
   onBack,
   onRestart,
 }: CompletePageProps) {
+  const router = useRouter() // routerインスタンスを取得
+  const [isSaving, setIsSaving] = useState(false) // ローディング状態
+
+  // 「録音に進む」ボタンが押されたときの処理
+  const handleProceedToRecording = async () => {
+    if (!themeObj || !script || !character) {
+      alert('エピソードのデータが不完全です。')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch('/api/episodes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: themeObj.theme,
+          gradient: themeObj.gradient,
+          script,
+          mainCharacter: character,
+          guestCharacter,
+          // gradient: '...' // 必要なら追加
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('エピソードの作成に失敗しました。')
+      }
+
+      const data = await response.json()
+      const { episodeId } = data
+
+      // episodeIdをクエリパラメータとして付けて録音ページに遷移
+      window.location.href = `/new/recording?episodeId=${episodeId}`
+    }
+    catch (error) {
+      console.error(error)
+      alert((error as Error).message)
+      setIsSaving(false)
+    }
+  }
   const handleCheckSessionStorage = () => {
     console.log('--- Current State (in React) ---')
-    console.log('Theme:', themeObj)
+    console.log('Theme:', themeObj?.theme)
     console.log('Main Character:', character)
+    console.log('gradient:', themeObj?.gradient)
     console.log('Guest Character:', guestCharacter)
     console.log('Structure:', structure)
     console.log('Script:', script)
@@ -74,6 +120,7 @@ export default function CompletePage({
         `${StorageKeys.MAIN}:`,
         sessionStorage.getItem(StorageKeys.MAIN),
       )
+
       console.log(
         `${StorageKeys.GUEST}:`,
         sessionStorage.getItem(StorageKeys.GUEST),
@@ -134,7 +181,11 @@ export default function CompletePage({
           />
           <StructureInfo structure={structure} />
           <ScriptInfo script={script} />
-          <ActionButtons onRestart={onRestart} />
+          <ActionButtons
+            onRestart={onRestart}
+            onProceedToRecording={handleProceedToRecording}
+            isSaving={isSaving}
+          />
         </div>
       </div>
     </div>

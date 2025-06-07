@@ -5,6 +5,8 @@ import { z } from 'zod'
 export const env = createEnv({
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
   },
   server: {
     DATABASE_URL: z.string(),
@@ -18,6 +20,7 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: z.string(),
     API_DOC_BASIC_AUTH_USER: z.string(),
     API_DOC_BASIC_AUTH_PASS: z.string(),
+    OPENAI_API_KEY: z.string(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -28,9 +31,12 @@ export const env = createEnv({
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     API_DOC_BASIC_AUTH_USER: process.env.API_DOC_BASIC_AUTH_USER,
     API_DOC_BASIC_AUTH_PASS: process.env.API_DOC_BASIC_AUTH_PASS,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   },
 })
