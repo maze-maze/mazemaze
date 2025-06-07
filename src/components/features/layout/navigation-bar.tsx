@@ -1,5 +1,6 @@
 'use client'
 import { authClient } from '🎙️/lib/auth-client'
+import { StorageKeys } from '🎙️/lib/storage-keys'
 import { Home, Plus, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -11,7 +12,7 @@ export default function NavigationBar() {
   const router = useRouter()
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       const { data: sessionData, error } = await authClient.getSession()
       if (!sessionData?.user?.id || error) {
         setIsLoading(false)
@@ -45,6 +46,13 @@ export default function NavigationBar() {
       router.push(route)
     }
   }
+
+  useEffect(() => {
+    if (username) {
+      // sessionStorageに値を保存
+      sessionStorage.setItem(StorageKeys.USERNAME, username)
+    }
+  }, [username, router])
 
   return (
     <div
