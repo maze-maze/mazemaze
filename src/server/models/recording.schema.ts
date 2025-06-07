@@ -3,7 +3,8 @@ import { z } from '@hono/zod-openapi'
 import { recording } from '🎙️/db/schema'
 import { createSelectSchema } from 'drizzle-zod'
 
-export const RecordingCreateRequestSchema = z.object({
+export const RecordingCreateRequestSchema = z.object({　
+    userId: z.string(),
   episodeId: z.string(),
   audioUrl: z.string().url(),
   duration: z.number().int().positive(),

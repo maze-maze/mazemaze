@@ -2,8 +2,8 @@
 'use client'
 
 import type { Conversation, Status } from '🎙️/lib/types/recording'
-import { createClient } from '🎙️/utils/supabase/client'
 import { useEffect, useRef, useState } from 'react'
+import { createClient } from '🎙️/utils/supabase/client'
 
 // ヘルパー関数：イベントハンドラ内で安全に使用できるID生成関数
 function generateUniqueId() {
@@ -25,7 +25,7 @@ interface UseWebRTCAudioSessionReturn {
   recordingDuration: number
   countdown: number | null
   isSaving: boolean
-  saveRecording: (episodeId: string) => Promise<void>
+  saveRecording: (episodeId: string, userId: string, username: string) => Promise<void>
 }
 
 export default function useWebRTCAudioSession(
@@ -45,11 +45,11 @@ export default function useWebRTCAudioSession(
   const recordingIntervalRef = useRef<number | null>(null)
   const countdownIntervalRef = useRef<number | null>(null)
 
-  // --- 保存処理中の状態を追加 ---
-  const [isSaving, setIsSaving] = useState(false)
+   // --- 保存処理中の状態を追加 ---
+   const [isSaving, setIsSaving] = useState(false)
 
-  // --- Supabaseクライアントをインスタンス化 ---
-  const supabase = createClient()
+   // --- Supabaseクライアントをインスタンス化 ---
+   const supabase = createClient()
 
   // 音声ミックス用の参照
   const mixedAudioContextRef = useRef<AudioContext | null>(null)
@@ -498,8 +498,7 @@ export default function useWebRTCAudioSession(
           setRecordingDuration(elapsed)
         }
       }, 1000)
-    }
-    catch (error) {
+    } catch (error) {
       console.error('録音開始エラー:', error)
     }
   }
@@ -536,53 +535,53 @@ export default function useWebRTCAudioSession(
     }
   }
 
-  // --- ★★★ ここからが新規・修正の主要部分 ★★★ ---
 
+// ★★★ 2. saveRecording 関数を修正 ★★★
   /**
    * 録音されたBlobをSupabaseにアップロードし、API経由でDBに保存する
    * @param episodeId - 保存対象のエピソードID
+   * @param userId - 保存対象のユーザーID
+   * @param username - ファイルパスに使用するユーザー名
    */
-  async function saveRecording(episodeId: string) {
+  async function saveRecording(episodeId: string, userId: string, username: string) {
     if (!recordedBlob) {
       alert('保存する録音データがありません。')
       return
     }
-    if (isSaving)
-      return
+    if (isSaving) return
 
     setIsSaving(true)
 
     try {
-      // 1. ユーザー情報を取得
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user)
-        throw new Error('ユーザーが認証されていません。')
+      if (!username) {
+        throw new Error('ユーザー名が取得できませんでした。ファイルパスを作成できません。')
+      }
+      if (!userId) {
+        throw new Error('ユーザーIDが取得できませんでした。')
+      }
 
-      // 2. ファイルパスを一意に決定 (例: userId/timestamp.webm)
-      const filePath = `${user.id}/${Date.now()}.webm`
+      const filePath = `${username}/${Date.now()}.webm`
 
-      // 3. Supabase Storageにアップロード
       const { error: uploadError } = await supabase.storage
-        .from('recordings') // Supabaseで作成したバケット名
+        .from('recordings')
         .upload(filePath, recordedBlob, {
           contentType: 'audio/webm',
           upsert: false,
         })
 
-      if (uploadError)
-        throw uploadError
+      if (uploadError) throw uploadError
 
-      // 4. アップロードしたファイルの公開URLを取得
       const { data: { publicUrl } } = supabase.storage
         .from('recordings')
         .getPublicUrl(filePath)
-
-      // 5. /api/recordings エンドポイントにデータを送信
+      
+      // /api/recordings エンドポイントにデータを送信
       const response = await fetch('/api/recordings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           episodeId,
+          userId, // ★★★ userIdをリクエストボディに含める
           audioUrl: publicUrl,
           duration: recordingDuration,
         }),
@@ -595,13 +594,11 @@ export default function useWebRTCAudioSession(
 
       const newRecording = await response.json()
       console.log('録音情報の保存成功！:', newRecording)
-      alert('録音の保存が完了しました！')
-    }
-    catch (error) {
+      
+    } catch (error) {
       console.error('録音の保存エラー:', error)
-      alert((error as Error).message)
-    }
-    finally {
+      throw error
+    } finally {
       setIsSaving(false)
     }
   }

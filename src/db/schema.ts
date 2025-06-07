@@ -96,6 +96,7 @@ export const recording = pgTable('recording', {
   id: text('id').primaryKey(),
   episodeId: text('episode_id').notNull().references(() => episode.id, { onDelete: 'cascade' }),
 
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   audioUrl: text('audio_url').notNull(),
   mimeType: text('mime_type'),
   duration: text('duration'), // 録音時間（例: "00:45"）

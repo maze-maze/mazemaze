@@ -20,6 +20,7 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: z.string(),
     API_DOC_BASIC_AUTH_USER: z.string(),
     API_DOC_BASIC_AUTH_PASS: z.string(),
+    OPENAI_API_KEY: z.string(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -36,5 +37,6 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     API_DOC_BASIC_AUTH_USER: process.env.API_DOC_BASIC_AUTH_USER,
     API_DOC_BASIC_AUTH_PASS: process.env.API_DOC_BASIC_AUTH_PASS,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   },
 })
