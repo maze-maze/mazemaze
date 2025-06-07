@@ -8,7 +8,8 @@ import Title from './title'
 export default async function ContentsPage({ userId, contentsId }: { userId: string, contentsId: string }) {
   const contents = await getContents(contentsId)
 
-  return (
+  if(contents === null) return
+   return (
     <div className="flex flex-col items-center justify-center gap-4 p-4 h-dvh">
       <Background />
       <Title title={contents.episodeInfo.title} imageUrl={contents.episodeInfo.imageUrl} />
