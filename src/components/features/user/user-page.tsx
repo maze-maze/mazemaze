@@ -88,7 +88,7 @@ export default function UserPage() {
               <p className="text-white col-span-2 text-center">読み込み中...</p>
             )
           : (
-              <ThemeGrid displayThemes={displayThemes} />
+              <ThemeGrid userId={usernameFromPath} displayThemes={displayThemes} />
             )}
       </div>
 

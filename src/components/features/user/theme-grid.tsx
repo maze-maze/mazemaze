@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '🎙️/lib/utils'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 // ★★★ 1. 受け取るデータの型を定義します ★★★
@@ -18,10 +19,13 @@ interface Episode {
 // ★★★ 2. propsの型を更新します ★★★
 // 不要になった `gradients` を削除し、`displayThemes` の型を `Episode[]` に変更
 interface ThemeGridProps {
+  userId: string
   displayThemes: Episode[]
 }
 
-export default function ThemeGrid({ displayThemes }: ThemeGridProps) {
+export default function ThemeGrid({ userId, displayThemes }: ThemeGridProps) {
+  const router = useRouter()
+
   if (displayThemes.length === 0) {
     return (
       <div className="col-span-2 text-center text-gray-400 py-10">
@@ -43,6 +47,9 @@ export default function ThemeGrid({ displayThemes }: ThemeGridProps) {
             // もしgradientが設定されていなければ、デフォルトの背景色を適用します
             episode.gradient ?? 'bg-gradient-to-b from-gray-700 to-gray-900',
           )}
+          onClick={() => {
+            router.push(`/${userId}/${episode.id}`)
+          }}
         >
           {/* episodeオブジェクトからタイトルを表示 */}
           <span className="text-base font-bold text-white">{episode.title}</span>
