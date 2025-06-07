@@ -48,7 +48,7 @@ export async function getContents(contentsId: string) {
       recordingId: recordingData.id,
       audioUrl: recordingData.audioUrl,
       // durationはDBではstring型で保存されている可能性があるため、数値に変換
-      duration: recordingData.duration ? parseInt(recordingData.duration, 10) : 0,
+      duration: recordingData.duration ? Number.parseInt(recordingData.duration, 10) : 0,
       createdAt: recordingData.createdAt.toISOString(),
     } : null, // 録音情報がない場合はnull
     characterInfo: {
@@ -59,12 +59,14 @@ export async function getContents(contentsId: string) {
         // episodeInfo同様、imageUrlはスキーマにないため固定値とします
         imageUrl: '/characters/character.png',
       } : null, // メインキャラクターがいない場合はnull
-      guestCharacter: guestCharacterData ? {
-        name: guestCharacterData.name,
-        description: guestCharacterData.description,
-        tone: guestCharacterData.tone,
-        imageUrl: '/characters/guest.png',
-      } : null, // ゲストキャラクターがいない場合はnull
+      guestCharacter: guestCharacterData
+        ? {
+            name: guestCharacterData.name,
+            description: guestCharacterData.description,
+            tone: guestCharacterData.tone,
+            imageUrl: '/characters/guest.png',
+          }
+        : null, // ゲストキャラクターがいない場合はnull
     },
   }
 
